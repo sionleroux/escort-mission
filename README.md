@@ -1,22 +1,6 @@
-# ebiten-game-template
+# Escort Mission
 
 A basic skeleton for a 2D game using the [Ebiten](https://ebiten.org/) library.
-
------✂️-----
-
-> ⚠️ After cloning this repository:
-
-> Write your OWN name name in the LICENSE file and run this command to replace the game name (tested on Linux and Mac):
-
-```bash
-grep -Rl ebiten-game-template | xargs sed -i '' -e "s/ebiten-game-template/${PWD##*/}/g"
-```
-
-> it assumes that the game name is the name of the current folder because that is what `go build` will call it.
-
-> Then delete this section from the README, and start editing `main.go` to make your own game!
-
------✂️-----
 
 ## For game testers
 
@@ -31,7 +15,7 @@ Game controls:
 
 Make sure you have [Go 1.19 or later](https://go.dev/) to contribute to the game
 
-To build the game yourself, run: `go build .` it will produce an ebiten-game-template file and on Windows ebiten-game-template.exe.
+To build the game yourself, run: `go build .` it will produce an escort-mission file and on Windows escort-mission.exe.
 
 To run the tests, run: `go test ./...` but there are no tests yet.
 
