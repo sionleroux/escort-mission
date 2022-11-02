@@ -9,6 +9,7 @@ import (
 	"image"
 	"image/color"
 	"log"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -24,7 +25,7 @@ func main() {
 	game := &Game{
 		Width:  gameWidth,
 		Height: gameHeight,
-		Player: &Player{image.Pt(gameWidth/2, gameHeight/2)},
+		Player: &Player{image.Pt(gameWidth/2, gameHeight/2), 0},
 	}
 
 	if err := ebiten.RunGame(game); err != nil {
@@ -75,7 +76,10 @@ func (g *Game) Update() error {
 		g.Player.MoveRight()
 	}
 
-	// XXX: Write game logic here
+	cx, cy := ebiten.CursorPosition()
+	adjacent := float64(g.Player.Coords.X - cx)
+	opposite := float64(g.Player.Coords.Y - cy)
+	g.Player.Angle = math.Atan2(opposite, adjacent)
 
 	return nil
 }
@@ -88,6 +92,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		float64(g.Player.Coords.Y),
 		20,
 		20,
+		color.White,
+	)
+	ebitenutil.DrawRect(
+		screen,
+		float64(g.Player.Coords.X)-math.Cos(g.Player.Angle)*20,
+		float64(g.Player.Coords.Y)-math.Sin(g.Player.Angle)*20,
+		10,
+		10,
 		color.White,
 	)
 }

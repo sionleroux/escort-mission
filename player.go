@@ -9,6 +9,7 @@ import "image"
 // Player is the player character in the game
 type Player struct {
 	Coords image.Point
+	Angle  float64
 }
 
 // MoveUp moves the player upwards
