@@ -9,7 +9,7 @@ For alpha testing use [this link](https://nightly.link/sinisterstuf/escort-missi
 Game controls:
 - F: toggle full-screen
 - Q: quit the game
-- Space: move up
+- WASD and mouse to move around
 
 ## For programmers
 
