@@ -4,7 +4,7 @@ A basic skeleton for a 2D game using the [Ebiten](https://ebiten.org/) library.
 
 ## For game testers
 
-<!-- TODO: add a link to the latest downloads page -->
+For alpha testing use [this link](https://nightly.link/sinisterstuf/escort-mission/workflows/build/main/escort-mission-bundle.zip) to download the latest development build.
 
 Game controls:
 - F: toggle full-screen
