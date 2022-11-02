@@ -91,28 +91,3 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		color.White,
 	)
 }
-
-// Player is the player character in the game
-type Player struct {
-	Coords image.Point
-}
-
-// MoveUp moves the player upwards
-func (p *Player) MoveUp() {
-	p.Coords.Y--
-}
-
-// MoveDown moves the player downwards
-func (p *Player) MoveDown() {
-	p.Coords.Y++
-}
-
-// MoveLeft moves the player left
-func (p *Player) MoveLeft() {
-	p.Coords.X--
-}
-
-// MoveRight moves the player right
-func (p *Player) MoveRight() {
-	p.Coords.X++
-}
