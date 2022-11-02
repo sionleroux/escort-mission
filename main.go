@@ -62,8 +62,17 @@ func (g *Game) Update() error {
 	}
 
 	// Movement controls
-	if ebiten.IsKeyPressed(ebiten.KeySpace) {
-		g.Player.Move()
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		g.Player.MoveUp()
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
+		g.Player.MoveLeft()
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyS) {
+		g.Player.MoveDown()
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
+		g.Player.MoveRight()
 	}
 
 	// XXX: Write game logic here
@@ -88,7 +97,22 @@ type Player struct {
 	Coords image.Point
 }
 
-// Move moves the player upwards
-func (p *Player) Move() {
+// MoveUp moves the player upwards
+func (p *Player) MoveUp() {
 	p.Coords.Y--
+}
+
+// MoveDown moves the player downwards
+func (p *Player) MoveDown() {
+	p.Coords.Y++
+}
+
+// MoveLeft moves the player left
+func (p *Player) MoveLeft() {
+	p.Coords.X--
+}
+
+// MoveRight moves the player right
+func (p *Player) MoveRight() {
+	p.Coords.X++
 }
