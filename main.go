@@ -30,7 +30,7 @@ func main() {
 	zs := []*Zombie{}
 	for i := 0; i < HowManyZombies; i++ {
 		z := &Zombie{
-			Object: resolv.NewObject(float64(gameWidth)/((float64(i)+1)*3), float64(gameHeight)/((float64(i)+1)*3), 16, 16),
+			Object: resolv.NewObject(float64(gameWidth)/(float64(i)+1)*3, float64(gameHeight)/(float64(i)+1*3), 16, 16, "mob"),
 			Angle:  0,
 		}
 		space.Add(z.Object)
