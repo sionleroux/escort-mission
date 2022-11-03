@@ -26,6 +26,7 @@ func main() {
 		Width:  gameWidth,
 		Height: gameHeight,
 		Player: &Player{image.Pt(gameWidth/2, gameHeight/2), 0},
+		Zombie: &Zombie{image.Pt(gameWidth/4, gameHeight/4), 0},
 	}
 
 	if err := ebiten.RunGame(game); err != nil {
@@ -38,6 +39,7 @@ type Game struct {
 	Width  int
 	Height int
 	Player *Player
+	Zombie *Zombie
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -86,6 +88,7 @@ func (g *Game) Update() error {
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
+	// Player
 	ebitenutil.DrawRect(
 		screen,
 		float64(g.Player.Coords.X),
@@ -94,6 +97,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		20,
 		color.White,
 	)
+	// Gun
 	ebitenutil.DrawRect(
 		screen,
 		float64(g.Player.Coords.X)-math.Cos(g.Player.Angle)*20,
@@ -101,5 +105,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		10,
 		10,
 		color.White,
+	)
+	// Zombie
+	ebitenutil.DrawRect(
+		screen,
+		float64(g.Zombie.Coords.X),
+		float64(g.Zombie.Coords.Y),
+		20,
+		20,
+		color.RGBA{255, 0, 0, 255},
 	)
 }
