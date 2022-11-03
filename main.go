@@ -83,6 +83,16 @@ func (g *Game) Update() error {
 	opposite := float64(g.Player.Coords.Y - cy)
 	g.Player.Angle = math.Atan2(opposite, adjacent)
 
+	if image.Rect(
+		g.Player.Coords.X, g.Player.Coords.Y,
+		g.Player.Coords.X+20, g.Player.Coords.Y+20,
+	).Overlaps(image.Rect(
+		g.Zombie.Coords.X, g.Zombie.Coords.Y,
+		g.Zombie.Coords.X+20, g.Zombie.Coords.Y+20,
+	)) {
+		return errors.New("you died")
+	}
+
 	return nil
 }
 
