@@ -6,6 +6,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"image/color"
 	"log"
 	"math"
@@ -24,6 +25,7 @@ func main() {
 
 	ebiten.SetWindowSize(gameWidth, gameHeight)
 	ebiten.SetWindowTitle("Escort Mission")
+	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
 	space := resolv.NewSpace(gameWidth, gameHeight, 20, 20)
 
@@ -167,4 +169,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			color.RGBA{255, 0, 0, 255},
 		)
 	}
+	ebitenutil.DebugPrint(screen, fmt.Sprintf(
+		"FPS: %.2f\nTPS: %.2f",
+		ebiten.ActualFPS(),
+		ebiten.ActualTPS(),
+	))
 }
