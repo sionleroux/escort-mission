@@ -16,32 +16,27 @@ type Zombie struct {
 
 // MoveUp moves the player upwards
 func (z *Zombie) MoveUp() {
-	dy := -1.0
-	if collision := z.Object.Check(0, dy, "mob", "wall"); collision == nil {
-		z.Object.Y += dy
-	}
+	z.move(0, -1)
 }
 
 // MoveDown moves the player downwards
 func (z *Zombie) MoveDown() {
-	dy := 1.0
-	if collision := z.Object.Check(0, dy, "mob", "wall"); collision == nil {
-		z.Object.Y += dy
-	}
+	z.move(0, 1)
 }
 
 // MoveLeft moves the player left
 func (z *Zombie) MoveLeft() {
-	dx := -1.0
-	if collision := z.Object.Check(dx, 0, "mob", "wall"); collision == nil {
-		z.Object.X += dx
-	}
+	z.move(-1, 0)
 }
 
 // MoveRight moves the player right
 func (z *Zombie) MoveRight() {
-	dx := 1.0
-	if collision := z.Object.Check(dx, 0, "mob", "wall"); collision == nil {
+	z.move(1, 0)
+}
+
+func (z *Zombie) move(dx, dy float64) {
+	if collision := z.Object.Check(dx, dy, "mob", "wall"); collision == nil {
 		z.Object.X += dx
+		z.Object.Y += dy
 	}
 }
