@@ -19,20 +19,28 @@ type Player struct {
 
 // MoveUp moves the player upwards
 func (p *Player) MoveUp() {
-	p.Object.Y -= playerSpeed
+	p.move(0, -playerSpeed)
 }
 
 // MoveDown moves the player downwards
 func (p *Player) MoveDown() {
-	p.Object.Y += playerSpeed
+	p.move(0, playerSpeed)
 }
 
 // MoveLeft moves the player left
 func (p *Player) MoveLeft() {
-	p.Object.X -= playerSpeed
+	p.move(-playerSpeed, 0)
 }
 
 // MoveRight moves the player right
 func (p *Player) MoveRight() {
-	p.Object.X += playerSpeed
+	p.move(playerSpeed, 0)
+}
+
+// Move the Player by the given vector if it is possible to do so
+func (p *Player) move(dx, dy float64) {
+	if collision := p.Object.Check(dx, dy, "wall"); collision == nil {
+		p.Object.X += dx
+		p.Object.Y += dy
+	}
 }
