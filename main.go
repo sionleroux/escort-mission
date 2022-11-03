@@ -6,7 +6,6 @@ package main
 
 import (
 	"errors"
-	"image"
 	"image/color"
 	"log"
 	"math"
@@ -14,6 +13,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/solarlune/resolv"
 )
 
 // HowManyZombies is how many zombies to generate at the start of the game
@@ -25,16 +25,27 @@ func main() {
 	ebiten.SetWindowSize(gameWidth, gameHeight)
 	ebiten.SetWindowTitle("Escort Mission")
 
+	space := resolv.NewSpace(gameWidth, gameHeight, 20, 20)
+
 	zs := []*Zombie{}
 	for i := 0; i < HowManyZombies; i++ {
-		zs = append(zs, &Zombie{image.Pt(gameWidth/(i+1)*3, gameHeight/(i+1)*3), 0})
+		z := &Zombie{
+			Object: resolv.NewObject(float64(gameWidth)/((float64(i)+1)*3), float64(gameHeight)/((float64(i)+1)*3), 16, 16),
+			Angle:  0,
+		}
+		space.Add(z.Object)
+		zs = append(zs, z)
 	}
+
+	player := &Player{resolv.NewObject(float64(gameWidth/2), float64(gameHeight/2), 20, 20), 0}
+	space.Add(player.Object)
 
 	game := &Game{
 		Width:   gameWidth,
 		Height:  gameHeight,
-		Player:  &Player{image.Pt(gameWidth/2, gameHeight/2), 0},
+		Player:  player,
 		Zombies: zs,
+		Space:   space,
 	}
 
 	if err := ebiten.RunGame(game); err != nil {
@@ -48,6 +59,7 @@ type Game struct {
 	Height  int
 	Player  *Player
 	Zombies []*Zombie
+	Space   *resolv.Space
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -88,37 +100,37 @@ func (g *Game) Update() error {
 
 	// Move zombie towards player
 	for _, z := range g.Zombies {
-		if z.Coords.X < g.Player.Coords.X {
+		if z.Object.X < g.Player.Object.X {
 			z.MoveRight()
 		}
-		if z.Coords.X > g.Player.Coords.X {
+		if z.Object.X > g.Player.Object.X {
 			z.MoveLeft()
 		}
-		if z.Coords.Y < g.Player.Coords.Y {
+		if z.Object.Y < g.Player.Object.Y {
 			z.MoveDown()
 		}
-		if z.Coords.Y > g.Player.Coords.Y {
+		if z.Object.Y > g.Player.Object.Y {
 			z.MoveUp()
 		}
 	}
 
 	// Player gun rotation
 	cx, cy := ebiten.CursorPosition()
-	adjacent := float64(g.Player.Coords.X - cx)
-	opposite := float64(g.Player.Coords.Y - cy)
+	adjacent := g.Player.Object.X - float64(cx)
+	opposite := g.Player.Object.Y - float64(cy)
 	g.Player.Angle = math.Atan2(opposite, adjacent)
 
 	// Collision detection and response between zombie and player
-	for _, z := range g.Zombies {
-		if image.Rect(
-			g.Player.Coords.X, g.Player.Coords.Y,
-			g.Player.Coords.X+20, g.Player.Coords.Y+20,
-		).Overlaps(image.Rect(
-			z.Coords.X, z.Coords.Y,
-			z.Coords.X+20, z.Coords.Y+20,
-		)) {
+	if collision := g.Player.Object.Check(0, 0); collision != nil {
+		if g.Player.Object.Overlaps(collision.Objects[0]) {
+			log.Printf("%#v", collision)
 			return errors.New("you died")
 		}
+	}
+
+	g.Player.Object.Update()
+	for _, z := range g.Zombies {
+		z.Object.Update()
 	}
 
 	return nil
@@ -129,17 +141,17 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Player
 	ebitenutil.DrawRect(
 		screen,
-		float64(g.Player.Coords.X),
-		float64(g.Player.Coords.Y),
-		20,
-		20,
+		g.Player.Object.X,
+		g.Player.Object.Y,
+		g.Player.Object.W,
+		g.Player.Object.H,
 		color.White,
 	)
 	// Gun
 	ebitenutil.DrawRect(
 		screen,
-		float64(g.Player.Coords.X)-math.Cos(g.Player.Angle)*20,
-		float64(g.Player.Coords.Y)-math.Sin(g.Player.Angle)*20,
+		g.Player.Object.X-math.Cos(g.Player.Angle)*20,
+		g.Player.Object.Y-math.Sin(g.Player.Angle)*20,
 		10,
 		10,
 		color.White,
@@ -148,10 +160,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for _, z := range g.Zombies {
 		ebitenutil.DrawRect(
 			screen,
-			float64(z.Coords.X),
-			float64(z.Coords.Y),
-			20,
-			20,
+			z.Object.X,
+			z.Object.Y,
+			z.Object.W,
+			z.Object.H,
 			color.RGBA{255, 0, 0, 255},
 		)
 	}

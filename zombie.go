@@ -4,30 +4,32 @@
 
 package main
 
-import "image"
+import (
+	"github.com/solarlune/resolv"
+)
 
 // Zombie is the player character in the game
 type Zombie struct {
-	Coords image.Point
+	Object *resolv.Object
 	Angle  float64
 }
 
 // MoveUp moves the player upwards
 func (z *Zombie) MoveUp() {
-	z.Coords.Y--
+	z.Object.Y--
 }
 
 // MoveDown moves the player downwards
 func (z *Zombie) MoveDown() {
-	z.Coords.Y++
+	z.Object.Y++
 }
 
 // MoveLeft moves the player left
 func (z *Zombie) MoveLeft() {
-	z.Coords.X--
+	z.Object.X--
 }
 
 // MoveRight moves the player right
 func (z *Zombie) MoveRight() {
-	z.Coords.X++
+	z.Object.X++
 }
