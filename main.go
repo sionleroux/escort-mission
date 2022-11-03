@@ -16,17 +16,25 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+// HowManyZombies is how many zombies to generate at the start of the game
+const HowManyZombies int = 5
+
 func main() {
 	gameWidth, gameHeight := 640, 480
 
 	ebiten.SetWindowSize(gameWidth, gameHeight)
 	ebiten.SetWindowTitle("Escort Mission")
 
+	zs := []*Zombie{}
+	for i := 0; i < HowManyZombies; i++ {
+		zs = append(zs, &Zombie{image.Pt(gameWidth/(i+1)*3, gameHeight/(i+1)*3), 0})
+	}
+
 	game := &Game{
-		Width:  gameWidth,
-		Height: gameHeight,
-		Player: &Player{image.Pt(gameWidth/2, gameHeight/2), 0},
-		Zombie: &Zombie{image.Pt(gameWidth/4, gameHeight/4), 0},
+		Width:   gameWidth,
+		Height:  gameHeight,
+		Player:  &Player{image.Pt(gameWidth/2, gameHeight/2), 0},
+		Zombies: zs,
 	}
 
 	if err := ebiten.RunGame(game); err != nil {
@@ -36,10 +44,10 @@ func main() {
 
 // Game represents the main game state
 type Game struct {
-	Width  int
-	Height int
-	Player *Player
-	Zombie *Zombie
+	Width   int
+	Height  int
+	Player  *Player
+	Zombies []*Zombie
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -79,17 +87,19 @@ func (g *Game) Update() error {
 	}
 
 	// Move zombie towards player
-	if g.Zombie.Coords.X < g.Player.Coords.X {
-		g.Zombie.MoveRight()
-	}
-	if g.Zombie.Coords.X > g.Player.Coords.X {
-		g.Zombie.MoveLeft()
-	}
-	if g.Zombie.Coords.Y < g.Player.Coords.Y {
-		g.Zombie.MoveDown()
-	}
-	if g.Zombie.Coords.Y > g.Player.Coords.Y {
-		g.Zombie.MoveUp()
+	for _, z := range g.Zombies {
+		if z.Coords.X < g.Player.Coords.X {
+			z.MoveRight()
+		}
+		if z.Coords.X > g.Player.Coords.X {
+			z.MoveLeft()
+		}
+		if z.Coords.Y < g.Player.Coords.Y {
+			z.MoveDown()
+		}
+		if z.Coords.Y > g.Player.Coords.Y {
+			z.MoveUp()
+		}
 	}
 
 	// Player gun rotation
@@ -99,14 +109,16 @@ func (g *Game) Update() error {
 	g.Player.Angle = math.Atan2(opposite, adjacent)
 
 	// Collision detection and response between zombie and player
-	if image.Rect(
-		g.Player.Coords.X, g.Player.Coords.Y,
-		g.Player.Coords.X+20, g.Player.Coords.Y+20,
-	).Overlaps(image.Rect(
-		g.Zombie.Coords.X, g.Zombie.Coords.Y,
-		g.Zombie.Coords.X+20, g.Zombie.Coords.Y+20,
-	)) {
-		return errors.New("you died")
+	for _, z := range g.Zombies {
+		if image.Rect(
+			g.Player.Coords.X, g.Player.Coords.Y,
+			g.Player.Coords.X+20, g.Player.Coords.Y+20,
+		).Overlaps(image.Rect(
+			z.Coords.X, z.Coords.Y,
+			z.Coords.X+20, z.Coords.Y+20,
+		)) {
+			return errors.New("you died")
+		}
 	}
 
 	return nil
@@ -132,13 +144,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		10,
 		color.White,
 	)
-	// Zombie
-	ebitenutil.DrawRect(
-		screen,
-		float64(g.Zombie.Coords.X),
-		float64(g.Zombie.Coords.Y),
-		20,
-		20,
-		color.RGBA{255, 0, 0, 255},
-	)
+	// Zombies
+	for _, z := range g.Zombies {
+		ebitenutil.DrawRect(
+			screen,
+			float64(z.Coords.X),
+			float64(z.Coords.Y),
+			20,
+			20,
+			color.RGBA{255, 0, 0, 255},
+		)
+	}
 }
