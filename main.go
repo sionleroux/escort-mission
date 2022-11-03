@@ -78,6 +78,19 @@ func (g *Game) Update() error {
 		g.Player.MoveRight()
 	}
 
+	if g.Zombie.Coords.X < g.Player.Coords.X {
+		g.Zombie.MoveRight()
+	}
+	if g.Zombie.Coords.X > g.Player.Coords.X {
+		g.Zombie.MoveLeft()
+	}
+	if g.Zombie.Coords.Y < g.Player.Coords.Y {
+		g.Zombie.MoveDown()
+	}
+	if g.Zombie.Coords.Y > g.Player.Coords.Y {
+		g.Zombie.MoveUp()
+	}
+
 	cx, cy := ebiten.CursorPosition()
 	adjacent := float64(g.Player.Coords.X - cx)
 	opposite := float64(g.Player.Coords.Y - cy)
