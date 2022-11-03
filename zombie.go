@@ -13,21 +13,21 @@ type Zombie struct {
 }
 
 // MoveUp moves the player upwards
-func (p *Zombie) MoveUp() {
-	p.Coords.Y--
+func (z *Zombie) MoveUp() {
+	z.Coords.Y--
 }
 
 // MoveDown moves the player downwards
-func (p *Zombie) MoveDown() {
-	p.Coords.Y++
+func (z *Zombie) MoveDown() {
+	z.Coords.Y++
 }
 
 // MoveLeft moves the player left
-func (p *Zombie) MoveLeft() {
-	p.Coords.X--
+func (z *Zombie) MoveLeft() {
+	z.Coords.X--
 }
 
 // MoveRight moves the player right
-func (p *Zombie) MoveRight() {
-	p.Coords.X++
+func (z *Zombie) MoveRight() {
+	z.Coords.X++
 }
