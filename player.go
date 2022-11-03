@@ -6,6 +6,9 @@ package main
 
 import "image"
 
+// playerSpeed is the distance the player moves per update cycle
+const playerSpeed int = 2
+
 // Player is the player character in the game
 type Player struct {
 	Coords image.Point
@@ -14,20 +17,20 @@ type Player struct {
 
 // MoveUp moves the player upwards
 func (p *Player) MoveUp() {
-	p.Coords.Y--
+	p.Coords.Y -= playerSpeed
 }
 
 // MoveDown moves the player downwards
 func (p *Player) MoveDown() {
-	p.Coords.Y++
+	p.Coords.Y += playerSpeed
 }
 
 // MoveLeft moves the player left
 func (p *Player) MoveLeft() {
-	p.Coords.X--
+	p.Coords.X -= playerSpeed
 }
 
 // MoveRight moves the player right
 func (p *Player) MoveRight() {
-	p.Coords.X++
+	p.Coords.X += playerSpeed
 }
