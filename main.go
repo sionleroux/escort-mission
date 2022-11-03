@@ -42,12 +42,16 @@ func main() {
 	player := &Player{resolv.NewObject(float64(gameWidth/2), float64(gameHeight/2), 20, 20), 0}
 	space.Add(player.Object)
 
+	wall := resolv.NewObject(200, 100, 20, 200, "wall")
+	space.Add(wall)
+
 	game := &Game{
 		Width:   gameWidth,
 		Height:  gameHeight,
 		Player:  player,
 		Zombies: zs,
 		Space:   space,
+		Wall:    wall,
 	}
 
 	if err := ebiten.RunGame(game); err != nil {
@@ -62,6 +66,7 @@ type Game struct {
 	Player  *Player
 	Zombies []*Zombie
 	Space   *resolv.Space
+	Wall    *resolv.Object
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -123,7 +128,7 @@ func (g *Game) Update() error {
 	g.Player.Angle = math.Atan2(opposite, adjacent)
 
 	// Collision detection and response between zombie and player
-	if collision := g.Player.Object.Check(0, 0); collision != nil {
+	if collision := g.Player.Object.Check(0, 0, "mob"); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
 			log.Printf("%#v", collision)
 			return errors.New("you died")
@@ -140,6 +145,15 @@ func (g *Game) Update() error {
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
+	// Wall
+	ebitenutil.DrawRect(
+		screen,
+		g.Wall.X,
+		g.Wall.Y,
+		g.Wall.W,
+		g.Wall.H,
+		color.RGBA{0, 0, 255, 255},
+	)
 	// Player
 	ebitenutil.DrawRect(
 		screen,
