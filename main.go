@@ -78,6 +78,7 @@ func (g *Game) Update() error {
 		g.Player.MoveRight()
 	}
 
+	// Move zombie towards player
 	if g.Zombie.Coords.X < g.Player.Coords.X {
 		g.Zombie.MoveRight()
 	}
@@ -91,11 +92,13 @@ func (g *Game) Update() error {
 		g.Zombie.MoveUp()
 	}
 
+	// Player gun rotation
 	cx, cy := ebiten.CursorPosition()
 	adjacent := float64(g.Player.Coords.X - cx)
 	opposite := float64(g.Player.Coords.Y - cy)
 	g.Player.Angle = math.Atan2(opposite, adjacent)
 
+	// Collision detection and response between zombie and player
 	if image.Rect(
 		g.Player.Coords.X, g.Player.Coords.Y,
 		g.Player.Coords.X+20, g.Player.Coords.Y+20,
