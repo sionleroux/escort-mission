@@ -33,10 +33,10 @@ func main() {
 	space.Add(wall)
 
 	game := &Game{
-		Width:   gameWidth,
-		Height:  gameHeight,
-		Space:   space,
-		Wall:    wall,
+		Width:  gameWidth,
+		Height: gameHeight,
+		Space:  space,
+		Wall:   wall,
 	}
 
 	go NewGame(game)
