@@ -64,8 +64,8 @@ func (p *Player) Draw(g *Game, screen *ebiten.Image) {
 	op.GeoM.Rotate(p.Angle + math.Pi/2)
 
 	op.GeoM.Translate(
-		float64(p.Object.X),
-		float64(p.Object.Y),
+		float64(p.Object.X)+float64(frame.Position.W/2),
+		float64(p.Object.Y)+float64(frame.Position.H/2),
 	)
 
 	screen.DrawImage(s.Image.SubImage(image.Rect(
