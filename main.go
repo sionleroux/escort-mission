@@ -152,6 +152,10 @@ func (g *Game) Update() error {
 
 	g.Player.Object.Update()
 	for _, z := range g.Zombies {
+		// Zombies rotate towards player
+		adjacent := z.Object.X - g.Player.Object.X
+		opposite := z.Object.Y - g.Player.Object.Y
+		z.Angle = math.Atan2(opposite, adjacent)
 		z.Object.Update()
 	}
 
