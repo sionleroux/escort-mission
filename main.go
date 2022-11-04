@@ -7,7 +7,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"image"
 	"image/color"
 	"log"
 	"math"
@@ -162,20 +161,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.Wall.H,
 		color.RGBA{0, 0, 255, 255},
 	)
+
 	// Player
-	s := g.Player.Sprite
-	frame := s.Sprite[0]
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(
-		float64(g.Player.Object.X),
-		float64(g.Player.Object.Y),
-	)
-	screen.DrawImage(s.Image.SubImage(image.Rect(
-		frame.Position.X,
-		frame.Position.Y,
-		frame.Position.X+frame.Position.W,
-		frame.Position.Y+frame.Position.H,
-	)).(*ebiten.Image), op)
+	g.Player.Draw(g, screen)
 
 	// Gun
 	ebitenutil.DrawRect(

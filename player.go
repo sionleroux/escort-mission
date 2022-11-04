@@ -5,6 +5,9 @@
 package main
 
 import (
+	"image"
+
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/solarlune/resolv"
 )
 
@@ -44,4 +47,22 @@ func (p *Player) move(dx, dy float64) {
 		p.Object.X += dx
 		p.Object.Y += dy
 	}
+}
+
+// Draw draws the Player to the screen
+func (p *Player) Draw(g *Game, screen *ebiten.Image) {
+	s := p.Sprite
+	frame := s.Sprite[0]
+	op := &ebiten.DrawImageOptions{}
+
+	op.GeoM.Translate(
+		float64(p.Object.X),
+		float64(p.Object.Y),
+	)
+	screen.DrawImage(s.Image.SubImage(image.Rect(
+		frame.Position.X,
+		frame.Position.Y,
+		frame.Position.X+frame.Position.W,
+		frame.Position.Y+frame.Position.H,
+	)).(*ebiten.Image), op)
 }
