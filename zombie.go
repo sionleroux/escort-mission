@@ -5,6 +5,10 @@
 package main
 
 import (
+	"image"
+	"math"
+
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/solarlune/resolv"
 )
 
@@ -41,4 +45,30 @@ func (z *Zombie) move(dx, dy float64) {
 		z.Object.X += dx
 		z.Object.Y += dy
 	}
+}
+
+// Draw draws the Zombie to the screen
+func (z *Zombie) Draw(g *Game, screen *ebiten.Image) {
+	s := z.Sprite
+	frame := s.Sprite[0]
+	op := &ebiten.DrawImageOptions{}
+
+	op.GeoM.Translate(
+		float64(-frame.Position.W/2),
+		float64(-frame.Position.H/2),
+	)
+
+	op.GeoM.Rotate(z.Angle + math.Pi/2)
+
+	op.GeoM.Translate(
+		float64(z.Object.X)+float64(frame.Position.W/2),
+		float64(z.Object.Y)+float64(frame.Position.H/2),
+	)
+
+	screen.DrawImage(s.Image.SubImage(image.Rect(
+		frame.Position.X,
+		frame.Position.Y,
+		frame.Position.X+frame.Position.W,
+		frame.Position.Y+frame.Position.H,
+	)).(*ebiten.Image), op)
 }

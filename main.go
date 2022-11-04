@@ -184,14 +184,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	)
 	// Zombies
 	for _, z := range g.Zombies {
-		ebitenutil.DrawRect(
-			screen,
-			z.Object.X,
-			z.Object.Y,
-			z.Object.W,
-			z.Object.H,
-			color.RGBA{255, 0, 0, 255},
-		)
+		z.Draw(g, screen)
 	}
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
 		"FPS: %.2f\nTPS: %.2f",
