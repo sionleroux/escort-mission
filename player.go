@@ -6,6 +6,7 @@ package main
 
 import (
 	"image"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/solarlune/resolv"
@@ -56,9 +57,17 @@ func (p *Player) Draw(g *Game, screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(
+		float64(-frame.Position.W/2),
+		float64(-frame.Position.H/2),
+	)
+
+	op.GeoM.Rotate(p.Angle + math.Pi/2)
+
+	op.GeoM.Translate(
 		float64(p.Object.X),
 		float64(p.Object.Y),
 	)
+
 	screen.DrawImage(s.Image.SubImage(image.Rect(
 		frame.Position.X,
 		frame.Position.Y,
