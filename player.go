@@ -51,7 +51,7 @@ func (p *Player) move(dx, dy float64) {
 }
 
 // Draw draws the Player to the screen
-func (p *Player) Draw(g *Game, screen *ebiten.Image) {
+func (p *Player) Draw(g *Game) {
 	s := p.Sprite
 	frame := s.Sprite[0]
 	op := &ebiten.DrawImageOptions{}
@@ -63,15 +63,15 @@ func (p *Player) Draw(g *Game, screen *ebiten.Image) {
 
 	op.GeoM.Rotate(p.Angle + math.Pi/2)
 
-	op.GeoM.Translate(
-		float64(p.Object.X)+float64(frame.Position.W/2),
-		float64(p.Object.Y)+float64(frame.Position.H/2),
-	)
-
-	screen.DrawImage(s.Image.SubImage(image.Rect(
-		frame.Position.X,
-		frame.Position.Y,
-		frame.Position.X+frame.Position.W,
-		frame.Position.Y+frame.Position.H,
-	)).(*ebiten.Image), op)
+	g.Camera.Surface.DrawImage(
+		s.Image.SubImage(image.Rect(
+			frame.Position.X,
+			frame.Position.Y,
+			frame.Position.X+frame.Position.W,
+			frame.Position.Y+frame.Position.H,
+		)).(*ebiten.Image),
+		g.Camera.GetTranslation(
+			op,
+			float64(p.Object.X)+float64(frame.Position.W/2),
+			float64(p.Object.Y)+float64(frame.Position.H/2)))
 }

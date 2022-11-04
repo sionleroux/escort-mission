@@ -16,6 +16,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/solarlune/resolv"
 	"github.com/solarlune/ldtkgo"
+	camera "github.com/melonfunction/ebiten-camera"
 )
 
 // HowManyZombies is how many zombies to generate at the start of the game
@@ -56,6 +57,7 @@ type Game struct {
 	LDTKProject  *ldtkgo.Project
 	Level        int
 	Background   *ebiten.Image
+	Camera       *camera.Camera
 	Sprites	     map[SpriteType]*SpriteSheet
 	Player       *Player
 	Zombies      []*Zombie
@@ -64,6 +66,8 @@ type Game struct {
 }
 
 func NewGame(g *Game) {
+	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
+
 	var renderer *TileRenderer
 	ldtkProject := loadMaps("assets/maps/maps.ldtk")
 	renderer = NewTileRenderer(&EmbedLoader{"assets/maps"})
@@ -164,7 +168,7 @@ func (g *Game) Update() error {
 	}
 
 	// Player gun rotation
-	cx, cy := ebiten.CursorPosition()
+	cx, cy := g.Camera.GetCursorCoords()
 	adjacent := g.Player.Object.X - float64(cx)
 	opposite := g.Player.Object.Y - float64(cy)
 	g.Player.Angle = math.Atan2(opposite, adjacent)
@@ -186,43 +190,57 @@ func (g *Game) Update() error {
 		z.Object.Update()
 	}
 
+	// Position camera
+	g.Camera.SetPosition(g.Player.Object.X, g.Player.Object.Y)
+
 	return nil
 }
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	screen.DrawImage(g.Background, op)
+
+	g.Camera.Surface.Clear()
+	g.Camera.Surface.DrawImage(g.Background, g.Camera.GetTranslation(op, 0, 0))
 
 	// Wall
+	sX, sY := g.Camera.GetScreenCoords(g.Wall.X, g.Wall.Y)
 	ebitenutil.DrawRect(
-		screen,
-		g.Wall.X,
-		g.Wall.Y,
+		g.Camera.Surface,
+		sX,
+		sY,
 		g.Wall.W,
 		g.Wall.H,
 		color.RGBA{0, 0, 255, 255},
 	)
 
 	// Player
-	g.Player.Draw(g, screen)
+	g.Player.Draw(g)
 
 	// Gun
-	ebitenutil.DrawRect(
-		screen,
+	sX, sY = g.Camera.GetScreenCoords(
 		g.Player.Object.X-math.Cos(g.Player.Angle)*20,
-		g.Player.Object.Y-math.Sin(g.Player.Angle)*20,
+		g.Player.Object.Y-math.Sin(g.Player.Angle)*20)
+	ebitenutil.DrawRect(
+		g.Camera.Surface,
+		sX,
+		sY,
 		10,
 		10,
 		color.White,
 	)
 	// Zombies
 	for _, z := range g.Zombies {
-		z.Draw(g, screen)
+		z.Draw(g)
 	}
+
+	g.Camera.Blit(screen)
+
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"FPS: %.2f\nTPS: %.2f",
+		"FPS: %.2f\nTPS: %.2f\n%.2f %.2f %.2f %.2f",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
+		g.Player.Object.X, g.Player.Object.Y,
+		g.Camera.X, g.Camera.Y,
 	))
 }

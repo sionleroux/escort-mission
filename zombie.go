@@ -48,7 +48,7 @@ func (z *Zombie) move(dx, dy float64) {
 }
 
 // Draw draws the Zombie to the screen
-func (z *Zombie) Draw(g *Game, screen *ebiten.Image) {
+func (z *Zombie) Draw(g *Game) {
 	s := z.Sprite
 	frame := s.Sprite[0]
 	op := &ebiten.DrawImageOptions{}
@@ -60,15 +60,16 @@ func (z *Zombie) Draw(g *Game, screen *ebiten.Image) {
 
 	op.GeoM.Rotate(z.Angle + math.Pi/2)
 
-	op.GeoM.Translate(
-		float64(z.Object.X)+float64(frame.Position.W/2),
-		float64(z.Object.Y)+float64(frame.Position.H/2),
-	)
+	g.Camera.Surface.DrawImage(
+		s.Image.SubImage(image.Rect(
+			frame.Position.X,
+			frame.Position.Y,
+			frame.Position.X+frame.Position.W,
+			frame.Position.Y+frame.Position.H,
+		)).(*ebiten.Image),
+		g.Camera.GetTranslation(
+			op,
+			float64(z.Object.X)+float64(frame.Position.W/2),
+			float64(z.Object.Y)+float64(frame.Position.H/2)))
 
-	screen.DrawImage(s.Image.SubImage(image.Rect(
-		frame.Position.X,
-		frame.Position.Y,
-		frame.Position.X+frame.Position.W,
-		frame.Position.Y+frame.Position.H,
-	)).(*ebiten.Image), op)
 }
