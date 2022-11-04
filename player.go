@@ -15,6 +15,7 @@ const playerSpeed float64 = 2
 type Player struct {
 	Object *resolv.Object
 	Angle  float64
+	Sprite *SpriteSheet
 }
 
 // MoveUp moves the player upwards

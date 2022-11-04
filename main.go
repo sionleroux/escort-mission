@@ -7,6 +7,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"image"
 	"image/color"
 	"log"
 	"math"
@@ -39,20 +40,18 @@ func main() {
 		zs = append(zs, z)
 	}
 
-	player := &Player{resolv.NewObject(float64(gameWidth/2), float64(gameHeight/2), 20, 20), 0}
-	space.Add(player.Object)
-
 	wall := resolv.NewObject(200, 100, 20, 200, "wall")
 	space.Add(wall)
 
 	game := &Game{
 		Width:   gameWidth,
 		Height:  gameHeight,
-		Player:  player,
 		Zombies: zs,
 		Space:   space,
 		Wall:    wall,
 	}
+
+	go NewGame(game)
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
@@ -63,10 +62,19 @@ func main() {
 type Game struct {
 	Width   int
 	Height  int
+	Sprites map[SpriteType]*SpriteSheet
 	Player  *Player
 	Zombies []*Zombie
 	Space   *resolv.Space
 	Wall    *resolv.Object
+}
+
+func NewGame(g *Game) {
+	g.Sprites = make(map[SpriteType]*SpriteSheet, 1)
+	g.Sprites[spritePlayer] = loadSprite("player")
+
+	g.Player = &Player{resolv.NewObject(float64(g.Width/2), float64(g.Height/2), 20, 20), 0, g.Sprites[spritePlayer]}
+	g.Space.Add(g.Player.Object)
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -155,14 +163,20 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		color.RGBA{0, 0, 255, 255},
 	)
 	// Player
-	ebitenutil.DrawRect(
-		screen,
-		g.Player.Object.X,
-		g.Player.Object.Y,
-		g.Player.Object.W,
-		g.Player.Object.H,
-		color.White,
+	s := g.Player.Sprite
+	frame := s.Sprite[0]
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(
+		float64(g.Player.Object.X),
+		float64(g.Player.Object.Y),
 	)
+	screen.DrawImage(s.Image.SubImage(image.Rect(
+		frame.Position.X,
+		frame.Position.Y,
+		frame.Position.X+frame.Position.W,
+		frame.Position.Y+frame.Position.H,
+	)).(*ebiten.Image), op)
+
 	// Gun
 	ebitenutil.DrawRect(
 		screen,
