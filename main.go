@@ -15,6 +15,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/solarlune/resolv"
+	"github.com/solarlune/ldtkgo"
 )
 
 // HowManyZombies is how many zombies to generate at the start of the game
@@ -37,6 +38,7 @@ func main() {
 		Height: gameHeight,
 		Space:  space,
 		Wall:   wall,
+		Level:  0,
 	}
 
 	go NewGame(game)
@@ -48,16 +50,41 @@ func main() {
 
 // Game represents the main game state
 type Game struct {
-	Width   int
-	Height  int
-	Sprites map[SpriteType]*SpriteSheet
-	Player  *Player
-	Zombies []*Zombie
-	Space   *resolv.Space
-	Wall    *resolv.Object
+	Width        int
+	Height       int
+	TileRenderer *TileRenderer
+	LDTKProject  *ldtkgo.Project
+	Level        int
+	Background   *ebiten.Image
+	Sprites	     map[SpriteType]*SpriteSheet
+	Player       *Player
+	Zombies      []*Zombie
+	Space        *resolv.Space
+	Wall         *resolv.Object
 }
 
 func NewGame(g *Game) {
+	var renderer *TileRenderer
+	ldtkProject := loadMaps("assets/maps/maps.ldtk")
+	renderer = NewTileRenderer(&EmbedLoader{"assets/maps"})
+
+	g.TileRenderer = renderer
+	g.LDTKProject = ldtkProject
+
+	bg := ebiten.NewImage(
+		g.LDTKProject.Levels[g.Level].Width,
+		g.LDTKProject.Levels[g.Level].Height,
+	)
+	bg.Fill(g.LDTKProject.Levels[g.Level].BGColor)
+
+	// Render map
+	g.TileRenderer.Render(g.LDTKProject.Levels[g.Level])
+	for _, layer := range g.TileRenderer.RenderedLayers {
+		bg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
+	}
+	g.Background = bg
+
+	//Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
 	g.Sprites[spritePlayer] = loadSprite("player")
 	g.Sprites[spriteZombie] = loadSprite("zombie")
@@ -164,6 +191,9 @@ func (g *Game) Update() error {
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
+	op := &ebiten.DrawImageOptions{}
+	screen.DrawImage(g.Background, op)
+
 	// Wall
 	ebitenutil.DrawRect(
 		screen,

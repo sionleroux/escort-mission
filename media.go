@@ -13,6 +13,7 @@ import (
 	"path"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/solarlune/ldtkgo"
 )
 
 //go:embed assets/*
@@ -112,4 +113,28 @@ func loadImage(name string) *ebiten.Image {
 	}
 
 	return ebiten.NewImageFromImage(raw)
+}
+
+// Load an project from embedded FS into an LDtk Project object
+func loadMaps(name string) *ldtkgo.Project {
+	log.Printf("loading %s\n", name)
+
+	file, err := assets.Open(name)
+	if err != nil {
+		log.Fatalf("error opening file %s: %v\n", name, err)
+	}
+	defer file.Close()
+
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Fatalf("error reading from file %s: %v\n", name, err)
+	}
+
+	// Load the LDtk Project
+	maps, err := ldtkgo.Read(data)
+	if err != nil {
+		log.Fatalf("error parsing file %s as LDtk Project: %v\n", name, err)
+	}
+
+	return maps
 }
