@@ -12,6 +12,7 @@ import (
 type Zombie struct {
 	Object *resolv.Object
 	Angle  float64
+	Sprite *SpriteSheet
 }
 
 // MoveUp moves the zombie upwards

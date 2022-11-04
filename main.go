@@ -29,23 +29,12 @@ func main() {
 
 	space := resolv.NewSpace(gameWidth, gameHeight, 20, 20)
 
-	zs := []*Zombie{}
-	for i := 0; i < HowManyZombies; i++ {
-		z := &Zombie{
-			Object: resolv.NewObject(float64(gameWidth)/(float64(i)+1)*3, float64(gameHeight)/(float64(i)+1*3), 16, 16, "mob"),
-			Angle:  0,
-		}
-		space.Add(z.Object)
-		zs = append(zs, z)
-	}
-
 	wall := resolv.NewObject(200, 100, 20, 200, "wall")
 	space.Add(wall)
 
 	game := &Game{
 		Width:   gameWidth,
 		Height:  gameHeight,
-		Zombies: zs,
 		Space:   space,
 		Wall:    wall,
 	}
@@ -69,11 +58,30 @@ type Game struct {
 }
 
 func NewGame(g *Game) {
-	g.Sprites = make(map[SpriteType]*SpriteSheet, 1)
+	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
 	g.Sprites[spritePlayer] = loadSprite("player")
+	g.Sprites[spriteZombie] = loadSprite("zombie")
 
-	g.Player = &Player{resolv.NewObject(float64(g.Width/2), float64(g.Height/2), 20, 20), 0, g.Sprites[spritePlayer]}
+	//Add player to the game
+	g.Player = &Player{
+		Object: resolv.NewObject(float64(g.Width/2), float64(g.Height/2), 20, 20),
+		Angle:  0,
+		Sprite: g.Sprites[spritePlayer],
+	}
 	g.Space.Add(g.Player.Object)
+
+	//Add zombies to the game
+	zs := []*Zombie{}
+	for i := 0; i < HowManyZombies; i++ {
+		z := &Zombie{
+			Object: resolv.NewObject(float64(g.Width)/(float64(i)+1)*3, float64(g.Height)/(float64(i)+1*3), 16, 16, "mob"),
+			Angle:  0,
+			Sprite: g.Sprites[spriteZombie],
+		}
+		g.Space.Add(z.Object)
+		zs = append(zs, z)
+	}
+	g.Zombies = zs
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
