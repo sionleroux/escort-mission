@@ -44,7 +44,7 @@ func (p *Player) MoveRight() {
 
 // Move the Player by the given vector if it is possible to do so
 func (p *Player) move(dx, dy float64) {
-	if collision := p.Object.Check(dx, dy, "wall"); collision == nil {
+	if collision := p.Object.Check(dx, dy, tagWall); collision == nil {
 		p.Object.X += dx
 		p.Object.Y += dy
 	}

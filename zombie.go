@@ -41,7 +41,7 @@ func (z *Zombie) MoveRight() {
 
 // Move the Zombie by the given vector if it is possible to do so
 func (z *Zombie) move(dx, dy float64) {
-	if collision := z.Object.Check(dx, dy, "mob", "wall"); collision == nil {
+	if collision := z.Object.Check(dx, dy, tagMob, tagWall); collision == nil {
 		z.Object.X += dx
 		z.Object.Y += dy
 	}

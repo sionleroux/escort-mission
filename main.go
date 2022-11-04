@@ -22,6 +22,11 @@ import (
 // HowManyZombies is how many zombies to generate at the start of the game
 const HowManyZombies int = 5
 
+const (
+	tagMob  = "mob"
+	tagWall = "wall"
+)
+
 func main() {
 	gameWidth, gameHeight := 640, 480
 
@@ -31,7 +36,7 @@ func main() {
 
 	space := resolv.NewSpace(gameWidth, gameHeight, 20, 20)
 
-	wall := resolv.NewObject(200, 100, 20, 200, "wall")
+	wall := resolv.NewObject(200, 100, 20, 200, tagWall)
 	space.Add(wall)
 
 	game := &Game{
@@ -105,7 +110,7 @@ func NewGame(g *Game) {
 	zs := []*Zombie{}
 	for i := 0; i < HowManyZombies; i++ {
 		z := &Zombie{
-			Object: resolv.NewObject(float64(g.Width)/(float64(i)+1)*3, float64(g.Height)/(float64(i)+1*3), 16, 16, "mob"),
+			Object: resolv.NewObject(float64(g.Width)/(float64(i)+1)*3, float64(g.Height)/(float64(i)+1*3), 16, 16, tagMob),
 			Angle:  0,
 			Sprite: g.Sprites[spriteZombie],
 		}
@@ -174,7 +179,7 @@ func (g *Game) Update() error {
 	g.Player.Angle = math.Atan2(opposite, adjacent)
 
 	// Collision detection and response between zombie and player
-	if collision := g.Player.Object.Check(0, 0, "mob"); collision != nil {
+	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
 			log.Printf("%#v", collision)
 			return errors.New("you died")
