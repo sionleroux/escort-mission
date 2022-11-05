@@ -190,8 +190,11 @@ func (g *Game) Update() error {
 		z.Object.Update()
 	}
 
-	// Position camera
-	g.Camera.SetPosition(g.Player.Object.X, g.Player.Object.Y)
+	// Position camera and clamp in to the Map dimensions
+	level := g.LDTKProject.Levels[g.Level]
+	g.Camera.SetPosition(
+		math.Min(math.Max(g.Player.Object.X, float64(g.Width)/2), float64(level.Width) - float64(g.Width)/2),
+		math.Min(math.Max(g.Player.Object.Y, float64(g.Height)/2), float64(level.Height) - float64(g.Height)/2))
 
 	return nil
 }
