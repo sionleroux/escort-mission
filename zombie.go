@@ -32,16 +32,18 @@ func (z *Zombie) Update(g *Game) {
 }
 
 func (z *Zombie) animate(g *Game) {
+	// Update only in every 5th cycle
 	if (g.Tick%5 != 0) {
 		return
 	}
 
-	//No states at the moment, zombies are always walking
+	// No states at the moment, zombies are always walking
 	ft := z.Sprite.Meta.FrameTags[1]
 	
 	if ft.From == ft.To {
 		z.Frame = ft.From
 	} else {
+		// Contiuously increase the Frame counter between From and To
 		z.Frame = (z.Frame - ft.From + 1) % (ft.To - ft.From + 1) + ft.From
 	}
 }

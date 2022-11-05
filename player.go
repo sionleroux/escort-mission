@@ -34,25 +34,20 @@ type Player struct {
 
 // Update updates the state of the player
 func (p *Player) Update(g *Game) {
-	state := playerIdle
+	p.State = playerIdle
 
 	if ebiten.IsKeyPressed(ebiten.KeyW) {
 		p.MoveUp()
-		state = playerWalking
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
 		p.MoveLeft()
-		state = playerWalking
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyS) {
 		p.MoveDown()
-		state = playerWalking
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyD) {
 		p.MoveRight()
-		state = playerWalking
 	}
-	p.State = state
 
 	// Player gun rotation
 	cx, cy := g.Camera.GetCursorCoords()
@@ -65,6 +60,7 @@ func (p *Player) Update(g *Game) {
 }
 
 func (p *Player) animate(g *Game) {
+	// Update only in every 5th cycle
 	if (g.Tick%5 != 0) {
 		return
 	}
@@ -74,6 +70,7 @@ func (p *Player) animate(g *Game) {
 	if ft.From == ft.To {
 		p.Frame = ft.From
 	} else {
+		// Contiuously increase the Frame counter between From and To
 		p.Frame = (p.Frame - ft.From + 1) % (ft.To - ft.From + 1) + ft.From
 	}
 }
@@ -104,6 +101,7 @@ func (p *Player) move(dx, dy float64) {
 		p.Object.X += dx
 		p.Object.Y += dy
 	}
+	p.State = playerWalking
 }
 
 // Draw draws the Player to the screen
