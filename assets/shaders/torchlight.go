@@ -30,3 +30,15 @@ func Fragment(position vec4, texCoord vec2, color vec4) vec4 {
 	diffuse := 0.75 * max(0.0, dot(normal.xyz, lightdir))
 	return imageSrc0UnsafeAt(texCoord) * (ambient + diffuse)
 }
+
+// void main(){
+// 	vec2 st = gl_FragCoord.xy/u_resolution;
+//     float pct = 0.0;
+
+//     // a. The DISTANCE from the pixel to the center
+//    pct = 1.0-distance(vec2(0.500,0.550),st);
+
+//     vec3 color = vec3(smoothstep(0.7,0.9,pct));
+
+// 	gl_FragColor = vec4( color, 1.0 );
+// }
