@@ -159,12 +159,6 @@ func (g *Game) Update() error {
 		}
 	}
 
-	// Player gun rotation
-	cx, cy := g.Camera.GetCursorCoords()
-	adjacent := g.Player.Object.X - float64(cx)
-	opposite := g.Player.Object.Y - float64(cy)
-	g.Player.Angle = math.Atan2(opposite, adjacent)
-
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, "mob"); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
@@ -173,14 +167,12 @@ func (g *Game) Update() error {
 		}
 	}
 
-	g.Player.Object.Update()
 	for _, z := range g.Zombies {
 		// Zombies rotate towards player
 		adjacent := z.Object.X - g.Player.Object.X
 		opposite := z.Object.Y - g.Player.Object.Y
 		z.Angle = math.Atan2(opposite, adjacent)
 		z.Update(g)
-		z.Object.Update()
 	}
 
 	// Position camera and clamp in to the Map dimensions

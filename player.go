@@ -52,7 +52,14 @@ func (p *Player) Update(g *Game) {
 	}
 	p.State = state
 
+	// Player gun rotation
+	cx, cy := g.Camera.GetCursorCoords()
+	adjacent := p.Object.X - float64(cx)
+	opposite := p.Object.Y - float64(cy)
+	p.Angle = math.Atan2(opposite, adjacent)
+
 	p.animate(g)
+	p.Object.Update()
 }
 
 func (p *Player) animate(g *Game) {

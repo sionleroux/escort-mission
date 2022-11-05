@@ -23,6 +23,7 @@ type Zombie struct {
 // Update updates the state of the zombie
 func (z *Zombie) Update(g *Game) {
 	z.animate(g)
+	z.Object.Update()
 }
 
 func (z *Zombie) animate(g *Game) {
