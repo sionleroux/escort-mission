@@ -122,7 +122,7 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 
 // Update calculates game logic
 func (g *Game) Update() error {
-
+	
 	// Pressing Q any time quits immediately
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		return errors.New("game quit by player")
@@ -138,18 +138,7 @@ func (g *Game) Update() error {
 	}
 
 	// Movement controls
-	if ebiten.IsKeyPressed(ebiten.KeyW) {
-		g.Player.MoveUp()
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		g.Player.MoveLeft()
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyS) {
-		g.Player.MoveDown()
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		g.Player.MoveRight()
-	}
+	g.Player.Update(g)
 
 	// Move zombie towards player
 	for _, z := range g.Zombies {

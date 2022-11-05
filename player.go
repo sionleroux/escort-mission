@@ -15,11 +15,42 @@ import (
 // playerSpeed is the distance the player moves per update cycle
 const playerSpeed float64 = 2
 
+//
+const (
+	playerIdle    int = 0
+	playerWalking     = 1   
+)
+
 // Player is the player character in the game
 type Player struct {
-	Object *resolv.Object
-	Angle  float64
-	Sprite *SpriteSheet
+	Object        *resolv.Object
+	Angle         float64
+	State         int
+	Sprite        *SpriteSheet
+}
+
+// Update updates the state of the player
+func (p *Player) Update(g *Game) {
+	state := playerIdle
+
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		p.MoveUp()
+		state = playerWalking
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
+		p.MoveLeft()
+		state = playerWalking
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyS) {
+		p.MoveDown()
+		state = playerWalking
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
+		p.MoveRight()
+		state = playerWalking
+	}
+	p.State = state
+
 }
 
 // MoveUp moves the player upwards
