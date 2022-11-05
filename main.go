@@ -140,7 +140,7 @@ func (g *Game) Update() error {
 		}
 	}
 
-	// Movement controls
+	// Update player
 	g.Player.Update(g)
 
 	// Move zombie towards player
@@ -167,11 +167,8 @@ func (g *Game) Update() error {
 		}
 	}
 
+	// Update zombies
 	for _, z := range g.Zombies {
-		// Zombies rotate towards player
-		adjacent := z.Object.X - g.Player.Object.X
-		opposite := z.Object.Y - g.Player.Object.Y
-		z.Angle = math.Atan2(opposite, adjacent)
 		z.Update(g)
 	}
 
