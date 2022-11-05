@@ -15,11 +15,64 @@ import (
 // playerSpeed is the distance the player moves per update cycle
 const playerSpeed float64 = 2
 
+// states of the player
+// It would be great to map them to the frameTag.Name from JSON
+const (
+	playerIdle    int = 0
+	playerWalking     = 1
+	playerShooting    = 2
+)
+
 // Player is the player character in the game
 type Player struct {
-	Object *resolv.Object
-	Angle  float64
-	Sprite *SpriteSheet
+	Object        *resolv.Object
+	Angle         float64
+	Frame         int
+	State         int
+	Sprite        *SpriteSheet
+}
+
+// Update updates the state of the player
+func (p *Player) Update(g *Game) {
+	p.State = playerIdle
+
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		p.MoveUp()
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
+		p.MoveLeft()
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyS) {
+		p.MoveDown()
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
+		p.MoveRight()
+	}
+
+	// Player gun rotation
+	cx, cy := g.Camera.GetCursorCoords()
+	adjacent := p.Object.X - float64(cx)
+	opposite := p.Object.Y - float64(cy)
+	p.Angle = math.Atan2(opposite, adjacent)
+
+	p.animate(g)
+	p.Object.Update()
+}
+
+func (p *Player) animate(g *Game) {
+	// Update only in every 5th cycle
+	if (g.Tick%5 != 0) {
+		return
+	}
+
+	ft := p.Sprite.Meta.FrameTags[p.State]
+	
+	if ft.From == ft.To {
+		p.Frame = ft.From
+	} else {
+		// Contiuously increase the Frame counter between From and To
+		p.Frame = (p.Frame - ft.From + 1) % (ft.To - ft.From + 1) + ft.From
+	}
 }
 
 // MoveUp moves the player upwards
@@ -48,12 +101,13 @@ func (p *Player) move(dx, dy float64) {
 		p.Object.X += dx
 		p.Object.Y += dy
 	}
+	p.State = playerWalking
 }
 
 // Draw draws the Player to the screen
 func (p *Player) Draw(g *Game) {
 	s := p.Sprite
-	frame := s.Sprite[0]
+	frame := s.Sprite[p.Frame]
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(

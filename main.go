@@ -45,6 +45,7 @@ func main() {
 		Space:  space,
 		Wall:   wall,
 		Level:  0,
+		Tick:   0,
 	}
 
 	go NewGame(game)
@@ -58,6 +59,7 @@ func main() {
 type Game struct {
 	Width        int
 	Height       int
+	Tick         int
 	TileRenderer *TileRenderer
 	LDTKProject  *ldtkgo.Project
 	Level        int
@@ -95,11 +97,12 @@ func NewGame(g *Game) {
 
 	//Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
-	g.Sprites[spritePlayer] = loadSprite("player")
-	g.Sprites[spriteZombie] = loadSprite("zombie")
+	g.Sprites[spritePlayer] = loadSprite("eZcort mission_Player Character")
+	g.Sprites[spriteZombie] = loadSprite("eZcort mission_Zombie")
 
 	//Add player to the game
 	g.Player = &Player{
+		State:  playerIdle,
 		Object: resolv.NewObject(float64(g.Width/2), float64(g.Height/2), 20, 20),
 		Angle:  0,
 		Sprite: g.Sprites[spritePlayer],
@@ -127,6 +130,7 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 
 // Update calculates game logic
 func (g *Game) Update() error {
+	g.Tick++
 
 	// Pressing Q any time quits immediately
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
@@ -142,19 +146,8 @@ func (g *Game) Update() error {
 		}
 	}
 
-	// Movement controls
-	if ebiten.IsKeyPressed(ebiten.KeyW) {
-		g.Player.MoveUp()
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		g.Player.MoveLeft()
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyS) {
-		g.Player.MoveDown()
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		g.Player.MoveRight()
-	}
+	// Update player
+	g.Player.Update(g)
 
 	// Move zombie towards player
 	for _, z := range g.Zombies {
@@ -172,12 +165,6 @@ func (g *Game) Update() error {
 		}
 	}
 
-	// Player gun rotation
-	cx, cy := g.Camera.GetCursorCoords()
-	adjacent := g.Player.Object.X - float64(cx)
-	opposite := g.Player.Object.Y - float64(cy)
-	g.Player.Angle = math.Atan2(opposite, adjacent)
-
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
@@ -186,13 +173,9 @@ func (g *Game) Update() error {
 		}
 	}
 
-	g.Player.Object.Update()
+	// Update zombies
 	for _, z := range g.Zombies {
-		// Zombies rotate towards player
-		adjacent := z.Object.X - g.Player.Object.X
-		opposite := z.Object.Y - g.Player.Object.Y
-		z.Angle = math.Atan2(opposite, adjacent)
-		z.Object.Update()
+		z.Update(g)
 	}
 
 	// Position camera and clamp in to the Map dimensions
