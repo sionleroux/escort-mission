@@ -13,23 +13,23 @@ import (
 )
 
 // playerSpeed is the distance the player moves per update cycle
-const playerSpeed float64 = 2
+const playerSpeed float64 = 1.2
 
 // states of the player
 // It would be great to map them to the frameTag.Name from JSON
 const (
-	playerIdle    int = 0
-	playerWalking     = 1
-	playerShooting    = 2
+	playerIdle     int = 0
+	playerWalking      = 1
+	playerShooting     = 2
 )
 
 // Player is the player character in the game
 type Player struct {
-	Object        *resolv.Object
-	Angle         float64
-	Frame         int
-	State         int
-	Sprite        *SpriteSheet
+	Object *resolv.Object
+	Angle  float64
+	Frame  int
+	State  int
+	Sprite *SpriteSheet
 }
 
 // Update updates the state of the player
@@ -61,17 +61,17 @@ func (p *Player) Update(g *Game) {
 
 func (p *Player) animate(g *Game) {
 	// Update only in every 5th cycle
-	if (g.Tick%5 != 0) {
+	if g.Tick%5 != 0 {
 		return
 	}
 
 	ft := p.Sprite.Meta.FrameTags[p.State]
-	
+
 	if ft.From == ft.To {
 		p.Frame = ft.From
 	} else {
 		// Contiuously increase the Frame counter between From and To
-		p.Frame = (p.Frame - ft.From + 1) % (ft.To - ft.From + 1) + ft.From
+		p.Frame = (p.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
 	}
 }
 
