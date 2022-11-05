@@ -25,6 +25,7 @@ const (
 type Player struct {
 	Object        *resolv.Object
 	Angle         float64
+	Frame         int
 	State         int
 	Sprite        *SpriteSheet
 }
@@ -51,6 +52,18 @@ func (p *Player) Update(g *Game) {
 	}
 	p.State = state
 
+	p.animate(g)
+}
+
+func (p *Player) animate(g *Game) {
+	//It should be changed to frameTags
+	switch p.State {
+	case playerIdle:
+		p.Frame = 0
+	case playerWalking:
+		//(p.Frame - startFrame + step) % (endFrame - startFrame + 1) + startFrame
+		p.Frame = (p.Frame - 0 + 1) % (2 - 0 + 1) + 0
+	}
 }
 
 // MoveUp moves the player upwards
@@ -84,7 +97,7 @@ func (p *Player) move(dx, dy float64) {
 // Draw draws the Player to the screen
 func (p *Player) Draw(g *Game) {
 	s := p.Sprite
-	frame := s.Sprite[0]
+	frame := s.Sprite[p.Frame]
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(
