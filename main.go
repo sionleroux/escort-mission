@@ -240,10 +240,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Camera.Blit(screen)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"FPS: %.2f\nTPS: %.2f\n%.2f %.2f %.2f %.2f",
+		"FPS: %.2f\nTPS: %.2f\n",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
-		g.Player.Object.X, g.Player.Object.Y,
-		g.Camera.X, g.Camera.Y,
 	))
 }
