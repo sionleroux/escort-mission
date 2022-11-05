@@ -179,6 +179,7 @@ func (g *Game) Update() error {
 		adjacent := z.Object.X - g.Player.Object.X
 		opposite := z.Object.Y - g.Player.Object.Y
 		z.Angle = math.Atan2(opposite, adjacent)
+		z.Update(g)
 		z.Object.Update()
 	}
 

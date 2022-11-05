@@ -16,7 +16,22 @@ import (
 type Zombie struct {
 	Object *resolv.Object
 	Angle  float64
+	Frame  int
 	Sprite *SpriteSheet
+}
+
+// Update updates the state of the zombie
+func (z *Zombie) Update(g *Game) {
+	z.animate(g)
+}
+
+func (z *Zombie) animate(g *Game) {
+	//No states at the moment, zombies are always walking
+	//It should be changed to frameTags
+	//(p.Frame - startFrame + step) % (endFrame - startFrame + 1) + startFrame
+	if (g.Tick%5 == 0) {
+		z.Frame = (z.Frame - 0 + 1) % (2 - 0 + 1) + 0
+	}
 }
 
 // MoveUp moves the zombie upwards
@@ -50,7 +65,7 @@ func (z *Zombie) move(dx, dy float64) {
 // Draw draws the Zombie to the screen
 func (z *Zombie) Draw(g *Game) {
 	s := z.Sprite
-	frame := s.Sprite[0]
+	frame := s.Sprite[z.Frame]
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(
