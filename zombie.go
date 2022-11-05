@@ -32,11 +32,17 @@ func (z *Zombie) Update(g *Game) {
 }
 
 func (z *Zombie) animate(g *Game) {
+	if (g.Tick%5 != 0) {
+		return
+	}
+
 	//No states at the moment, zombies are always walking
-	//It should be changed to frameTags
-	//(p.Frame - startFrame + step) % (endFrame - startFrame + 1) + startFrame
-	if (g.Tick%5 == 0) {
-		z.Frame = (z.Frame - 0 + 1) % (2 - 0 + 1) + 0
+	ft := z.Sprite.Meta.FrameTags[1]
+	
+	if ft.From == ft.To {
+		z.Frame = ft.From
+	} else {
+		z.Frame = (z.Frame - ft.From + 1) % (ft.To - ft.From + 1) + ft.From
 	}
 }
 

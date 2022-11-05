@@ -15,10 +15,12 @@ import (
 // playerSpeed is the distance the player moves per update cycle
 const playerSpeed float64 = 2
 
-//
+// states of the player
+// It would be great to map them to the frameTag.Name from JSON
 const (
 	playerIdle    int = 0
-	playerWalking     = 1   
+	playerWalking     = 1
+	playerShooting    = 2
 )
 
 // Player is the player character in the game
@@ -63,15 +65,16 @@ func (p *Player) Update(g *Game) {
 }
 
 func (p *Player) animate(g *Game) {
-	//It should be changed to frameTags
-	switch p.State {
-	case playerIdle:
-		p.Frame = 0
-	case playerWalking:
-		//(p.Frame - startFrame + step) % (endFrame - startFrame + 1) + startFrame
-		if (g.Tick%5 == 0) {
-			p.Frame = (p.Frame - 0 + 1) % (2 - 0 + 1) + 0
-		}
+	if (g.Tick%5 != 0) {
+		return
+	}
+
+	ft := p.Sprite.Meta.FrameTags[p.State]
+	
+	if ft.From == ft.To {
+		p.Frame = ft.From
+	} else {
+		p.Frame = (p.Frame - ft.From + 1) % (ft.To - ft.From + 1) + ft.From
 	}
 }
 

@@ -92,11 +92,12 @@ func NewGame(g *Game) {
 
 	//Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
-	g.Sprites[spritePlayer] = loadSprite("player")
-	g.Sprites[spriteZombie] = loadSprite("zombie")
+	g.Sprites[spritePlayer] = loadSprite("eZcort mission_Player Character")
+	g.Sprites[spriteZombie] = loadSprite("eZcort mission_Zombie")
 
 	//Add player to the game
 	g.Player = &Player{
+		State:  playerIdle,
 		Object: resolv.NewObject(float64(g.Width/2), float64(g.Height/2), 20, 20),
 		Angle:  0,
 		Sprite: g.Sprites[spritePlayer],
