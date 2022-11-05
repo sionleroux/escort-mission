@@ -28,9 +28,9 @@ const (
 )
 
 func main() {
-	gameWidth, gameHeight := 640, 480
+	gameWidth, gameHeight := 320, 240
 
-	ebiten.SetWindowSize(gameWidth, gameHeight)
+	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
 	ebiten.SetWindowTitle("Escort Mission")
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
