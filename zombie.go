@@ -12,6 +12,9 @@ import (
 	"github.com/solarlune/resolv"
 )
 
+// zombieSpeed is the distance the zombie moves per update cycle
+const zombieSpeed float64 = 0.2
+
 // Zombie is a monster that's trying to eat the player character
 type Zombie struct {
 	Object *resolv.Object
@@ -33,39 +36,39 @@ func (z *Zombie) Update(g *Game) {
 
 func (z *Zombie) animate(g *Game) {
 	// Update only in every 5th cycle
-	if (g.Tick%5 != 0) {
+	if g.Tick%5 != 0 {
 		return
 	}
 
 	// No states at the moment, zombies are always walking
 	ft := z.Sprite.Meta.FrameTags[1]
-	
+
 	if ft.From == ft.To {
 		z.Frame = ft.From
 	} else {
 		// Contiuously increase the Frame counter between From and To
-		z.Frame = (z.Frame - ft.From + 1) % (ft.To - ft.From + 1) + ft.From
+		z.Frame = (z.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
 	}
 }
 
 // MoveUp moves the zombie upwards
 func (z *Zombie) MoveUp() {
-	z.move(0, -1)
+	z.move(0, -zombieSpeed)
 }
 
 // MoveDown moves the zombie downwards
 func (z *Zombie) MoveDown() {
-	z.move(0, 1)
+	z.move(0, zombieSpeed)
 }
 
 // MoveLeft moves the zombie left
 func (z *Zombie) MoveLeft() {
-	z.move(-1, 0)
+	z.move(-zombieSpeed, 0)
 }
 
 // MoveRight moves the zombie right
 func (z *Zombie) MoveRight() {
-	z.move(1, 0)
+	z.move(zombieSpeed, 0)
 }
 
 // Move the Zombie by the given vector if it is possible to do so
