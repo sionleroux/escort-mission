@@ -210,10 +210,10 @@ func (g *Game) Update() error {
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
-	op := &ebiten.DrawImageOptions{}
+	// op := &ebiten.DrawImageOptions{}
 
 	g.Camera.Surface.Clear()
-	g.Camera.Surface.DrawImage(g.Background, g.Camera.GetTranslation(op, 0, 0))
+	// g.Camera.Surface.DrawImage(g.Background, g.Camera.GetTranslation(op, 0, 0))
 
 	// Wall
 	sX, sY := g.Camera.GetScreenCoords(g.Wall.X, g.Wall.Y)
@@ -235,7 +235,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		w, h, g.Torchlight,
 		&ebiten.DrawRectShaderOptions{
 			Uniforms: map[string]any{
-				"TorchPos": []float32{float32(sX), float32(sY)},
+				"TorchPos": []float32{float32(sX + 5), float32(sY + 5)},
 			},
 			Images: [4]*ebiten.Image{
 				g.Background.SubImage(g.Camera.Surface.Bounds().Add(image.Pt(int(g.Camera.X), int(g.Camera.Y)))).(*ebiten.Image),
