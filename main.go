@@ -14,9 +14,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/solarlune/resolv"
-	"github.com/solarlune/ldtkgo"
 	camera "github.com/melonfunction/ebiten-camera"
+	"github.com/solarlune/ldtkgo"
+	"github.com/solarlune/resolv"
 )
 
 // HowManyZombies is how many zombies to generate at the start of the game
@@ -36,14 +36,10 @@ func main() {
 
 	space := resolv.NewSpace(gameWidth, gameHeight, 20, 20)
 
-	wall := resolv.NewObject(200, 100, 20, 200, tagWall)
-	space.Add(wall)
-
 	game := &Game{
 		Width:  gameWidth,
 		Height: gameHeight,
 		Space:  space,
-		Wall:   wall,
 		Level:  0,
 		Tick:   0,
 	}
@@ -65,11 +61,10 @@ type Game struct {
 	Level        int
 	Background   *ebiten.Image
 	Camera       *camera.Camera
-	Sprites	     map[SpriteType]*SpriteSheet
+	Sprites      map[SpriteType]*SpriteSheet
 	Player       *Player
 	Zombies      []*Zombie
 	Space        *resolv.Space
-	Wall         *resolv.Object
 }
 
 func NewGame(g *Game) {
@@ -181,8 +176,8 @@ func (g *Game) Update() error {
 	// Position camera and clamp in to the Map dimensions
 	level := g.LDTKProject.Levels[g.Level]
 	g.Camera.SetPosition(
-		math.Min(math.Max(g.Player.Object.X, float64(g.Width)/2), float64(level.Width) - float64(g.Width)/2),
-		math.Min(math.Max(g.Player.Object.Y, float64(g.Height)/2), float64(level.Height) - float64(g.Height)/2))
+		math.Min(math.Max(g.Player.Object.X, float64(g.Width)/2), float64(level.Width)-float64(g.Width)/2),
+		math.Min(math.Max(g.Player.Object.Y, float64(g.Height)/2), float64(level.Height)-float64(g.Height)/2))
 
 	return nil
 }
@@ -194,22 +189,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Camera.Surface.Clear()
 	g.Camera.Surface.DrawImage(g.Background, g.Camera.GetTranslation(op, 0, 0))
 
-	// Wall
-	sX, sY := g.Camera.GetScreenCoords(g.Wall.X, g.Wall.Y)
-	ebitenutil.DrawRect(
-		g.Camera.Surface,
-		sX,
-		sY,
-		g.Wall.W,
-		g.Wall.H,
-		color.RGBA{0, 0, 255, 255},
-	)
-
 	// Player
 	g.Player.Draw(g)
 
 	// Gun
-	sX, sY = g.Camera.GetScreenCoords(
+	sX, sY := g.Camera.GetScreenCoords(
 		g.Player.Object.X-math.Cos(g.Player.Angle)*20,
 		g.Player.Object.Y-math.Sin(g.Player.Angle)*20)
 	ebitenutil.DrawRect(
