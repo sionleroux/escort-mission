@@ -7,6 +7,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"image"
 	"image/color"
 	"log"
 	"math"
@@ -14,9 +15,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/solarlune/resolv"
-	"github.com/solarlune/ldtkgo"
 	camera "github.com/melonfunction/ebiten-camera"
+	"github.com/solarlune/ldtkgo"
+	"github.com/solarlune/resolv"
 )
 
 // HowManyZombies is how many zombies to generate at the start of the game
@@ -63,11 +64,12 @@ type Game struct {
 	Level        int
 	Background   *ebiten.Image
 	Camera       *camera.Camera
-	Sprites	     map[SpriteType]*SpriteSheet
+	Sprites      map[SpriteType]*SpriteSheet
 	Player       *Player
 	Zombies      []*Zombie
 	Space        *resolv.Space
 	Wall         *resolv.Object
+	Torchlight   *ebiten.Shader
 }
 
 func NewGame(g *Game) {
@@ -97,6 +99,8 @@ func NewGame(g *Game) {
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
 	g.Sprites[spritePlayer] = loadSprite("player")
 	g.Sprites[spriteZombie] = loadSprite("zombie")
+
+	g.Torchlight = loadShader("assets/shaders/torchlight.go")
 
 	//Add player to the game
 	g.Player = &Player{
@@ -198,8 +202,8 @@ func (g *Game) Update() error {
 	// Position camera and clamp in to the Map dimensions
 	level := g.LDTKProject.Levels[g.Level]
 	g.Camera.SetPosition(
-		math.Min(math.Max(g.Player.Object.X, float64(g.Width)/2), float64(level.Width) - float64(g.Width)/2),
-		math.Min(math.Max(g.Player.Object.Y, float64(g.Height)/2), float64(level.Height) - float64(g.Height)/2))
+		math.Min(math.Max(g.Player.Object.X, float64(g.Width)/2), float64(level.Width)-float64(g.Width)/2),
+		math.Min(math.Max(g.Player.Object.Y, float64(g.Height)/2), float64(level.Height)-float64(g.Height)/2))
 
 	return nil
 }
@@ -222,13 +226,27 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		color.RGBA{0, 0, 255, 255},
 	)
 
-	// Player
-	g.Player.Draw(g)
-
-	// Gun
+	// Torch coords
 	sX, sY = g.Camera.GetScreenCoords(
 		g.Player.Object.X-math.Cos(g.Player.Angle)*20,
 		g.Player.Object.Y-math.Sin(g.Player.Angle)*20)
+	w, h := g.Camera.Surface.Size()
+	g.Camera.Surface.DrawRectShader(
+		w, h, g.Torchlight,
+		&ebiten.DrawRectShaderOptions{
+			Uniforms: map[string]any{
+				"TorchPos": []float32{float32(sX), float32(sY)},
+			},
+			Images: [4]*ebiten.Image{
+				g.Background.SubImage(g.Camera.Surface.Bounds().Add(image.Pt(int(g.Camera.X), int(g.Camera.Y)))).(*ebiten.Image),
+				g.Background.SubImage(g.Camera.Surface.Bounds().Add(image.Pt(int(g.Camera.X), int(g.Camera.Y)))).(*ebiten.Image),
+			},
+		})
+
+	// Player
+	g.Player.Draw(g)
+
+	// Gun/torch
 	ebitenutil.DrawRect(
 		g.Camera.Surface,
 		sX,
@@ -237,6 +255,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		10,
 		color.White,
 	)
+
 	// Zombies
 	for _, z := range g.Zombies {
 		z.Draw(g)

@@ -8,6 +8,7 @@ import (
 	"embed"
 	"encoding/json"
 	"image/png"
+	"io"
 	"io/ioutil"
 	"log"
 	"path"
@@ -137,4 +138,27 @@ func loadMaps(name string) *ldtkgo.Project {
 	}
 
 	return maps
+}
+
+// Load a kage file and parse it as an ebiten shader
+func loadShader(name string) *ebiten.Shader {
+	log.Printf("loading %s\n", name)
+
+	file, err := assets.Open(name)
+	if err != nil {
+		log.Fatalf("error opening file %s: %v\n", name, err)
+	}
+	defer file.Close()
+
+	raw, err := io.ReadAll(file)
+	if err != nil {
+		log.Fatalf("error reading file %s: %v\n", name, err)
+	}
+
+	shader, err := ebiten.NewShader(raw)
+	if err != nil {
+		log.Fatalf("error parsing shader %s: %v\n", name, err)
+	}
+
+	return shader
 }
