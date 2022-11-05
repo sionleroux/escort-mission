@@ -37,13 +37,13 @@ func (p *Player) Update(g *Game) {
 	p.State = playerIdle
 
 	if ebiten.IsKeyPressed(ebiten.KeyW) {
-		p.MoveUp()
+		p.MoveForward()
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
 		p.MoveLeft()
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyS) {
-		p.MoveDown()
+		p.MoveBackward()
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyD) {
 		p.MoveRight()
@@ -75,24 +75,36 @@ func (p *Player) animate(g *Game) {
 	}
 }
 
-// MoveUp moves the player upwards
-func (p *Player) MoveUp() {
-	p.move(0, -playerSpeed)
-}
-
-// MoveDown moves the player downwards
-func (p *Player) MoveDown() {
-	p.move(0, playerSpeed)
-}
-
 // MoveLeft moves the player left
 func (p *Player) MoveLeft() {
-	p.move(-playerSpeed, 0)
+	p.move(
+		-math.Sin(p.Angle)*playerSpeed,
+		math.Cos(p.Angle)*playerSpeed,
+	)
 }
 
 // MoveRight moves the player right
 func (p *Player) MoveRight() {
-	p.move(playerSpeed, 0)
+	p.move(
+		math.Sin(p.Angle)*playerSpeed,
+		-math.Cos(p.Angle)*playerSpeed,
+	)
+}
+
+// MoveForward moves the player forward towards the pointer
+func (p *Player) MoveForward() {
+	p.move(
+		-math.Cos(p.Angle)*playerSpeed,
+		-math.Sin(p.Angle)*playerSpeed,
+	)
+}
+
+// MoveBackward moves the player backward away from the pointer
+func (p *Player) MoveBackward() {
+	p.move(
+		math.Cos(p.Angle)*playerSpeed,
+		math.Sin(p.Angle)*playerSpeed,
+	)
 }
 
 // Move the Player by the given vector if it is possible to do so
