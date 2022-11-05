@@ -40,6 +40,7 @@ func main() {
 		Space:  space,
 		Wall:   wall,
 		Level:  0,
+		Tick:   0,
 	}
 
 	go NewGame(game)
@@ -53,6 +54,7 @@ func main() {
 type Game struct {
 	Width        int
 	Height       int
+	Tick         int
 	TileRenderer *TileRenderer
 	LDTKProject  *ldtkgo.Project
 	Level        int
@@ -122,7 +124,8 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 
 // Update calculates game logic
 func (g *Game) Update() error {
-	
+	g.Tick++
+
 	// Pressing Q any time quits immediately
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		return errors.New("game quit by player")

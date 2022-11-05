@@ -62,7 +62,9 @@ func (p *Player) animate(g *Game) {
 		p.Frame = 0
 	case playerWalking:
 		//(p.Frame - startFrame + step) % (endFrame - startFrame + 1) + startFrame
-		p.Frame = (p.Frame - 0 + 1) % (2 - 0 + 1) + 0
+		if (g.Tick%5 == 0) {
+			p.Frame = (p.Frame - 0 + 1) % (2 - 0 + 1) + 0
+		}
 	}
 }
 
