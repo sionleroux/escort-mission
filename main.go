@@ -7,7 +7,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"image/color"
 	"log"
 	"math"
 
@@ -193,17 +192,18 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Player.Draw(g)
 
 	// Gun
-	sX, sY := g.Camera.GetScreenCoords(
-		g.Player.Object.X-math.Cos(g.Player.Angle)*20,
-		g.Player.Object.Y-math.Sin(g.Player.Angle)*20)
-	ebitenutil.DrawRect(
-		g.Camera.Surface,
-		sX,
-		sY,
-		10,
-		10,
-		color.White,
-	)
+	// sX, sY := g.Camera.GetScreenCoords(
+	// 	g.Player.Object.X-math.Cos(g.Player.Angle)*20,
+	// 	g.Player.Object.Y-math.Sin(g.Player.Angle)*20)
+	// ebitenutil.DrawRect(
+	// 	g.Camera.Surface,
+	// 	sX,
+	// 	sY,
+	// 	10,
+	// 	10,
+	// 	color.White,
+	// )
+
 	// Zombies
 	for _, z := range g.Zombies {
 		z.Draw(g)
