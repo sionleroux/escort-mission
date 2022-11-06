@@ -22,8 +22,10 @@ import (
 const HowManyZombies int = 5
 
 const (
-	tagMob  = "mob"
-	tagWall = "wall"
+	tagPlayer = "player"
+	tagMob    = "mob"
+	tagWall   = "wall"
+	tagDog    = "dog"
 )
 
 func main() {
@@ -62,6 +64,7 @@ type Game struct {
 	Camera       *camera.Camera
 	Sprites      map[SpriteType]*SpriteSheet
 	Player       *Player
+	Dog          *Dog
 	Zombies      []*Zombie
 	Space        *resolv.Space
 }
@@ -93,15 +96,25 @@ func NewGame(g *Game) {
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
 	g.Sprites[spritePlayer] = loadSprite("Player")
 	g.Sprites[spriteZombie] = loadSprite("Zombie")
+	g.Sprites[spriteDog] = loadSprite("Dog")
 
 	//Add player to the game
 	g.Player = &Player{
 		State:  playerIdle,
-		Object: resolv.NewObject(float64(g.Width/2), float64(g.Height/2), 20, 20),
+		Object: resolv.NewObject(float64(g.Width/2), float64(g.Height/2), 20, 20, tagPlayer),
 		Angle:  0,
 		Sprite: g.Sprites[spritePlayer],
 	}
 	g.Space.Add(g.Player.Object)
+
+	// Add dog to the game
+	g.Dog = &Dog{
+		Object: resolv.NewObject(float64(g.Width/2 + 32), float64(g.Height/2), 32, 32, tagDog),
+		Angle:  0,
+		Sprite: g.Sprites[spriteDog],
+		State:  dogWalking,
+	}
+	g.Space.Add(g.Dog.Object)
 
 	//Add zombies to the game
 	zs := []*Zombie{}
@@ -142,6 +155,9 @@ func (g *Game) Update() error {
 
 	// Update player
 	g.Player.Update(g)
+
+	// Update dog
+	g.Dog.Update(g)
 
 	// Move zombie towards player
 	for _, z := range g.Zombies {
@@ -190,6 +206,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Player
 	g.Player.Draw(g)
+
+	// Dog
+	g.Dog.Draw(g)
 
 	// Gun
 	// sX, sY := g.Camera.GetScreenCoords(
