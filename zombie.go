@@ -51,6 +51,22 @@ func (z *Zombie) animate(g *Game) {
 	}
 }
 
+// Move determines which way to move the zombie
+func (z *Zombie) Move(g *Game) {
+	if z.Object.X < g.Player.Object.X {
+		z.MoveRight()
+	}
+	if z.Object.X > g.Player.Object.X {
+		z.MoveLeft()
+	}
+	if z.Object.Y < g.Player.Object.Y {
+		z.MoveDown()
+	}
+	if z.Object.Y > g.Player.Object.Y {
+		z.MoveUp()
+	}
+}
+
 // MoveUp moves the zombie upwards
 func (z *Zombie) MoveUp() {
 	z.move(0, -zombieSpeed)

@@ -145,18 +145,7 @@ func (g *Game) Update() error {
 
 	// Move zombie towards player
 	for _, z := range g.Zombies {
-		if z.Object.X < g.Player.Object.X {
-			z.MoveRight()
-		}
-		if z.Object.X > g.Player.Object.X {
-			z.MoveLeft()
-		}
-		if z.Object.Y < g.Player.Object.Y {
-			z.MoveDown()
-		}
-		if z.Object.Y > g.Player.Object.Y {
-			z.MoveUp()
-		}
+		z.Move(g)
 	}
 
 	// Collision detection and response between zombie and player
