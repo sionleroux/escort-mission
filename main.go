@@ -62,7 +62,7 @@ type Game struct {
 	Camera       *camera.Camera
 	Sprites      map[SpriteType]*SpriteSheet
 	Player       *Player
-	Zombies      []*Zombie
+	Zombies      Zombies
 	Space        *resolv.Space
 }
 
@@ -143,10 +143,8 @@ func (g *Game) Update() error {
 	// Update player
 	g.Player.Update(g)
 
-	// Move zombie towards player
-	for _, z := range g.Zombies {
-		z.Move(g)
-	}
+	// Update zombies
+	g.Zombies.Update(g)
 
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
@@ -154,11 +152,6 @@ func (g *Game) Update() error {
 			log.Printf("%#v", collision)
 			return errors.New("you died")
 		}
-	}
-
-	// Update zombies
-	for _, z := range g.Zombies {
-		z.Update(g)
 	}
 
 	// Position camera and clamp in to the Map dimensions
