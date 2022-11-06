@@ -33,12 +33,9 @@ func main() {
 	ebiten.SetWindowTitle("Escort Mission")
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
-	space := resolv.NewSpace(gameWidth, gameHeight, 20, 20)
-
 	game := &Game{
 		Width:  gameWidth,
 		Height: gameHeight,
-		Space:  space,
 		Level:  0,
 		Tick:   0,
 	}
@@ -76,25 +73,51 @@ func NewGame(g *Game) {
 	g.TileRenderer = renderer
 	g.LDTKProject = ldtkProject
 
+	level := g.LDTKProject.Levels[g.Level]
+
 	bg := ebiten.NewImage(
-		g.LDTKProject.Levels[g.Level].Width,
-		g.LDTKProject.Levels[g.Level].Height,
+		level.Width,
+		level.Height,
 	)
-	bg.Fill(g.LDTKProject.Levels[g.Level].BGColor)
+	bg.Fill(level.BGColor)
 
 	// Render map
-	g.TileRenderer.Render(g.LDTKProject.Levels[g.Level])
+	g.TileRenderer.Render(level)
 	for _, layer := range g.TileRenderer.RenderedLayers {
 		bg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
 	}
 	g.Background = bg
 
-	//Load sprites
+	// Create space for collision detection
+	g.Space = resolv.NewSpace(level.Width, level.Height, 16, 16)
+
+	// Add wall tiles to space for collision detection
+	for _, layer := range level.Layers {
+		switch layer.Type {
+		case ldtkgo.LayerTypeIntGrid:
+
+			if ints := layer.IntGrid; len(ints) > 0 {
+
+				for _, intData := range ints {
+					wall := resolv.NewObject(
+						float64(intData.Position[0]+layer.OffsetX),
+						float64(intData.Position[1]+layer.OffsetY),
+						float64(layer.GridSize),
+						float64(layer.GridSize),
+						tagWall,
+					)
+					g.Space.Add(wall)
+				}
+			}
+		}
+	}
+
+	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
 	g.Sprites[spritePlayer] = loadSprite("Player")
 	g.Sprites[spriteZombie] = loadSprite("Zombie")
 
-	//Add player to the game
+	// Add player to the game
 	g.Player = &Player{
 		State:  playerIdle,
 		Object: resolv.NewObject(float64(g.Width/2), float64(g.Height/2), 20, 20),
@@ -103,7 +126,7 @@ func NewGame(g *Game) {
 	}
 	g.Space.Add(g.Player.Object)
 
-	//Add zombies to the game
+	// Add zombies to the game
 	zs := []*Zombie{}
 	for i := 0; i < HowManyZombies; i++ {
 		z := &Zombie{
@@ -191,19 +214,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Player
 	g.Player.Draw(g)
 
-	// Gun
-	// sX, sY := g.Camera.GetScreenCoords(
-	// 	g.Player.Object.X-math.Cos(g.Player.Angle)*20,
-	// 	g.Player.Object.Y-math.Sin(g.Player.Angle)*20)
-	// ebitenutil.DrawRect(
-	// 	g.Camera.Surface,
-	// 	sX,
-	// 	sY,
-	// 	10,
-	// 	10,
-	// 	color.White,
-	// )
-
 	// Zombies
 	for _, z := range g.Zombies {
 		z.Draw(g)
@@ -212,8 +222,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Camera.Blit(screen)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"FPS: %.2f\nTPS: %.2f\n",
+		"FPS: %.2f\nTPS: %.2f\nX: %.2f\nY: %.2f\n",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
+		g.Player.Object.X / 32,
+		g.Player.Object.Y / 32,
 	))
 }
