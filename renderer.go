@@ -2,12 +2,10 @@ package main
 
 import (
 	"image"
-	"image/color"
 	"path"
 	"sort"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/solarlune/ldtkgo"
 
 	_ "image/png" // Importing for loading PNGs
@@ -121,26 +119,9 @@ func (er *TileRenderer) Render(level *ldtkgo.Level) {
 
 		switch layer.Type {
 
-		case ldtkgo.LayerTypeIntGrid:
-			if ints := layer.IntGrid; len(ints) > 0 {
-
-				er.beginLayer(layer, level.Width, level.Height)
-
-				for _, intData := range ints {
-					// It would be great to read color from ldtk, but it seems that ldtkgo does not parse definitions
-					// Or use a tile image
-					ebitenutil.DrawRect(
-						er.RenderedLayers[len(er.RenderedLayers)-1].Image,
-						float64(intData.Position[0]+layer.OffsetX),
-						float64(intData.Position[1]+layer.OffsetY),
-						float64(layer.GridSize),
-						float64(layer.GridSize),
-						color.RGBA{0, 0, 255, 255},
-					)
-				}
-
-			}
-		case ldtkgo.LayerTypeAutoTile:
+		case ldtkgo.LayerTypeIntGrid: // IntGrid is rendered from AutoTiles
+			fallthrough
+		case ldtkgo.LayerTypeAutoTile: // AutoTile is rendered in the same way as Tile
 			fallthrough
 		case ldtkgo.LayerTypeTile:
 			if tiles := layer.AllTiles(); len(tiles) > 0 {
