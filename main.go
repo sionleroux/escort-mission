@@ -140,6 +140,10 @@ func (g *Game) Update() error {
 		}
 	}
 
+	if g.Player.State != playerShooting && clicked() {
+		g.Player.State = playerShooting
+	}
+
 	// Update player
 	g.Player.Update(g)
 
@@ -198,4 +202,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
 	))
+}
+
+// Clicked is shorthand for when the left mouse button has just been clicked
+func clicked() bool {
+	return inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
 }

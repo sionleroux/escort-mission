@@ -20,7 +20,9 @@ const playerSpeed float64 = 1.2
 const (
 	playerIdle     int = 0
 	playerWalking      = 1
-	playerShooting     = 2
+	playerReady        = 2
+	playerShooting     = 3
+	playerUnready      = 4
 )
 
 // Player is the player character in the game
@@ -34,19 +36,21 @@ type Player struct {
 
 // Update updates the state of the player
 func (p *Player) Update(g *Game) {
-	p.State = playerIdle
+	if p.State != playerShooting {
+		p.State = playerIdle
 
-	if ebiten.IsKeyPressed(ebiten.KeyW) {
-		p.MoveForward()
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		p.MoveLeft()
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyS) {
-		p.MoveBackward()
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		p.MoveRight()
+		if ebiten.IsKeyPressed(ebiten.KeyW) {
+			p.MoveForward()
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyA) {
+			p.MoveLeft()
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyS) {
+			p.MoveBackward()
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyD) {
+			p.MoveRight()
+		}
 	}
 
 	// Player gun rotation
@@ -70,8 +74,12 @@ func (p *Player) animate(g *Game) {
 	if ft.From == ft.To {
 		p.Frame = ft.From
 	} else {
-		// Contiuously increase the Frame counter between From and To
+		// Continuously increase the Frame counter between From and To
 		p.Frame = (p.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
+	}
+
+	if p.State == playerShooting && p.Frame == ft.To {
+		p.State = playerIdle
 	}
 }
 
