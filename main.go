@@ -142,6 +142,9 @@ func (g *Game) Update() error {
 
 	if g.Player.State != playerShooting && clicked() {
 		g.Player.State = playerShooting
+		// TODO: replace this with zombie dying state, animation, sfx
+		// and only remove it *afterwards*
+		g.Zombies = g.Zombies[1:]
 	}
 
 	// Update player
