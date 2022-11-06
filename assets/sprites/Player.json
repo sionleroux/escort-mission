@@ -1,0 +1,212 @@
+{ "frames": [
+   {
+    "filename": "Player 0.png",
+    "frame": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 1.png",
+    "frame": { "x": 16, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 2.png",
+    "frame": { "x": 32, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 3.png",
+    "frame": { "x": 48, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 4.png",
+    "frame": { "x": 64, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 5.png",
+    "frame": { "x": 80, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 6.png",
+    "frame": { "x": 96, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 7.png",
+    "frame": { "x": 112, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 8.png",
+    "frame": { "x": 128, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 9.png",
+    "frame": { "x": 144, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 10.png",
+    "frame": { "x": 160, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 11.png",
+    "frame": { "x": 176, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 12.png",
+    "frame": { "x": 192, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 13.png",
+    "frame": { "x": 208, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 14.png",
+    "frame": { "x": 224, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 15.png",
+    "frame": { "x": 240, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 16.png",
+    "frame": { "x": 256, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 17.png",
+    "frame": { "x": 272, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 18.png",
+    "frame": { "x": 288, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 19.png",
+    "frame": { "x": 304, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "Player 20.png",
+    "frame": { "x": 320, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.2.40-x64",
+  "image": "Player.png",
+  "format": "RGBA8888",
+  "size": { "w": 336, "h": 16 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "Idle", "from": 0, "to": 0, "direction": "forward" },
+   { "name": "Running", "from": 1, "to": 8, "direction": "forward" },
+   { "name": "Ready", "from": 9, "to": 12, "direction": "forward" },
+   { "name": "Shooting", "from": 13, "to": 16, "direction": "forward" },
+   { "name": "Unready", "from": 17, "to": 20, "direction": "forward" }
+  ],
+  "layers": [
+   { "name": "Sprite Sheet", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}
