@@ -12,6 +12,15 @@ import (
 	"github.com/solarlune/resolv"
 )
 
+// Coord is the coordinate of a path point
+type Coord struct {
+	X float64
+	Y float64
+}
+
+// Path is an array of coordinates
+type Path []Coord
+
 // dogSpeed is the distance the dog moves per update cycle
 const dogSpeed float64 = 0.3
 
@@ -30,6 +39,7 @@ type Dog struct {
 	Speed  float64
 	Frame  int
 	State  int
+	Path   Path
 	Sprite *SpriteSheet
 }
 
@@ -65,26 +75,6 @@ func (d *Dog) MoveForward() {
 		math.Cos(d.Angle)*dogSpeed,
 		math.Sin(d.Angle)*dogSpeed,
 	)
-}
-
-// MoveUp moves the dog upwards
-func (d *Dog) MoveUp() {
-	d.move(0, -dogSpeed)
-}
-
-// MoveDown moves the dog downwards
-func (d *Dog) MoveDown() {
-	d.move(0, dogSpeed)
-}
-
-// MoveLeft moves the dog left
-func (d *Dog) MoveLeft() {
-	d.move(-dogSpeed, 0)
-}
-
-// MoveRight moves the dog right
-func (d *Dog) MoveRight() {
-	d.move(dogSpeed, 0)
 }
 
 // Move the Dog by the given vector if it is possible to do so

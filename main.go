@@ -18,6 +18,9 @@ import (
 	"github.com/solarlune/resolv"
 )
 
+// LayerEntities is the layer to use for entity positions
+const LayerEntities int = 0
+
 // HowManyZombies is how many zombies to generate at the start of the game
 const HowManyZombies int = 5
 
@@ -126,11 +129,23 @@ func NewGame(g *Game) {
 	}
 	g.Space.Add(g.Player.Object)
 
+	// Load the dog's path
+	pathArray := g.EntityByIdentifier("Dog").Properties[0].AsArray()
+	path := make([]Coord, len(pathArray))
+	for index, pathCoord := range pathArray {
+		// Do we really need to make these crazy castings?
+		path[index] = Coord{
+			X: pathCoord.(map[string]interface{})["cx"].(float64),
+			Y: pathCoord.(map[string]interface{})["cy"].(float64),
+		}
+	}
+
 	// Add dog to the game
 	g.Dog = &Dog{
 		Object: resolv.NewObject(float64(g.Width/2 + 32), float64(g.Height/2), 32, 32, tagDog),
 		Angle:  0,
 		Sprite: g.Sprites[spriteDog],
+		Path: path,
 		State:  dogWalking,
 	}
 	g.Space.Add(g.Dog.Object)
@@ -237,4 +252,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 // Clicked is shorthand for when the left mouse button has just been clicked
 func clicked() bool {
 	return inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
+}
+
+// EntityByIdentifier is a convenience function for the same thing in ldtkgo but
+// defaulting to checking the Entities layer of the current level
+func (g *Game) EntityByIdentifier(identifier string) *ldtkgo.Entity {
+	return g.LDTKProject.Levels[g.Level].
+		Layers[LayerEntities].
+		EntityByIdentifier(identifier)
 }
