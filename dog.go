@@ -51,8 +51,10 @@ func (d *Dog) Update(g *Game) {
 
 	playerDistance := math.Sqrt(math.Pow(d.Object.X - g.Player.Object.X, 2) + math.Pow(d.Object.Y - g.Player.Object.Y, 2))
 	if playerDistance < waitingDistance {
+		d.State = dogSniffing
 		d.MoveForward()
-
+	} else {
+		d.State = dogSitting
 	}
 
 	d.animate(g)
