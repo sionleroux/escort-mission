@@ -18,9 +18,6 @@ import (
 	"github.com/solarlune/resolv"
 )
 
-// HowManyZombies is how many zombies to generate at the start of the game
-const HowManyZombies int = 5
-
 const (
 	tagMob  = "mob"
 	tagWall = "wall"
@@ -128,17 +125,18 @@ func NewGame(g *Game) {
 	g.Space.Add(g.Player.Object)
 
 	// Add zombies to the game
-	zs := []*Zombie{}
-	for i := 0; i < HowManyZombies; i++ {
-		z := &Zombie{
-			Object: resolv.NewObject(float64(g.Width)/(float64(i)+1)*3, float64(g.Height)/(float64(i)+1*3), 16, 16, tagMob),
-			Angle:  0,
-			Sprite: g.Sprites[spriteZombie],
+	for _, e := range entities.Entities {
+		if e.Identifier == "Zombie" {
+
+			z := &Zombie{
+				Object: resolv.NewObject(float64(e.Position[0]), float64(e.Position[1]), 16, 16, tagMob),
+				Angle:  0,
+				Sprite: g.Sprites[spriteZombie],
+			}
+			g.Space.Add(z.Object)
+			g.Zombies = append(g.Zombies, z)
 		}
-		g.Space.Add(z.Object)
-		zs = append(zs, z)
 	}
-	g.Zombies = zs
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
