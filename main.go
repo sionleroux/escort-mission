@@ -113,10 +113,15 @@ func NewGame(g *Game) {
 	g.Sprites[spritePlayer] = loadSprite("Player")
 	g.Sprites[spriteZombie] = loadSprite("Zombie")
 
+	// Load entities from map
+	entities := level.LayerByIdentifier("Entities")
+
 	// Add player to the game
+	playerPosition := entities.EntityByIdentifier("Player").Position
+
 	g.Player = &Player{
 		State:  playerIdle,
-		Object: resolv.NewObject(float64(g.Width/2), float64(g.Height/2), 20, 20),
+		Object: resolv.NewObject(float64(playerPosition[0]), float64(playerPosition[1]), 20, 20),
 		Angle:  0,
 		Sprite: g.Sprites[spritePlayer],
 	}
@@ -210,8 +215,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		"FPS: %.2f\nTPS: %.2f\nX: %.2f\nY: %.2f\n",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
-		g.Player.Object.X / 32,
-		g.Player.Object.Y / 32,
+		g.Player.Object.X/32,
+		g.Player.Object.Y/32,
 	))
 }
 
