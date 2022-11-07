@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -142,6 +143,10 @@ func NewGame(g *Game) {
 		path[index] = Coord{
 			X: pathCoord.(map[string]interface{})["cx"].(float64),
 			Y: pathCoord.(map[string]interface{})["cy"].(float64),
+		}
+
+		if index > 0 {
+			ebitenutil.DrawLine(g.Background, path[index-1].X, path[index-1].Y, path[index].X, path[index].Y, color.Black)
 		}
 	}
 
