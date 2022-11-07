@@ -24,6 +24,9 @@ type Path []Coord
 // dogSpeed is the distance the dog moves per update cycle
 const dogSpeed float64 = 0.3
 
+// waitingDistance is the maximum distance the dog walks away from the player
+const waitingDistance float64 = 96
+
 // states of the dog
 // It would be great to map them to the frameTag.Name from JSON
 const (
@@ -46,7 +49,11 @@ type Dog struct {
 // Update updates the state of the dog
 func (d *Dog) Update(g *Game) {
 
-	d.MoveForward()
+	playerDistance := math.Sqrt(math.Pow(d.Object.X - g.Player.Object.X, 2) + math.Pow(d.Object.Y - g.Player.Object.Y, 2))
+	if playerDistance < waitingDistance {
+		d.MoveForward()
+
+	}
 
 	d.animate(g)
 	d.Object.Update()
