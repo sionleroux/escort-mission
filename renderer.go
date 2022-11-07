@@ -119,12 +119,11 @@ func (er *TileRenderer) Render(level *ldtkgo.Level) {
 
 		switch layer.Type {
 
-		case ldtkgo.LayerTypeIntGrid: // IntGrids get autotiles automatically
+		case ldtkgo.LayerTypeIntGrid: // IntGrid is rendered from AutoTiles
 			fallthrough
-		case ldtkgo.LayerTypeAutoTile:
+		case ldtkgo.LayerTypeAutoTile: // AutoTile is rendered in the same way as Tile
 			fallthrough
 		case ldtkgo.LayerTypeTile:
-
 			if tiles := layer.AllTiles(); len(tiles) > 0 {
 
 				er.beginLayer(layer, level.Width, level.Height)

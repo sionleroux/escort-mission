@@ -35,12 +35,9 @@ func main() {
 	ebiten.SetWindowTitle("Escort Mission")
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
-	space := resolv.NewSpace(gameWidth, gameHeight, 20, 20)
-
 	game := &Game{
 		Width:  gameWidth,
 		Height: gameHeight,
-		Space:  space,
 		Level:  0,
 		Tick:   0,
 	}
@@ -65,7 +62,7 @@ type Game struct {
 	Sprites      map[SpriteType]*SpriteSheet
 	Player       *Player
 	Dog          *Dog
-	Zombies      []*Zombie
+	Zombies      Zombies
 	Space        *resolv.Space
 }
 
@@ -79,26 +76,48 @@ func NewGame(g *Game) {
 	g.TileRenderer = renderer
 	g.LDTKProject = ldtkProject
 
+	level := g.LDTKProject.Levels[g.Level]
+
 	bg := ebiten.NewImage(
-		g.LDTKProject.Levels[g.Level].Width,
-		g.LDTKProject.Levels[g.Level].Height,
+		level.Width,
+		level.Height,
 	)
-	bg.Fill(g.LDTKProject.Levels[g.Level].BGColor)
+	bg.Fill(level.BGColor)
 
 	// Render map
-	g.TileRenderer.Render(g.LDTKProject.Levels[g.Level])
+	g.TileRenderer.Render(level)
 	for _, layer := range g.TileRenderer.RenderedLayers {
 		bg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
 	}
 	g.Background = bg
 
-	//Load sprites
+	// Create space for collision detection
+	g.Space = resolv.NewSpace(level.Width, level.Height, 16, 16)
+
+	// Add wall tiles to space for collision detection
+	for _, layer := range level.Layers {
+		switch layer.Type {
+		case ldtkgo.LayerTypeIntGrid:
+
+			for _, intData := range layer.IntGrid {
+				g.Space.Add(resolv.NewObject(
+					float64(intData.Position[0]+layer.OffsetX),
+					float64(intData.Position[1]+layer.OffsetY),
+					float64(layer.GridSize),
+					float64(layer.GridSize),
+					tagWall,
+				))
+			}
+		}
+	}
+
+	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
 	g.Sprites[spritePlayer] = loadSprite("Player")
 	g.Sprites[spriteZombie] = loadSprite("Zombie")
 	g.Sprites[spriteDog] = loadSprite("Dog")
 
-	//Add player to the game
+	// Add player to the game
 	g.Player = &Player{
 		State:  playerIdle,
 		Object: resolv.NewObject(float64(g.Width/2), float64(g.Height/2), 20, 20, tagPlayer),
@@ -116,7 +135,7 @@ func NewGame(g *Game) {
 	}
 	g.Space.Add(g.Dog.Object)
 
-	//Add zombies to the game
+	// Add zombies to the game
 	zs := []*Zombie{}
 	for i := 0; i < HowManyZombies; i++ {
 		z := &Zombie{
@@ -153,27 +172,21 @@ func (g *Game) Update() error {
 		}
 	}
 
+	if g.Player.State != playerShooting && clicked() {
+		g.Player.State = playerShooting
+		// TODO: replace this with zombie dying state, animation, sfx
+		// and only remove it *afterwards*
+		g.Zombies = g.Zombies[1:]
+	}
+
 	// Update player
 	g.Player.Update(g)
 
 	// Update dog
 	g.Dog.Update(g)
 
-	// Move zombie towards player
-	for _, z := range g.Zombies {
-		if z.Object.X < g.Player.Object.X {
-			z.MoveRight()
-		}
-		if z.Object.X > g.Player.Object.X {
-			z.MoveLeft()
-		}
-		if z.Object.Y < g.Player.Object.Y {
-			z.MoveDown()
-		}
-		if z.Object.Y > g.Player.Object.Y {
-			z.MoveUp()
-		}
-	}
+	// Update zombies
+	g.Zombies.Update(g)
 
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
@@ -181,11 +194,6 @@ func (g *Game) Update() error {
 			log.Printf("%#v", collision)
 			return errors.New("you died")
 		}
-	}
-
-	// Update zombies
-	for _, z := range g.Zombies {
-		z.Update(g)
 	}
 
 	// Position camera and clamp in to the Map dimensions
@@ -210,19 +218,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Dog
 	g.Dog.Draw(g)
 
-	// Gun
-	// sX, sY := g.Camera.GetScreenCoords(
-	// 	g.Player.Object.X-math.Cos(g.Player.Angle)*20,
-	// 	g.Player.Object.Y-math.Sin(g.Player.Angle)*20)
-	// ebitenutil.DrawRect(
-	// 	g.Camera.Surface,
-	// 	sX,
-	// 	sY,
-	// 	10,
-	// 	10,
-	// 	color.White,
-	// )
-
 	// Zombies
 	for _, z := range g.Zombies {
 		z.Draw(g)
@@ -231,8 +226,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Camera.Blit(screen)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"FPS: %.2f\nTPS: %.2f\n",
+		"FPS: %.2f\nTPS: %.2f\nX: %.2f\nY: %.2f\n",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
+		g.Player.Object.X / 32,
+		g.Player.Object.Y / 32,
 	))
+}
+
+// Clicked is shorthand for when the left mouse button has just been clicked
+func clicked() bool {
+	return inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
 }

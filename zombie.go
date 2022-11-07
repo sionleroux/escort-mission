@@ -15,6 +15,16 @@ import (
 // zombieSpeed is the distance the zombie moves per update cycle
 const zombieSpeed float64 = 0.2
 
+// Zombies is an array of Zombie
+type Zombies []*Zombie
+
+// Update updates all the zombies
+func (zs Zombies) Update(g *Game) {
+	for _, z := range zs {
+		z.Update(g)
+	}
+}
+
 // Zombie is a monster that's trying to eat the player character
 type Zombie struct {
 	Object *resolv.Object
@@ -29,6 +39,21 @@ func (z *Zombie) Update(g *Game) {
 	adjacent := z.Object.X - g.Player.Object.X
 	opposite := z.Object.Y - g.Player.Object.Y
 	z.Angle = math.Atan2(opposite, adjacent)
+
+	// Zombie movement logic
+	// TODO: this could be simplified using maths
+	if z.Object.X < g.Player.Object.X {
+		z.MoveRight()
+	}
+	if z.Object.X > g.Player.Object.X {
+		z.MoveLeft()
+	}
+	if z.Object.Y < g.Player.Object.Y {
+		z.MoveDown()
+	}
+	if z.Object.Y > g.Player.Object.Y {
+		z.MoveUp()
+	}
 
 	z.animate(g)
 	z.Object.Update()

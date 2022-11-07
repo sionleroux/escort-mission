@@ -1,2 +1,2 @@
-*.ldtk binary
-assets/sprites/*.json binary
+*.ldtk binary linguist-generated
+assets/sprites/*.json binary linguist-generated
