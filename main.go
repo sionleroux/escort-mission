@@ -155,8 +155,7 @@ func NewGame(g *Game) {
 		Object: resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 32, 32, tagDog),
 		Angle:  0,
 		Sprite: g.Sprites[spriteDog],
-		Path: path,
-		State:  dogWalking,
+		Path:   path,
 	}
 	g.Space.Add(g.Dog.Object)
 
@@ -262,4 +261,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 // Clicked is shorthand for when the left mouse button has just been clicked
 func clicked() bool {
 	return inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
+}
+
+// CalcDistance calculates the distance between two coordinates
+func CalcDistance(x1, y1, x2, y2 float64) float64 {
+	return math.Sqrt(math.Pow(x1-x2, 2) + math.Pow(y1-y2, 2))
 }

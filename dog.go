@@ -22,7 +22,7 @@ type Coord struct {
 type Path []Coord
 
 // dogSpeed is the distance the dog moves per update cycle
-const dogSpeed float64 = 0.3
+const dogSpeed float64 = 1
 
 // waitingDistance is the maximum distance the dog walks away from the player
 const waitingDistance float64 = 96
@@ -37,22 +37,22 @@ const (
 
 // Dog is player's companion
 type Dog struct {
-	Object *resolv.Object
-	Angle  float64
-	Speed  float64
-	Frame  int
-	State  int
-	Path   Path
-	Sprite *SpriteSheet
+	Object   *resolv.Object
+	Angle    float64
+	Speed    float64
+	Frame    int
+	State    int
+	Path     Path
+	NextPath int
+	Sprite   *SpriteSheet
 }
 
 // Update updates the state of the dog
 func (d *Dog) Update(g *Game) {
-
-	playerDistance := math.Sqrt(math.Pow(d.Object.X - g.Player.Object.X, 2) + math.Pow(d.Object.Y - g.Player.Object.Y, 2))
+	playerDistance := CalcDistance(g.Player.Object.X, g.Player.Object.Y, d.Object.X, d.Object.Y)
 	if playerDistance < waitingDistance {
 		d.State = dogSniffing
-		d.MoveForward()
+		d.FollowPath()
 	} else {
 		d.State = dogSitting
 	}
@@ -77,9 +77,22 @@ func (d *Dog) animate(g *Game) {
 	}
 }
 
+// FollowPath moves the dog along the path
+func (d *Dog) FollowPath() {
+	
+	nextPathCoordDistance := CalcDistance(d.Path[d.NextPath].X, d.Path[d.NextPath].Y, d.Object.X, d.Object.Y)
+	if d.NextPath==0 || nextPathCoordDistance < 2 {
+		d.NextPath++
+		if d.NextPath == len(d.Path) {
+			d.NextPath = 0
+		}
+		adjacent := d.Object.X - float64(d.Path[d.NextPath].X)
+		opposite := d.Object.Y - float64(d.Path[d.NextPath].Y)
+		// math.Pi is needed only until the dog sprite is looking up
+		d.Angle = math.Atan2(opposite, adjacent)-math.Pi
+	}
 
-// MoveForward moves the dog forward without turning
-func (d *Dog) MoveForward() {
+	// Temporary until the dog sprite is looking up
 	d.move(
 		math.Cos(d.Angle)*dogSpeed,
 		math.Sin(d.Angle)*dogSpeed,
@@ -88,10 +101,9 @@ func (d *Dog) MoveForward() {
 
 // Move the Dog by the given vector if it is possible to do so
 func (d *Dog) move(dx, dy float64) {
-	if collision := d.Object.Check(dx, dy, tagMob, tagWall); collision == nil {
-		d.Object.X += dx
-		d.Object.Y += dy
-	}
+	// No collision detection for the time being
+	d.Object.X += dx
+	d.Object.Y += dy
 }
 
 // Draw draws the Dog to the screen
@@ -116,7 +128,6 @@ func (d *Dog) Draw(g *Game) {
 		)).(*ebiten.Image),
 		g.Camera.GetTranslation(
 			op,
-			float64(d.Object.X)+float64(frame.Position.W/2),
-			float64(d.Object.Y)+float64(frame.Position.H/2)))
-
+			float64(d.Object.X),
+			float64(d.Object.Y)))
 }
