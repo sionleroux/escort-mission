@@ -96,18 +96,14 @@ func NewGame(g *Game) {
 		switch layer.Type {
 		case ldtkgo.LayerTypeIntGrid:
 
-			if ints := layer.IntGrid; len(ints) > 0 {
-
-				for _, intData := range ints {
-					wall := resolv.NewObject(
-						float64(intData.Position[0]+layer.OffsetX),
-						float64(intData.Position[1]+layer.OffsetY),
-						float64(layer.GridSize),
-						float64(layer.GridSize),
-						tagWall,
-					)
-					g.Space.Add(wall)
-				}
+			for _, intData := range layer.IntGrid {
+				g.Space.Add(resolv.NewObject(
+					float64(intData.Position[0]+layer.OffsetX),
+					float64(intData.Position[1]+layer.OffsetY),
+					float64(layer.GridSize),
+					float64(layer.GridSize),
+					tagWall,
+				))
 			}
 		}
 	}
