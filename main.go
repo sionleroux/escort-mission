@@ -120,6 +120,9 @@ func NewGame(g *Game) {
 	g.Sprites[spriteZombie] = loadSprite("Zombie")
 	g.Sprites[spriteDog] = loadSprite("Dog")
 
+	// Load entities from map
+	entities := level.LayerByIdentifier("Entities")
+
 	// Add player to the game
 	g.Player = &Player{
 		State:  playerIdle,
@@ -130,7 +133,9 @@ func NewGame(g *Game) {
 	g.Space.Add(g.Player.Object)
 
 	// Load the dog's path
-	pathArray := g.EntityByIdentifier("Dog").Properties[0].AsArray()
+	dogEntity := entities.EntityByIdentifier("Dog")
+
+	pathArray := dogEntity.Properties[0].AsArray()
 	path := make([]Coord, len(pathArray))
 	for index, pathCoord := range pathArray {
 		// Do we really need to make these crazy castings?
@@ -142,7 +147,7 @@ func NewGame(g *Game) {
 
 	// Add dog to the game
 	g.Dog = &Dog{
-		Object: resolv.NewObject(float64(g.Width/2 + 32), float64(g.Height/2), 32, 32, tagDog),
+		Object: resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 32, 32, tagDog),
 		Angle:  0,
 		Sprite: g.Sprites[spriteDog],
 		Path: path,
@@ -252,12 +257,4 @@ func (g *Game) Draw(screen *ebiten.Image) {
 // Clicked is shorthand for when the left mouse button has just been clicked
 func clicked() bool {
 	return inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
-}
-
-// EntityByIdentifier is a convenience function for the same thing in ldtkgo but
-// defaulting to checking the Entities layer of the current level
-func (g *Game) EntityByIdentifier(identifier string) *ldtkgo.Entity {
-	return g.LDTKProject.Levels[g.Level].
-		Layers[LayerEntities].
-		EntityByIdentifier(identifier)
 }
