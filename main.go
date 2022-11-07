@@ -113,11 +113,12 @@ func NewGame(g *Game) {
 	g.Sprites[spritePlayer] = loadSprite("Player")
 	g.Sprites[spriteZombie] = loadSprite("Zombie")
 
+	// Load entities from map
 	entities := level.LayerByIdentifier("Entities")
-	playerLayer := entities.EntityByIdentifier("Player")
-	playerPosition := playerLayer.Position
 
 	// Add player to the game
+	playerPosition := entities.EntityByIdentifier("Player").Position
+
 	g.Player = &Player{
 		State:  playerIdle,
 		Object: resolv.NewObject(float64(playerPosition[0]), float64(playerPosition[1]), 20, 20),
