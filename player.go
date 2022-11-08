@@ -18,11 +18,11 @@ const playerSpeed float64 = 1.2
 // states of the player
 // It would be great to map them to the frameTag.Name from JSON
 const (
-	playerIdle     int = 0
-	playerWalking      = 1
-	playerReady        = 2
-	playerShooting     = 3
-	playerUnready      = 4
+	playerIdle = iota
+	playerWalking
+	playerReady
+	playerShooting
+	playerUnready
 )
 
 // Player is the player character in the game
