@@ -166,6 +166,7 @@ func (g *Game) Update() error {
 		g.Player.State = playerShooting
 		// TODO: replace this with zombie dying state, animation, sfx
 		// and only remove it *afterwards*
+		g.Space.Remove(g.Zombies[0].Object)
 		g.Zombies = g.Zombies[1:]
 	}
 
