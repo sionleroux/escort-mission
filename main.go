@@ -167,27 +167,7 @@ func (g *Game) Update() error {
 	}
 
 	// Gun shooting handler
-	if g.Player.State != playerShooting && clicked() {
-		g.Player.State = playerShooting
-		var rangeOfFire float64 = 100 // XXX this should come from Player
-		sX, sY := g.Space.WorldToSpace(
-			g.Player.Object.X-math.Cos(g.Player.Angle)*rangeOfFire,
-			g.Player.Object.Y-math.Sin(g.Player.Angle)*rangeOfFire,
-		)
-		pX, pY := g.Space.WorldToSpace(
-			g.Player.Object.X+8, // XXX this should come from Player
-			g.Player.Object.Y+8,
-		)
-		cells := g.Space.CellsInLine(pX, pY, sX, sY)
-		for _, c := range cells {
-			for _, o := range c.Objects {
-				if o.HasTags(tagMob) {
-					log.Println("HIT!")
-					o.Data.(*Zombie).Die()
-				}
-			}
-		}
-	}
+	Shoot(g)
 
 	// Update player
 	g.Player.Update(g)
@@ -246,4 +226,30 @@ func (g *Game) Draw(screen *ebiten.Image) {
 // Clicked is shorthand for when the left mouse button has just been clicked
 func clicked() bool {
 	return inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
+}
+
+// Shoot sets shooting states and also die states for any zombies in range
+func Shoot(g *Game) {
+	if g.Player.State != playerShooting && clicked() {
+		g.Player.State = playerShooting
+		var rangeOfFire float64 = 100 // XXX this should come from Player
+		sX, sY := g.Space.WorldToSpace(
+			g.Player.Object.X-math.Cos(g.Player.Angle)*rangeOfFire,
+			g.Player.Object.Y-math.Sin(g.Player.Angle)*rangeOfFire,
+		)
+		pX, pY := g.Space.WorldToSpace(
+			g.Player.Object.X+8, // XXX this should come from Player
+			g.Player.Object.Y+8,
+		)
+		cells := g.Space.CellsInLine(pX, pY, sX, sY)
+		for _, c := range cells {
+			for _, o := range c.Objects {
+				if o.HasTags(tagMob) {
+					log.Println("HIT!")
+					o.Data.(*Zombie).Die()
+					return // stop at the first zombie
+				}
+			}
+		}
+	}
 }
