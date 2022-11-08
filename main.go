@@ -60,6 +60,9 @@ type Game struct {
 	Space        *resolv.Space
 }
 
+// NewGame fills up the main Game data with assets, entities, pre-generated
+// tiles and other things that take longer to load and would make the game pause
+// before starting if we did it before the first Update loop
 func NewGame(g *Game) {
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
 
@@ -133,6 +136,7 @@ func NewGame(g *Game) {
 				Angle:  0,
 				Sprite: g.Sprites[spriteZombie],
 			}
+			z.Object.Data = z // self-reference for later
 			g.Space.Add(z.Object)
 			g.Zombies = append(g.Zombies, z)
 		}
@@ -162,11 +166,27 @@ func (g *Game) Update() error {
 		}
 	}
 
+	// Gun shooting handler
 	if g.Player.State != playerShooting && clicked() {
 		g.Player.State = playerShooting
-		// TODO: replace this with zombie dying state, animation, sfx
-		// and only remove it *afterwards*
-		g.Zombies = g.Zombies[1:]
+		var rangeOfFire float64 = 100 // XXX this should come from Player
+		sX, sY := g.Space.WorldToSpace(
+			g.Player.Object.X-math.Cos(g.Player.Angle)*rangeOfFire,
+			g.Player.Object.Y-math.Sin(g.Player.Angle)*rangeOfFire,
+		)
+		pX, pY := g.Space.WorldToSpace(
+			g.Player.Object.X+8, // XXX this should come from Player
+			g.Player.Object.Y+8,
+		)
+		cells := g.Space.CellsInLine(pX, pY, sX, sY)
+		for _, c := range cells {
+			for _, o := range c.Objects {
+				if o.HasTags(tagMob) {
+					log.Println("HIT!")
+					o.Data.(*Zombie).Die()
+				}
+			}
+		}
 	}
 
 	// Update player
@@ -210,11 +230,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Camera.Blit(screen)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"FPS: %.2f\nTPS: %.2f\nX: %.2f\nY: %.2f\n",
+		"FPS: %.2f\n"+
+			"TPS: %.2f\n"+
+			"X: %.2f\n"+
+			"Y: %.2f\n"+
+			"Zombies: %d\n",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
 		g.Player.Object.X/32,
 		g.Player.Object.Y/32,
+		len(g.Zombies),
 	))
 }
 
