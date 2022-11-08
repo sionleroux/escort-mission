@@ -118,7 +118,7 @@ func NewGame(g *Game) {
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
 	g.Sprites[spritePlayer] = loadSprite("Player")
-	g.Sprites[spriteZombie] = loadSprite("Zombie")
+	g.Sprites[spriteZombie] = loadSprite("Zombie_1")
 	g.Sprites[spriteDog] = loadSprite("Dog")
 
 	// Load entities from map

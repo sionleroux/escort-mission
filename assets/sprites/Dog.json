@@ -1,6 +1,6 @@
 { "frames": [
    {
-    "filename": "Dog 0.png",
+    "filename": "Dog 0.ase",
     "frame": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -9,7 +9,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 1.png",
+    "filename": "Dog 1.ase",
     "frame": { "x": 32, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -18,7 +18,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 2.png",
+    "filename": "Dog 2.ase",
     "frame": { "x": 64, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -27,7 +27,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 3.png",
+    "filename": "Dog 3.ase",
     "frame": { "x": 96, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -36,7 +36,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 4.png",
+    "filename": "Dog 4.ase",
     "frame": { "x": 128, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -45,7 +45,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 5.png",
+    "filename": "Dog 5.ase",
     "frame": { "x": 160, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -54,7 +54,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 6.png",
+    "filename": "Dog 6.ase",
     "frame": { "x": 192, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -63,7 +63,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 7.png",
+    "filename": "Dog 7.ase",
     "frame": { "x": 224, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -72,7 +72,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 8.png",
+    "filename": "Dog 8.ase",
     "frame": { "x": 256, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -81,7 +81,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 9.png",
+    "filename": "Dog 9.ase",
     "frame": { "x": 288, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -90,7 +90,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 10.png",
+    "filename": "Dog 10.ase",
     "frame": { "x": 320, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -99,7 +99,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 11.png",
+    "filename": "Dog 11.ase",
     "frame": { "x": 352, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -108,7 +108,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 12.png",
+    "filename": "Dog 12.ase",
     "frame": { "x": 384, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -117,7 +117,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 13.png",
+    "filename": "Dog 13.ase",
     "frame": { "x": 416, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -126,7 +126,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 14.png",
+    "filename": "Dog 14.ase",
     "frame": { "x": 448, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -135,7 +135,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 15.png",
+    "filename": "Dog 15.ase",
     "frame": { "x": 480, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -144,7 +144,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 16.png",
+    "filename": "Dog 16.ase",
     "frame": { "x": 512, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -153,7 +153,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 17.png",
+    "filename": "Dog 17.ase",
     "frame": { "x": 544, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -162,7 +162,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 18.png",
+    "filename": "Dog 18.ase",
     "frame": { "x": 576, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -171,7 +171,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 19.png",
+    "filename": "Dog 19.ase",
     "frame": { "x": 608, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -180,7 +180,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 20.png",
+    "filename": "Dog 20.ase",
     "frame": { "x": 640, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -189,7 +189,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 21.png",
+    "filename": "Dog 21.ase",
     "frame": { "x": 672, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -198,7 +198,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 22.png",
+    "filename": "Dog 22.ase",
     "frame": { "x": 704, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -207,7 +207,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 23.png",
+    "filename": "Dog 23.ase",
     "frame": { "x": 736, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -216,7 +216,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 24.png",
+    "filename": "Dog 24.ase",
     "frame": { "x": 768, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -225,7 +225,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 25.png",
+    "filename": "Dog 25.ase",
     "frame": { "x": 800, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -234,7 +234,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 26.png",
+    "filename": "Dog 26.ase",
     "frame": { "x": 832, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -243,7 +243,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 27.png",
+    "filename": "Dog 27.ase",
     "frame": { "x": 864, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -252,7 +252,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 28.png",
+    "filename": "Dog 28.ase",
     "frame": { "x": 896, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -261,7 +261,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 29.png",
+    "filename": "Dog 29.ase",
     "frame": { "x": 928, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -270,7 +270,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 30.png",
+    "filename": "Dog 30.ase",
     "frame": { "x": 960, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -279,7 +279,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 31.png",
+    "filename": "Dog 31.ase",
     "frame": { "x": 992, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -288,7 +288,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 32.png",
+    "filename": "Dog 32.ase",
     "frame": { "x": 1024, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -297,7 +297,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 33.png",
+    "filename": "Dog 33.ase",
     "frame": { "x": 1056, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -306,7 +306,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 34.png",
+    "filename": "Dog 34.ase",
     "frame": { "x": 1088, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -315,7 +315,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 35.png",
+    "filename": "Dog 35.ase",
     "frame": { "x": 1120, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -324,7 +324,7 @@
     "duration": 100
    },
    {
-    "filename": "Dog 36.png",
+    "filename": "Dog 36.ase",
     "frame": { "x": 1152, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
