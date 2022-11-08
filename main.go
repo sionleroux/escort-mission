@@ -141,8 +141,8 @@ func NewGame(g *Game) {
 	for index, pathCoord := range pathArray {
 		// Do we really need to make these crazy castings?
 		path[index] = Coord{
-			X: pathCoord.(map[string]interface{})["cx"].(float64),
-			Y: pathCoord.(map[string]interface{})["cy"].(float64),
+			X: (pathCoord.(map[string]interface{})["cx"].(float64) + 0.5)*float64(entities.GridSize),
+			Y: (pathCoord.(map[string]interface{})["cy"].(float64) + 0.5)*float64(entities.GridSize),
 		}
 
 		if index > 0 {
