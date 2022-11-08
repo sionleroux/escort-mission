@@ -5,7 +5,9 @@
 package main
 
 import (
+	"errors"
 	"image"
+	"log"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -20,21 +22,38 @@ type Zombies []*Zombie
 
 // Update updates all the zombies
 func (zs Zombies) Update(g *Game) {
-	for _, z := range zs {
-		z.Update(g)
+	for i, z := range zs {
+		err := z.Update(g)
+		if err != nil {
+			// clear and remove dead zombies
+			log.Println(err)
+			g.Zombies[i] = nil
+			g.Zombies = append(zs[:i], zs[i+1:]...)
+		}
 	}
 }
+
+// List of possible zombie states
+const (
+	zombieAlive = iota
+	zombieDead
+)
 
 // Zombie is a monster that's trying to eat the player character
 type Zombie struct {
 	Object *resolv.Object
 	Angle  float64
 	Frame  int
+	State  int
 	Sprite *SpriteSheet
 }
 
 // Update updates the state of the zombie
-func (z *Zombie) Update(g *Game) {
+func (z *Zombie) Update(g *Game) error {
+	if z.State == zombieDead {
+		return errors.New("Zombie died")
+	}
+
 	// Zombies rotate towards player
 	adjacent := z.Object.X - g.Player.Object.X
 	opposite := z.Object.Y - g.Player.Object.Y
@@ -57,6 +76,7 @@ func (z *Zombie) Update(g *Game) {
 
 	z.animate(g)
 	z.Object.Update()
+	return nil
 }
 
 func (z *Zombie) animate(g *Game) {
@@ -129,4 +149,10 @@ func (z *Zombie) Draw(g *Game) {
 			float64(z.Object.X)+float64(frame.Position.W/2),
 			float64(z.Object.Y)+float64(frame.Position.H/2)))
 
+}
+
+// Die changes zombie state and updates game data in response to it getting shot
+func (z *Zombie) Die() {
+	z.Object.Space.Remove(z.Object)
+	z.State = zombieDead
 }
