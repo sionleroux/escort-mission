@@ -251,7 +251,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Camera.Blit(screen)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"FPS: %.2f\nTPS: %.2f\nX: %.2f\nY: %.2f\n",
+		"FPS: %.2f\nTPS: %.2f\nX: %.2f\nY: %.2f",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
 		g.Player.Object.X / 32,
@@ -262,6 +262,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 // Clicked is shorthand for when the left mouse button has just been clicked
 func clicked() bool {
 	return inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
+}
+
+// CalcObjectDistance calculates the distance between two Objects
+func CalcObjectDistance(obj1, obj2 *resolv.Object) (float64, float64, float64) {
+	return CalcDistance(obj1.X, obj1.Y, obj2.X, obj2.Y), obj2.X-obj1.X, obj2.Y-obj1.Y
 }
 
 // CalcDistance calculates the distance between two coordinates

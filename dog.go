@@ -24,8 +24,14 @@ type Path []Coord
 // dogSpeed is the distance the dog moves per update cycle
 const dogSpeed float64 = 1
 
-// waitingDistance is the maximum distance the dog walks away from the player
-const waitingDistance float64 = 96
+// waitingRadius is the maximum distance the dog walks away from the player
+const waitingRadius float64 = 96
+
+// zombieDangerRadius: if a zombie is this close to the dog, it runs away
+const zombieDangerRadius float64 = 128
+
+// zombieSafeRadius: if a zombie is at least this far from the dog, it stops running
+const zombieSafeRadius float64 = 192
 
 // states of the dog
 // It would be great to map them to the frameTag.Name from JSON
@@ -45,16 +51,51 @@ type Dog struct {
 	Path     Path
 	NextPath int
 	Sprite   *SpriteSheet
+	InDanger bool
 }
 
 // Update updates the state of the dog
 func (d *Dog) Update(g *Game) {
-	playerDistance := CalcDistance(g.Player.Object.X, g.Player.Object.Y, d.Object.X, d.Object.Y)
-	if playerDistance < waitingDistance {
-		d.State = dogSniffing
-		d.FollowPath()
-	} else {
+	isSafeAgain := true
+	resultantVector := Coord{
+		X: 0,
+		Y: 0,
+	}
+	for _, zombie := range g.Zombies {
+		zombieDistance, xDistance, yDistance := CalcObjectDistance(d.Object, zombie.Object)
+		if zombieDistance < zombieDangerRadius {
+			// If zombies are too close then the dog is in danger and will run away
+			resultantVector.X += xDistance
+			resultantVector.Y += yDistance
+			isSafeAgain = false
+			d.InDanger = true
+			d.State = dogWalking
+		} else if d.InDanger && zombieDistance < zombieSafeRadius {
+			// If the dog is running away from zombies then it will be safe again when getting far enough from the zombies
+			isSafeAgain = false
+		}
+	}
+
+	// If the dog is not in danger anymore then it turn towards the next path point
+	if d.InDanger && isSafeAgain {
+		d.TurnTowardsPathPoint()
+	}
+	d.InDanger = !isSafeAgain
+
+	if (!d.InDanger) {
+		playerDistance, _, _ := CalcObjectDistance(d.Object, g.Player.Object)
+		if playerDistance < waitingRadius {
+			// If the dog is not in danger and it is close to the player then it sniffs towards next path point
+			d.State = dogSniffing
+			d.FollowPath()
+		} else {
+		// If the player is not close enough then the dog sits down
 		d.State = dogSitting
+		}
+	} else {
+		// If the dog is in danger then it runs away from the zombies
+		d.TurnTowardsCoordinate(resultantVector)
+		d.Run()
 	}
 
 	d.animate(g)
@@ -75,6 +116,14 @@ func (d *Dog) animate(g *Game) {
 		// Contiuously increase the Frame counter between From and To
 		d.Frame = (d.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
 	}
+}
+
+// TurnTowardsCoordinate turns the dog to the direction of the point
+func (d *Dog) TurnTowardsCoordinate(coord Coord) {
+	adjacent := d.Object.X - coord.X
+	opposite := d.Object.Y - coord.Y
+	// math.Pi is needed only until the dog sprite is looking up
+	d.Angle = math.Atan2(opposite, adjacent)+math.Pi/2
 }
 
 // TurnTowardsPathPoint turns the dog to the direction of the next path point
@@ -105,6 +154,15 @@ func (d *Dog) FollowPath() {
 	d.move(
 		math.Cos(d.Angle)*dogSpeed,
 		math.Sin(d.Angle)*dogSpeed,
+	)
+}
+
+// Run moves the dog faster
+func (d *Dog) Run() {
+	// Temporary until the dog sprite is looking up
+	d.move(
+		math.Cos(d.Angle)*dogSpeed*1.2,
+		math.Sin(d.Angle)*dogSpeed*1.2,
 	)
 }
 
