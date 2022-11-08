@@ -56,6 +56,11 @@ func (z *Zombie) Update(g *Game) error {
 		return errors.New("Zombie died")
 	}
 
+	if z.State == zombieDeath {
+		z.animate(g)
+		return nil
+	}
+
 	// Zombies rotate towards player
 	adjacent := z.Object.X - g.Player.Object.X
 	opposite := z.Object.Y - g.Player.Object.Y
@@ -95,6 +100,11 @@ func (z *Zombie) animate(g *Game) {
 	} else {
 		// Contiuously increase the Frame counter between From and To
 		z.Frame = (z.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
+	}
+
+	// Set as dead after death animation
+	if z.State == zombieDeath && z.Frame == ft.To {
+		z.State = zombieDead
 	}
 }
 
@@ -157,5 +167,5 @@ func (z *Zombie) Draw(g *Game) {
 // Die changes zombie state and updates game data in response to it getting shot
 func (z *Zombie) Die() {
 	z.Object.Space.Remove(z.Object)
-	z.State = zombieDead
+	z.State = zombieDeath
 }

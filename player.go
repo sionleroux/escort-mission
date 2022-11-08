@@ -78,6 +78,7 @@ func (p *Player) animate(g *Game) {
 		p.Frame = (p.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
 	}
 
+	// Back to idle after shooting animation
 	if p.State == playerShooting && p.Frame == ft.To {
 		p.State = playerIdle
 	}
