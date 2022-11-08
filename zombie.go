@@ -35,7 +35,9 @@ func (zs Zombies) Update(g *Game) {
 
 // List of possible zombie states
 const (
-	zombieAlive = iota
+	zombieIdle = iota
+	zombieWalking
+	zombieDeath
 	zombieDead
 )
 
@@ -86,7 +88,7 @@ func (z *Zombie) animate(g *Game) {
 	}
 
 	// No states at the moment, zombies are always walking
-	ft := z.Sprite.Meta.FrameTags[1]
+	ft := z.Sprite.Meta.FrameTags[z.State]
 
 	if ft.From == ft.To {
 		z.Frame = ft.From
@@ -118,6 +120,7 @@ func (z *Zombie) MoveRight() {
 
 // Move the Zombie by the given vector if it is possible to do so
 func (z *Zombie) move(dx, dy float64) {
+	z.State = zombieWalking
 	if collision := z.Object.Check(dx, dy, tagMob, tagWall); collision == nil {
 		z.Object.X += dx
 		z.Object.Y += dy
