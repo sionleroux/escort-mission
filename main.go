@@ -152,10 +152,11 @@ func NewGame(g *Game) {
 
 	// Add dog to the game
 	g.Dog = &Dog{
-		Object: resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 32, 32, tagDog),
-		Angle:  0,
-		Sprite: g.Sprites[spriteDog],
-		Path:   path,
+		Object:   resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 32, 32, tagDog),
+		Angle:    0,
+		Sprite:   g.Sprites[spriteDog],
+		Path:     path,
+		NextPath: -1,
 	}
 	g.Space.Add(g.Dog.Object)
 

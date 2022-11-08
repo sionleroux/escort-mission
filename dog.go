@@ -77,19 +77,28 @@ func (d *Dog) animate(g *Game) {
 	}
 }
 
+// TurnTowardsPathPoint turns the dog to the direction of the next path point
+func (d *Dog) TurnTowardsPathPoint() {
+	adjacent := d.Object.X - float64(d.Path[d.NextPath].X)
+	opposite := d.Object.Y - float64(d.Path[d.NextPath].Y)
+	// math.Pi is needed only until the dog sprite is looking up
+	d.Angle = math.Atan2(opposite, adjacent)-math.Pi
+}
+
 // FollowPath moves the dog along the path
 func (d *Dog) FollowPath() {
-	
+	if d.NextPath < 0 {
+		d.NextPath = 0
+		d.TurnTowardsPathPoint()
+	}
+
 	nextPathCoordDistance := CalcDistance(d.Path[d.NextPath].X, d.Path[d.NextPath].Y, d.Object.X, d.Object.Y)
-	if d.NextPath==0 || nextPathCoordDistance < 2 {
+	if nextPathCoordDistance < 2 {
 		d.NextPath++
 		if d.NextPath == len(d.Path) {
 			d.NextPath = 0
 		}
-		adjacent := d.Object.X - float64(d.Path[d.NextPath].X)
-		opposite := d.Object.Y - float64(d.Path[d.NextPath].Y)
-		// math.Pi is needed only until the dog sprite is looking up
-		d.Angle = math.Atan2(opposite, adjacent)-math.Pi
+		d.TurnTowardsPathPoint()
 	}
 
 	// Temporary until the dog sprite is looking up
