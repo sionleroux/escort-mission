@@ -22,6 +22,8 @@ const playerSpeedFactorReverse float64 = 0.2
 // amount to change speed by when the player is strafing sideways
 const playerSpeedFactorSideways float64 = 0.6
 
+const playerSpeedFactorSprint float64 = 2.4
+
 // states of the player
 // It would be great to map them to the frameTag.Name from JSON
 const (
@@ -34,18 +36,24 @@ const (
 
 // Player is the player character in the game
 type Player struct {
-	Object *resolv.Object
-	Angle  float64
-	Frame  int
-	State  int
-	Sprite *SpriteSheet
+	Object    *resolv.Object
+	Angle     float64
+	Frame     int
+	State     int
+	Sprinting bool // XXX: logical state and animation state is beginning to diverge
+	Sprite    *SpriteSheet
 }
 
 // Update updates the state of the player
 func (p *Player) Update(g *Game) {
+	p.Sprinting = false
+
 	if p.State != playerShooting {
 		p.State = playerIdle
 
+		if ebiten.IsKeyPressed(ebiten.KeyShift) {
+			p.Sprinting = true
+		}
 		if ebiten.IsKeyPressed(ebiten.KeyW) {
 			p.MoveForward()
 		}
@@ -111,9 +119,13 @@ func (p *Player) MoveRight() {
 
 // MoveForward moves the player forward towards the pointer
 func (p *Player) MoveForward() {
+	speed := playerSpeed
+	if p.Sprinting {
+		speed = speed * playerSpeedFactorSprint
+	}
 	p.move(
-		-math.Cos(p.Angle)*playerSpeed,
-		-math.Sin(p.Angle)*playerSpeed,
+		-math.Cos(p.Angle)*speed,
+		-math.Sin(p.Angle)*speed,
 	)
 }
 
