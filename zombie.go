@@ -23,6 +23,9 @@ func init() {
 // zombieSpeed is the distance the zombie moves per update cycle
 const zombieSpeed float64 = 0.2
 
+// zombieRange is how far away the zombie sees something to attack
+const zombieRange float64 = 200
+
 // Zombies is an array of Zombie
 type Zombies []*Zombie
 
@@ -92,7 +95,12 @@ func (z *Zombie) Update(g *Game) error {
 		return nil
 	}
 
-	z.walk(g)
+	playerDistance, _, _ := CalcObjectDistance(z.Object, g.Player.Object)
+	if playerDistance < zombieRange {
+		z.walk(g)
+	} else {
+		z.State = zombieIdle
+	}
 
 	z.animate(g)
 	z.Object.Update()
