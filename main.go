@@ -203,9 +203,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Player.Draw(g)
 
 	// Zombies
-	for _, z := range g.Zombies {
-		z.Draw(g)
-	}
+	g.Zombies.Draw(g)
 
 	g.Camera.Blit(screen)
 

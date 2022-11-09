@@ -33,6 +33,13 @@ func (zs Zombies) Update(g *Game) {
 	}
 }
 
+// Draw draws all the zombies
+func (zs Zombies) Draw(g *Game) {
+	for _, z := range zs {
+		z.Draw(g)
+	}
+}
+
 // List of possible zombie states
 const (
 	zombieIdle    = iota // Doesn't have any target to attack
@@ -160,7 +167,9 @@ func (z *Zombie) Draw(g *Game) {
 		g.Camera.GetTranslation(
 			op,
 			float64(z.Object.X)+float64(frame.Position.W/2),
-			float64(z.Object.Y)+float64(frame.Position.H/2)))
+			float64(z.Object.Y)+float64(frame.Position.H/2),
+		),
+	)
 
 }
 
