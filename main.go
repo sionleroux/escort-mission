@@ -266,7 +266,7 @@ func clicked() bool {
 
 // CalcObjectDistance calculates the distance between two Objects
 func CalcObjectDistance(obj1, obj2 *resolv.Object) (float64, float64, float64) {
-	return CalcDistance(obj1.X, obj1.Y, obj2.X, obj2.Y), obj2.X-obj1.X, obj2.Y-obj1.Y
+	return CalcDistance(obj1.X, obj1.Y, obj2.X, obj2.Y), obj1.X-obj2.X, obj1.Y-obj2.Y
 }
 
 // CalcDistance calculates the distance between two coordinates

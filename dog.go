@@ -21,8 +21,11 @@ type Coord struct {
 // Path is an array of coordinates
 type Path []Coord
 
-// dogSpeed is the distance the dog moves per update cycle
-const dogSpeed float64 = 1
+// dogSniffingSpeed is the distance the dog moves per update cycle when sniffing
+const dogSniffingSpeed float64 = 0.7
+
+// dogRunningSpeed is the distance the dog moves per update cycle when running
+const dogRunningSpeed float64 = 1.3
 
 // waitingRadius is the maximum distance the dog walks away from the player
 const waitingRadius float64 = 96
@@ -56,19 +59,25 @@ type Dog struct {
 
 // Update updates the state of the dog
 func (d *Dog) Update(g *Game) {
+	if d.NextPath < 0 {
+		d.NextPath = 0
+		d.TurnTowardsPathPoint()
+	}
+
 	isSafeAgain := true
-	resultantVector := Coord{
-		X: 0,
-		Y: 0,
+	zombieInRange := false
+	resultantVectorCoord := Coord{
+		X: d.Object.X,
+		Y: d.Object.Y,
 	}
 	for _, zombie := range g.Zombies {
 		zombieDistance, xDistance, yDistance := CalcObjectDistance(d.Object, zombie.Object)
 		if zombieDistance < zombieDangerRadius {
 			// If zombies are too close then the dog is in danger and will run away
-			resultantVector.X += xDistance
-			resultantVector.Y += yDistance
+			resultantVectorCoord.X += xDistance
+			resultantVectorCoord.Y += yDistance
 			isSafeAgain = false
-			d.InDanger = true
+			zombieInRange = true
 			d.State = dogWalking
 		} else if d.InDanger && zombieDistance < zombieSafeRadius {
 			// If the dog is running away from zombies then it will be safe again when getting far enough from the zombies
@@ -80,7 +89,7 @@ func (d *Dog) Update(g *Game) {
 	if d.InDanger && isSafeAgain {
 		d.TurnTowardsPathPoint()
 	}
-	d.InDanger = !isSafeAgain
+	d.InDanger = zombieInRange || !isSafeAgain
 
 	if (!d.InDanger) {
 		playerDistance, _, _ := CalcObjectDistance(d.Object, g.Player.Object)
@@ -94,7 +103,10 @@ func (d *Dog) Update(g *Game) {
 		}
 	} else {
 		// If the dog is in danger then it runs away from the zombies
-		d.TurnTowardsCoordinate(resultantVector)
+		if zombieInRange {
+			//If zombies are close then recalculate Angle
+			d.TurnTowardsCoordinate(resultantVectorCoord)
+		}
 		d.Run()
 	}
 
@@ -120,27 +132,18 @@ func (d *Dog) animate(g *Game) {
 
 // TurnTowardsCoordinate turns the dog to the direction of the point
 func (d *Dog) TurnTowardsCoordinate(coord Coord) {
-	adjacent := d.Object.X - coord.X
-	opposite := d.Object.Y - coord.Y
-	// math.Pi is needed only until the dog sprite is looking up
-	d.Angle = math.Atan2(opposite, adjacent)+math.Pi/2
+	adjacent := coord.X - d.Object.X
+	opposite := coord.Y - d.Object.Y
+	d.Angle = math.Atan2(opposite, adjacent)
 }
 
 // TurnTowardsPathPoint turns the dog to the direction of the next path point
 func (d *Dog) TurnTowardsPathPoint() {
-	adjacent := d.Object.X - float64(d.Path[d.NextPath].X)
-	opposite := d.Object.Y - float64(d.Path[d.NextPath].Y)
-	// math.Pi is needed only until the dog sprite is looking up
-	d.Angle = math.Atan2(opposite, adjacent)-math.Pi
+	d.TurnTowardsCoordinate(d.Path[d.NextPath])
 }
 
 // FollowPath moves the dog along the path
 func (d *Dog) FollowPath() {
-	if d.NextPath < 0 {
-		d.NextPath = 0
-		d.TurnTowardsPathPoint()
-	}
-
 	nextPathCoordDistance := CalcDistance(d.Path[d.NextPath].X, d.Path[d.NextPath].Y, d.Object.X, d.Object.Y)
 	if nextPathCoordDistance < 2 {
 		d.NextPath++
@@ -150,19 +153,17 @@ func (d *Dog) FollowPath() {
 		d.TurnTowardsPathPoint()
 	}
 
-	// Temporary until the dog sprite is looking up
 	d.move(
-		math.Cos(d.Angle)*dogSpeed,
-		math.Sin(d.Angle)*dogSpeed,
+		math.Cos(d.Angle)*dogSniffingSpeed,
+		math.Sin(d.Angle)*dogSniffingSpeed,
 	)
 }
 
 // Run moves the dog faster
 func (d *Dog) Run() {
-	// Temporary until the dog sprite is looking up
 	d.move(
-		math.Cos(d.Angle)*dogSpeed*1.2,
-		math.Sin(d.Angle)*dogSpeed*1.2,
+		math.Cos(d.Angle)*dogRunningSpeed,
+		math.Sin(d.Angle)*dogRunningSpeed,
 	)
 }
 
