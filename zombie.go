@@ -92,6 +92,14 @@ func (z *Zombie) Update(g *Game) error {
 		return nil
 	}
 
+	z.walk(g)
+
+	z.animate(g)
+	z.Object.Update()
+	return nil
+}
+
+func (z *Zombie) walk(g *Game) {
 	// Zombies rotate towards player
 	adjacent := g.Player.Object.X - z.Object.X
 	opposite := g.Player.Object.Y - z.Object.Y
@@ -111,10 +119,6 @@ func (z *Zombie) Update(g *Game) error {
 	if z.Object.Y > g.Player.Object.Y {
 		z.MoveUp()
 	}
-
-	z.animate(g)
-	z.Object.Update()
-	return nil
 }
 
 func (z *Zombie) animate(g *Game) {
