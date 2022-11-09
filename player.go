@@ -44,6 +44,21 @@ type Player struct {
 	Sprite    *SpriteSheet
 }
 
+// NewPlayer constructs a new Player object at the provided location and size
+func NewPlayer(position []int, sprites *SpriteSheet) *Player {
+	dimensions := sprites.Sprite[0].Position
+	player := &Player{
+		State: playerIdle,
+		Object: resolv.NewObject(
+			float64(position[0]), float64(position[1]),
+			float64(dimensions.W), float64(dimensions.H),
+		),
+		Angle:  0,
+		Sprite: sprites,
+	}
+	return player
+}
+
 // Update updates the state of the player
 func (p *Player) Update(g *Game) {
 	p.Sprinting = false

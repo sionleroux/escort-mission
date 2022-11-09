@@ -118,18 +118,7 @@ func NewGame(g *Game) {
 
 	// Add player to the game
 	playerPosition := entities.EntityByIdentifier("Player").Position
-	playerDimensions := g.Sprites[spritePlayer].Sprite[0].Position
-	g.Player = &Player{
-		State: playerIdle,
-		Object: resolv.NewObject(
-			float64(playerPosition[0]),
-			float64(playerPosition[1]),
-			float64(playerDimensions.W),
-			float64(playerDimensions.H),
-		),
-		Angle:  0,
-		Sprite: g.Sprites[spritePlayer],
-	}
+	g.Player = NewPlayer(playerPosition, g.Sprites[spritePlayer])
 	g.Space.Add(g.Player.Object)
 
 	// Add zombies to the game
