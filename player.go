@@ -70,8 +70,8 @@ func (p *Player) Update(g *Game) {
 
 	// Player gun rotation
 	cx, cy := g.Camera.GetCursorCoords()
-	adjacent := p.Object.X - float64(cx)
-	opposite := p.Object.Y - float64(cy)
+	adjacent := float64(cx) - p.Object.X
+	opposite := float64(cy) - p.Object.Y
 	p.Angle = math.Atan2(opposite, adjacent)
 
 	p.animate(g)
@@ -103,8 +103,8 @@ func (p *Player) animate(g *Game) {
 func (p *Player) MoveLeft() {
 	speed := playerSpeed * playerSpeedFactorSideways
 	p.move(
-		-math.Sin(p.Angle)*speed,
-		math.Cos(p.Angle)*speed,
+		math.Sin(p.Angle)*speed,
+		-math.Cos(p.Angle)*speed,
 	)
 }
 
@@ -112,8 +112,8 @@ func (p *Player) MoveLeft() {
 func (p *Player) MoveRight() {
 	speed := playerSpeed * playerSpeedFactorSideways
 	p.move(
-		math.Sin(p.Angle)*speed,
-		-math.Cos(p.Angle)*speed,
+		-math.Sin(p.Angle)*speed,
+		math.Cos(p.Angle)*speed,
 	)
 }
 
@@ -124,8 +124,8 @@ func (p *Player) MoveForward() {
 		speed = speed * playerSpeedFactorSprint
 	}
 	p.move(
-		-math.Cos(p.Angle)*speed,
-		-math.Sin(p.Angle)*speed,
+		math.Cos(p.Angle)*speed,
+		math.Sin(p.Angle)*speed,
 	)
 }
 
@@ -133,8 +133,8 @@ func (p *Player) MoveForward() {
 func (p *Player) MoveBackward() {
 	speed := playerSpeed * playerSpeedFactorReverse
 	p.move(
-		math.Cos(p.Angle)*speed,
-		math.Sin(p.Angle)*speed,
+		-math.Cos(p.Angle)*speed,
+		-math.Sin(p.Angle)*speed,
 	)
 }
 

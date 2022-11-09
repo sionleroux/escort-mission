@@ -67,6 +67,7 @@ type SpriteType uint64
 const (
 	spritePlayer SpriteType = iota
 	spriteZombie
+	spriteDog
 )
 
 // Load a sprite image and associated meta-data given a file name (without

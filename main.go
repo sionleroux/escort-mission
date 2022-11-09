@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -19,8 +20,10 @@ import (
 )
 
 const (
-	tagMob  = "mob"
-	tagWall = "wall"
+	tagPlayer = "player"
+	tagMob    = "mob"
+	tagWall   = "wall"
+	tagDog    = "dog"
 )
 
 func main() {
@@ -56,6 +59,7 @@ type Game struct {
 	Camera       *camera.Camera
 	Sprites      map[SpriteType]*SpriteSheet
 	Player       *Player
+	Dog          *Dog
 	Zombies      Zombies
 	Space        *resolv.Space
 }
@@ -111,7 +115,8 @@ func NewGame(g *Game) {
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
 	g.Sprites[spritePlayer] = loadSprite("Player")
-	g.Sprites[spriteZombie] = loadSprite("Zombie")
+	g.Sprites[spriteZombie] = loadSprite("Zombie_1")
+	g.Sprites[spriteDog] = loadSprite("Dog")
 
 	// Load entities from map
 	entities := level.LayerByIdentifier("Entities")
@@ -120,6 +125,33 @@ func NewGame(g *Game) {
 	playerPosition := entities.EntityByIdentifier("Player").Position
 	g.Player = NewPlayer(playerPosition, g.Sprites[spritePlayer])
 	g.Space.Add(g.Player.Object)
+
+	// Load the dog's path
+	dogEntity := entities.EntityByIdentifier("Dog")
+
+	pathArray := dogEntity.PropertyByIdentifier("Path").AsArray()
+	path := make([]Coord, len(pathArray))
+	for index, pathCoord := range pathArray {
+		// Do we really need to make these crazy castings?
+		path[index] = Coord{
+			X: (pathCoord.(map[string]any)["cx"].(float64) + 0.5)*float64(entities.GridSize),
+			Y: (pathCoord.(map[string]any)["cy"].(float64) + 0.5)*float64(entities.GridSize),
+		}
+
+		if index > 0 {
+			ebitenutil.DrawLine(g.Background, path[index-1].X, path[index-1].Y, path[index].X, path[index].Y, color.Black)
+		}
+	}
+
+	// Add dog to the game
+	g.Dog = &Dog{
+		Object:   resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 32, 32, tagDog),
+		Angle:    0,
+		Sprite:   g.Sprites[spriteDog],
+		Path:     path,
+		NextPath: -1,
+	}
+	g.Space.Add(g.Dog.Object)
 
 	// Add zombies to the game
 	for _, e := range entities.Entities {
@@ -160,6 +192,9 @@ func (g *Game) Update() error {
 	// Update player
 	g.Player.Update(g)
 
+	// Update dog
+	g.Dog.Update(g)
+
 	// Update zombies
 	g.Zombies.Update(g)
 
@@ -189,6 +224,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Player
 	g.Player.Draw(g)
+
+	// Dog
+	g.Dog.Draw(g)
 
 	// Zombies
 	g.Zombies.Draw(g)
@@ -220,8 +258,8 @@ func Shoot(g *Game) {
 		g.Player.State = playerShooting
 		var rangeOfFire float64 = 100 // XXX this should come from Player
 		sX, sY := g.Space.WorldToSpace(
-			g.Player.Object.X-math.Cos(g.Player.Angle)*rangeOfFire,
-			g.Player.Object.Y-math.Sin(g.Player.Angle)*rangeOfFire,
+			g.Player.Object.X-math.Cos(g.Player.Angle-math.Pi)*rangeOfFire,
+			g.Player.Object.Y-math.Sin(g.Player.Angle-math.Pi)*rangeOfFire,
 		)
 		pX, pY := g.Space.WorldToSpace(
 			g.Player.Object.X+8, // XXX this should come from Player
@@ -238,4 +276,14 @@ func Shoot(g *Game) {
 			}
 		}
 	}
+}
+	
+// CalcObjectDistance calculates the distance between two Objects
+func CalcObjectDistance(obj1, obj2 *resolv.Object) (float64, float64, float64) {
+	return CalcDistance(obj1.X, obj1.Y, obj2.X, obj2.Y), obj1.X-obj2.X, obj1.Y-obj2.Y
+}
+
+// CalcDistance calculates the distance between two coordinates
+func CalcDistance(x1, y1, x2, y2 float64) float64 {
+	return math.Sqrt(math.Pow(x1-x2, 2) + math.Pow(y1-y2, 2))
 }

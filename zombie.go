@@ -93,8 +93,8 @@ func (z *Zombie) Update(g *Game) error {
 	}
 
 	// Zombies rotate towards player
-	adjacent := z.Object.X - g.Player.Object.X
-	opposite := z.Object.Y - g.Player.Object.Y
+	adjacent := g.Player.Object.X - z.Object.X
+	opposite := g.Player.Object.Y - z.Object.Y
 	z.Angle = math.Atan2(opposite, adjacent)
 
 	// Zombie movement logic
