@@ -250,7 +250,7 @@ func clicked() bool {
 func Shoot(g *Game) {
 	if g.Player.State != playerShooting && clicked() {
 		g.Player.State = playerShooting
-		var rangeOfFire float64 = 100 // XXX this should come from Player
+		var rangeOfFire float64 = 200 // XXX this should come from Player
 		sX, sY := g.Space.WorldToSpace(
 			g.Player.Object.X-math.Cos(g.Player.Angle-math.Pi)*rangeOfFire,
 			g.Player.Object.Y-math.Sin(g.Player.Angle-math.Pi)*rangeOfFire,
