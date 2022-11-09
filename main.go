@@ -196,7 +196,6 @@ func (g *Game) Update() error {
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
-			log.Printf("%#v", collision)
 			return errors.New("you died")
 		}
 	}
