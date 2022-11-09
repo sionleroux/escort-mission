@@ -9,10 +9,16 @@ import (
 	"image"
 	"log"
 	"math"
+	"math/rand"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/solarlune/resolv"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 // zombieSpeed is the distance the zombie moves per update cycle
 const zombieSpeed float64 = 0.2
@@ -55,6 +61,7 @@ type Zombie struct {
 	Frame  int            // The current animation frame
 	State  int            // The current animation state
 	Sprite *SpriteSheet   // Used for zombie animations
+	Speed  float64        // The speed this zombie walks at
 }
 
 // NewZombie constructs a new Zombie object
@@ -68,6 +75,7 @@ func NewZombie(position []int, sprites *SpriteSheet) *Zombie {
 		),
 		Angle:  0,
 		Sprite: sprites,
+		Speed:  zombieSpeed * (1 + rand.Float64()),
 	}
 	zombie.Object.Data = zombie // self-reference for later
 	return zombie
@@ -133,22 +141,22 @@ func (z *Zombie) animate(g *Game) {
 
 // MoveUp moves the zombie upwards
 func (z *Zombie) MoveUp() {
-	z.move(0, -zombieSpeed)
+	z.move(0, -z.Speed)
 }
 
 // MoveDown moves the zombie downwards
 func (z *Zombie) MoveDown() {
-	z.move(0, zombieSpeed)
+	z.move(0, z.Speed)
 }
 
 // MoveLeft moves the zombie left
 func (z *Zombie) MoveLeft() {
-	z.move(-zombieSpeed, 0)
+	z.move(-z.Speed, 0)
 }
 
 // MoveRight moves the zombie right
 func (z *Zombie) MoveRight() {
-	z.move(zombieSpeed, 0)
+	z.move(z.Speed, 0)
 }
 
 // Move the Zombie by the given vector if it is possible to do so
