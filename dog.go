@@ -39,9 +39,9 @@ const zombieSafeRadius float64 = 192
 // states of the dog
 // It would be great to map them to the frameTag.Name from JSON
 const (
-	dogWalking  int = 0
-	dogSniffing     = 1
-	dogSitting      = 2
+	dogWalking  = iota
+	dogSniffing
+	dogSitting
 )
 
 // Dog is player's companion

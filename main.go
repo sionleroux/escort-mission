@@ -136,13 +136,13 @@ func NewGame(g *Game) {
 	// Load the dog's path
 	dogEntity := entities.EntityByIdentifier("Dog")
 
-	pathArray := dogEntity.Properties[0].AsArray()
+	pathArray := dogEntity.PropertyByIdentifier("Path").AsArray()
 	path := make([]Coord, len(pathArray))
 	for index, pathCoord := range pathArray {
 		// Do we really need to make these crazy castings?
 		path[index] = Coord{
-			X: (pathCoord.(map[string]interface{})["cx"].(float64) + 0.5)*float64(entities.GridSize),
-			Y: (pathCoord.(map[string]interface{})["cy"].(float64) + 0.5)*float64(entities.GridSize),
+			X: (pathCoord.(map[string]any)["cx"].(float64) + 0.5)*float64(entities.GridSize),
+			Y: (pathCoord.(map[string]any)["cy"].(float64) + 0.5)*float64(entities.GridSize),
 		}
 
 		if index > 0 {
