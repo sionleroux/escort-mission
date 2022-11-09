@@ -57,6 +57,22 @@ type Zombie struct {
 	Sprite *SpriteSheet   // Used for zombie animations
 }
 
+// NewZombie constructs a new Zombie object
+func NewZombie(position []int, sprites *SpriteSheet) *Zombie {
+	dimensions := sprites.Sprite[0].Position
+	zombie := &Zombie{
+		Object: resolv.NewObject(
+			float64(position[0]), float64(position[1]),
+			float64(dimensions.W), float64(dimensions.H),
+			tagMob,
+		),
+		Angle:  0,
+		Sprite: sprites,
+	}
+	zombie.Object.Data = zombie // self-reference for later
+	return zombie
+}
+
 // Update updates the state of the zombie
 func (z *Zombie) Update(g *Game) error {
 	if z.State == zombieDead {

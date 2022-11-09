@@ -122,21 +122,9 @@ func NewGame(g *Game) {
 	g.Space.Add(g.Player.Object)
 
 	// Add zombies to the game
-	zombieDimensions := g.Sprites[spriteZombie].Sprite[0].Position
 	for _, e := range entities.Entities {
 		if e.Identifier == "Zombie" {
-			z := &Zombie{
-				Object: resolv.NewObject(
-					float64(e.Position[0]),
-					float64(e.Position[1]),
-					float64(zombieDimensions.W),
-					float64(zombieDimensions.H),
-					tagMob,
-				),
-				Angle:  0,
-				Sprite: g.Sprites[spriteZombie],
-			}
-			z.Object.Data = z // self-reference for later
+			z := NewZombie(e.Position, g.Sprites[spriteZombie])
 			g.Space.Add(z.Object)
 			g.Zombies = append(g.Zombies, z)
 		}
