@@ -15,6 +15,13 @@ import (
 // playerSpeed is the distance the player moves per update cycle
 const playerSpeed float64 = 1.2
 
+// amount to change speed by when the player is reversing backwards
+// walking backwards is very slow
+const playerSpeedFactorReverse float64 = 0.2
+
+// amount to change speed by when the player is strafing sideways
+const playerSpeedFactorSideways float64 = 0.6
+
 // states of the player
 // It would be great to map them to the frameTag.Name from JSON
 const (
@@ -86,17 +93,19 @@ func (p *Player) animate(g *Game) {
 
 // MoveLeft moves the player left
 func (p *Player) MoveLeft() {
+	speed := playerSpeed * playerSpeedFactorSideways
 	p.move(
-		-math.Sin(p.Angle)*playerSpeed,
-		math.Cos(p.Angle)*playerSpeed,
+		-math.Sin(p.Angle)*speed,
+		math.Cos(p.Angle)*speed,
 	)
 }
 
 // MoveRight moves the player right
 func (p *Player) MoveRight() {
+	speed := playerSpeed * playerSpeedFactorSideways
 	p.move(
-		math.Sin(p.Angle)*playerSpeed,
-		-math.Cos(p.Angle)*playerSpeed,
+		math.Sin(p.Angle)*speed,
+		-math.Cos(p.Angle)*speed,
 	)
 }
 
@@ -110,9 +119,10 @@ func (p *Player) MoveForward() {
 
 // MoveBackward moves the player backward away from the pointer
 func (p *Player) MoveBackward() {
+	speed := playerSpeed * playerSpeedFactorReverse
 	p.move(
-		math.Cos(p.Angle)*playerSpeed,
-		math.Sin(p.Angle)*playerSpeed,
+		math.Cos(p.Angle)*speed,
+		math.Sin(p.Angle)*speed,
 	)
 }
 
