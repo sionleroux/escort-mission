@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -134,12 +133,8 @@ func NewGame(g *Game) {
 	for index, pathCoord := range pathArray {
 		// Do we really need to make these crazy castings?
 		path[index] = Coord{
-			X: (pathCoord.(map[string]any)["cx"].(float64) + 0.5)*float64(entities.GridSize),
-			Y: (pathCoord.(map[string]any)["cy"].(float64) + 0.5)*float64(entities.GridSize),
-		}
-
-		if index > 0 {
-			ebitenutil.DrawLine(g.Background, path[index-1].X, path[index-1].Y, path[index].X, path[index].Y, color.Black)
+			X: (pathCoord.(map[string]any)["cx"].(float64) + 0.5) * float64(entities.GridSize),
+			Y: (pathCoord.(map[string]any)["cy"].(float64) + 0.5) * float64(entities.GridSize),
 		}
 	}
 
@@ -277,10 +272,10 @@ func Shoot(g *Game) {
 		}
 	}
 }
-	
+
 // CalcObjectDistance calculates the distance between two Objects
 func CalcObjectDistance(obj1, obj2 *resolv.Object) (float64, float64, float64) {
-	return CalcDistance(obj1.X, obj1.Y, obj2.X, obj2.Y), obj1.X-obj2.X, obj1.Y-obj2.Y
+	return CalcDistance(obj1.X, obj1.Y, obj2.X, obj2.Y), obj1.X - obj2.X, obj1.Y - obj2.Y
 }
 
 // CalcDistance calculates the distance between two coordinates
