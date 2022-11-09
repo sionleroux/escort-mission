@@ -27,21 +27,21 @@ const playerSpeedFactorSprint float64 = 2.4
 // states of the player
 // It would be great to map them to the frameTag.Name from JSON
 const (
-	playerIdle = iota
-	playerWalking
-	playerReady
-	playerShooting
-	playerUnready
+	playerIdle     = iota // Waiting for input from the player
+	playerWalking         // Walking in some direction
+	playerReady           // Readying the gun to shoot
+	playerShooting        // Shooting the gun
+	playerUnready         // Unreadying the gun after shooting
 )
 
 // Player is the player character in the game
 type Player struct {
-	Object    *resolv.Object
-	Angle     float64
-	Frame     int
-	State     int
-	Sprinting bool // XXX: logical state and animation state is beginning to diverge
-	Sprite    *SpriteSheet
+	Object    *resolv.Object // Used for collision detection with other objects
+	Angle     float64        // The angle the player is facing at
+	Frame     int            // The current animation frame
+	State     int            // The current animation state
+	Sprinting bool           // Whether the player is sprinting or not
+	Sprite    *SpriteSheet   // Used for player animations
 }
 
 // NewPlayer constructs a new Player object at the provided location and size

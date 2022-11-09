@@ -35,19 +35,19 @@ func (zs Zombies) Update(g *Game) {
 
 // List of possible zombie states
 const (
-	zombieIdle = iota
-	zombieWalking
-	zombieDeath
-	zombieDead
+	zombieIdle    = iota // Doesn't have any target to attack
+	zombieWalking        // Walking in some direction
+	zombieDeath          // Plays the death animation
+	zombieDead           // Marked as dead, will be removed on next Update
 )
 
 // Zombie is a monster that's trying to eat the player character
 type Zombie struct {
-	Object *resolv.Object
-	Angle  float64
-	Frame  int
-	State  int
-	Sprite *SpriteSheet
+	Object *resolv.Object // Used for collision detection with other objects
+	Angle  float64        // The angle the zombies is facing at
+	Frame  int            // The current animation frame
+	State  int            // The current animation state
+	Sprite *SpriteSheet   // Used for zombie animations
 }
 
 // Update updates the state of the zombie
