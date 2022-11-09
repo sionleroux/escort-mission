@@ -50,22 +50,7 @@ func (p *Player) Update(g *Game) {
 
 	if p.State != playerShooting {
 		p.State = playerIdle
-
-		if ebiten.IsKeyPressed(ebiten.KeyShift) {
-			p.Sprinting = true
-		}
-		if ebiten.IsKeyPressed(ebiten.KeyW) {
-			p.MoveForward()
-		}
-		if ebiten.IsKeyPressed(ebiten.KeyA) {
-			p.MoveLeft()
-		}
-		if ebiten.IsKeyPressed(ebiten.KeyS) {
-			p.MoveBackward()
-		}
-		if ebiten.IsKeyPressed(ebiten.KeyD) {
-			p.MoveRight()
-		}
+		p.handleControls()
 	}
 
 	// Player gun rotation
@@ -171,4 +156,22 @@ func (p *Player) Draw(g *Game) {
 			op,
 			float64(p.Object.X)+float64(frame.Position.W/2),
 			float64(p.Object.Y)+float64(frame.Position.H/2)))
+}
+
+func (p *Player) handleControls() {
+	if ebiten.IsKeyPressed(ebiten.KeyShift) {
+		p.Sprinting = true
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		p.MoveForward()
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
+		p.MoveLeft()
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyS) {
+		p.MoveBackward()
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
+		p.MoveRight()
+	}
 }
