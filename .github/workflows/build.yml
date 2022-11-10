@@ -30,7 +30,7 @@ jobs:
         go-version: 1.19
     - name: Build Windows exe
       shell: bash
-      run: go build
+      run: go build -tags release
     - name: Upload Windows exe
       uses: actions/upload-artifact@v3
       with:
@@ -51,7 +51,7 @@ jobs:
         go-version: 1.19
     - name: Build Mac exe
       shell: bash
-      run: go build
+      run: go build -tags release
     - name: Tar it up
       shell: bash
       run: tar -zcvf escort-mission-mac.tar.gz escort-mission LICENSE
@@ -76,7 +76,7 @@ jobs:
       run: sudo apt-get -y install libgl1-mesa-dev xorg-dev libasound2-dev
     - name: Build Linux exe
       shell: bash
-      run: go build -v
+      run: go build -v -tags release
     - name: Tar it up
       shell: bash
       run: tar -zcvf escort-mission-lin.tar.gz escort-mission LICENSE
@@ -98,7 +98,7 @@ jobs:
         go-version: 1.19
     - name: Build Web binary
       shell: bash
-      run: GOOS=js GOARCH=wasm go build -v -ldflags "-w -s" -o dist/web/escort-mission.wasm
+      run: GOOS=js GOARCH=wasm go build -v -ldflags "-w -s" -o dist/web/escort-mission.wasm -tags release
     - name: Copy WASM exec script
       shell: bash
       run: cp $(go env GOROOT)/misc/wasm/wasm_exec.js dist/web/.
