@@ -31,10 +31,11 @@ func main() {
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
 	game := &Game{
-		Width:  gameWidth,
-		Height: gameHeight,
-		Level:  0,
-		Tick:   0,
+		Width:     gameWidth,
+		Height:    gameHeight,
+		Level:     0,
+		Tick:      0,
+		Debuggers: debuggers,
 	}
 
 	go NewGame(game)
@@ -155,9 +156,6 @@ func NewGame(g *Game) {
 			g.Zombies = append(g.Zombies, z)
 		}
 	}
-
-	g.Debuggers.Add(DebugFunc(DebugText))
-	g.Debuggers.Add(DebugFunc(DebugAim))
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
