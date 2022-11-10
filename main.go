@@ -59,7 +59,7 @@ type Game struct {
 	Dog          *Dog
 	Zombies      Zombies
 	Space        *resolv.Space
-	Debuggers    []Debugger
+	Debuggers    Debuggers
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -156,8 +156,8 @@ func NewGame(g *Game) {
 		}
 	}
 
-	g.Debuggers = append(g.Debuggers, DebugFunc(DebugText))
-	g.Debuggers = append(g.Debuggers, DebugFunc(DebugAim))
+	g.Debuggers.Add(DebugFunc(DebugText))
+	g.Debuggers.Add(DebugFunc(DebugAim))
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -229,9 +229,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	g.Camera.Blit(screen)
 
-	for _, fn := range g.Debuggers {
-		fn.Debug(g, screen)
-	}
+	g.Debuggers.Debug(g, screen)
 }
 
 // Clicked is shorthand for when the left mouse button has just been clicked

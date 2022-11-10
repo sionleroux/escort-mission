@@ -22,6 +22,21 @@ func (f DebugFunc) Debug(g *Game, screen *ebiten.Image) {
 	f(g, screen)
 }
 
+// Debuggers is a slice of a Debugger to make it easier to handle many debuggers
+type Debuggers []Debugger
+
+// Debug passes on the Debug call to all its child Debuggers
+func (ds Debuggers) Debug(g *Game, screen *ebiten.Image) {
+	for _, d := range ds {
+		d.Debug(g, screen)
+	}
+}
+
+// Add is a shorthand for adding a child Debugger to the Debuggers
+func (ds *Debuggers) Add(d Debugger) {
+	*ds = append(*ds, d)
+}
+
 // DebugText prints out general debug information as text
 func DebugText(g *Game, screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
