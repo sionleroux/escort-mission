@@ -61,6 +61,7 @@ type Game struct {
 	Dog          *Dog
 	Zombies      Zombies
 	Space        *resolv.Space
+	Debuggers    []func(g *Game, screen *ebiten.Image)
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -156,6 +157,21 @@ func NewGame(g *Game) {
 			g.Zombies = append(g.Zombies, z)
 		}
 	}
+
+	g.Debuggers = append(g.Debuggers, func(g *Game, screen *ebiten.Image) {
+		ebitenutil.DebugPrint(screen, fmt.Sprintf(
+			"FPS: %.2f\n"+
+				"TPS: %.2f\n"+
+				"X: %.2f\n"+
+				"Y: %.2f\n"+
+				"Zombies: %d\n",
+			ebiten.ActualFPS(),
+			ebiten.ActualTPS(),
+			g.Player.Object.X/32,
+			g.Player.Object.Y/32,
+			len(g.Zombies),
+		))
+	})
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -227,18 +243,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	g.Camera.Blit(screen)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"FPS: %.2f\n"+
-			"TPS: %.2f\n"+
-			"X: %.2f\n"+
-			"Y: %.2f\n"+
-			"Zombies: %d\n",
-		ebiten.ActualFPS(),
-		ebiten.ActualTPS(),
-		g.Player.Object.X/32,
-		g.Player.Object.Y/32,
-		len(g.Zombies),
-	))
+	for _, fn := range g.Debuggers {
+		fn(g, screen)
+	}
 }
 
 // Clicked is shorthand for when the left mouse button has just been clicked
