@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"image/color"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -34,4 +36,18 @@ func DebugText(g *Game, screen *ebiten.Image) {
 		g.Player.Object.Y/32,
 		len(g.Zombies),
 	))
+}
+
+// DebugAim draws a line showing the direction and range of the gun
+func DebugAim(g *Game, screen *ebiten.Image) {
+	rangeOfFire := g.Player.Range
+	sX, sY := g.Camera.GetScreenCoords(
+		g.Player.Object.X-math.Cos(g.Player.Angle-math.Pi)*rangeOfFire,
+		g.Player.Object.Y-math.Sin(g.Player.Angle-math.Pi)*rangeOfFire,
+	)
+	pX, pY := g.Camera.GetScreenCoords(
+		g.Player.Object.X+g.Player.Object.W/2,
+		g.Player.Object.Y+g.Player.Object.H/2,
+	)
+	ebitenutil.DrawLine(screen, pX, pY, sX, sY, color.Black)
 }

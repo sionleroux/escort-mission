@@ -157,6 +157,7 @@ func NewGame(g *Game) {
 	}
 
 	g.Debuggers = append(g.Debuggers, DebugFunc(DebugText))
+	g.Debuggers = append(g.Debuggers, DebugFunc(DebugAim))
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
