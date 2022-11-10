@@ -30,14 +30,14 @@ const zombieRange float64 = 200
 type Zombies []*Zombie
 
 // Update updates all the zombies
-func (zs Zombies) Update(g *Game) {
-	for i, z := range zs {
+func (zs *Zombies) Update(g *Game) {
+	for i, z := range *zs {
 		err := z.Update(g)
 		if err != nil {
 			// clear and remove dead zombies
 			log.Println(err)
 			g.Zombies[i] = nil
-			g.Zombies = append(zs[:i], zs[i+1:]...)
+			g.Zombies = append((*zs)[:i], (*zs)[i+1:]...)
 		}
 	}
 }
