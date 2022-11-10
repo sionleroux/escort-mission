@@ -42,6 +42,7 @@ type Player struct {
 	State     int            // The current animation state
 	Sprinting bool           // Whether the player is sprinting or not
 	Sprite    *SpriteSheet   // Used for player animations
+	Range     float64        // How far you can shoot with the gun
 }
 
 // NewPlayer constructs a new Player object at the provided location and size
@@ -55,6 +56,7 @@ func NewPlayer(position []int, sprites *SpriteSheet) *Player {
 		),
 		Angle:  0,
 		Sprite: sprites,
+		Range:  200,
 	}
 	return player
 }
