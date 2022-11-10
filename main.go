@@ -256,8 +256,8 @@ func Shoot(g *Game) {
 			g.Player.Object.Y-math.Sin(g.Player.Angle-math.Pi)*rangeOfFire,
 		)
 		pX, pY := g.Space.WorldToSpace(
-			g.Player.Object.X+8, // XXX this should come from Player
-			g.Player.Object.Y+8,
+			g.Player.Object.X+g.Player.Object.W/2,
+			g.Player.Object.Y+g.Player.Object.H/2,
 		)
 		cells := g.Space.CellsInLine(pX, pY, sX, sY)
 		for _, c := range cells {
