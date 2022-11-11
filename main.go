@@ -180,7 +180,7 @@ func NewGame(g *Game) {
 	} // XXX: surely there is a smarter way than writing this by hand
 	for h, e := range entities.Entities {
 		if e.Identifier == "Zombie" {
-			howManyZombies := e.PropertyByIdentifier("initial").AsInt()
+			howManyZombies := e.PropertyByIdentifier("Initial").AsInt()
 			log.Printf("%d zombies at point #%d", h, howManyZombies)
 			for i := 0; i < howManyZombies; i++ {
 				if i >= len(zombiePositions) {
