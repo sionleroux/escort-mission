@@ -161,13 +161,7 @@ func (d *Dog) FollowPath() {
 	case dogSitting:
 		fallthrough
 	case dogFleeing:
-		if (!d.OnTheWay) {
-			d.State = dogWalking
-		} else {
-			d.State = dogSniffing
-			d.SniffNextPathPoint()
-			return
-		}
+		d.State = dogWalking
 	case dogSniffing:
 		d.SniffNextPathPoint()
 		return
@@ -180,8 +174,8 @@ func (d *Dog) FollowPath() {
 			d.NextPath = 0
 		}
 		d.State = dogSniffing
-		d.SniffNextPathPoint()
-}
+		return
+	}
 
 	d.move(
 		math.Cos(d.Angle)*dogSniffingSpeed,
@@ -199,9 +193,11 @@ func (d *Dog) Run() {
 
 // Move the Dog by the given vector if it is possible to do so
 func (d *Dog) move(dx, dy float64) {
-	// No collision detection for the time being
-	d.Object.X += dx
-	d.Object.Y += dy
+	if collision := d.Object.Check(dx, dy, tagWall, tagMob, tagPlayer); collision == nil {
+		d.Object.X += dx
+		d.Object.Y += dy
+	}
+
 }
 
 // Draw draws the Dog to the screen
