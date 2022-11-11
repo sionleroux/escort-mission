@@ -11,7 +11,10 @@ require (
 	github.com/ebitengine/purego v0.0.0-20220905075623-aeed57cda744 // indirect
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20220806181222-55e207c401ad // indirect
 	github.com/hajimehoshi/file2byteslice v0.0.0-20210813153925-5340248a8f41 // indirect
+	github.com/hajimehoshi/oto/v2 v2.3.1 // indirect
 	github.com/jezek/xgb v1.0.1 // indirect
+	github.com/jfreymuth/oggvorbis v1.0.4 // indirect
+	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/kvartborg/vector v0.0.0-20200419093813-2cba0cabb4f0 // indirect
 	github.com/melonfunction/ebiten-camera v0.0.0-20220812153034-695003d18a6d // indirect
 	github.com/solarlune/ldtkgo v0.9.3 // indirect
