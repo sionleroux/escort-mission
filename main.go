@@ -11,9 +11,9 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/audio"
 	camera "github.com/melonfunction/ebiten-camera"
 	"github.com/solarlune/ldtkgo"
 	"github.com/solarlune/resolv"
@@ -47,6 +47,13 @@ func main() {
 	}
 }
 
+type GameState int
+
+const (
+	gameLoading GameState = iota
+	gameRunning
+)
+
 // Game represents the main game state
 type Game struct {
 	Width        int
@@ -54,7 +61,7 @@ type Game struct {
 	Tick         int
 	TileRenderer *TileRenderer
 	LDTKProject  *ldtkgo.Project
-	Sounds        []*audio.Player
+	Sounds       []*audio.Player
 	Level        int
 	Background   *ebiten.Image
 	Camera       *camera.Camera
@@ -63,6 +70,7 @@ type Game struct {
 	Dog          *Dog
 	Zombies      Zombies
 	Space        *resolv.Space
+	State        GameState
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -188,6 +196,8 @@ func NewGame(g *Game) {
 			}
 		}
 	}
+
+	g.State = gameRunning
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -197,6 +207,10 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 
 // Update calculates game logic
 func (g *Game) Update() error {
+	if g.State == gameLoading {
+		return nil // game hasn't loaded yet
+	}
+
 	g.Tick++
 
 	// Pressing Q any time quits immediately
@@ -243,6 +257,11 @@ func (g *Game) Update() error {
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
+	if g.State == gameLoading {
+		ebitenutil.DebugPrint(screen, "Loading...")
+		return // game not loaded yet
+	}
+
 	op := &ebiten.DrawImageOptions{}
 
 	g.Camera.Surface.Clear()
