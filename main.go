@@ -181,13 +181,11 @@ func NewGame(g *Game) {
 	for h, e := range entities.Entities {
 		if e.Identifier == "Zombie" {
 			howManyZombies := e.PropertyByIdentifier("Initial").AsInt()
-			log.Printf("%d zombies at point #%d", h, howManyZombies)
 			for i := 0; i < howManyZombies; i++ {
 				if i >= len(zombiePositions) {
 					log.Println("ran out of zombie positions, aborting spawning")
 					break
 				}
-				log.Printf("putting %d to %v", i, zombiePositions[i])
 				e.Position[0] += zombiePositions[i].X * 16 // 16px should come from Zombie
 				e.Position[1] += zombiePositions[i].Y * 16 // 16px should come from Zombie
 				z := NewZombie(e.Position, g.Sprites[spriteZombie])
