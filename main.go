@@ -178,7 +178,7 @@ func NewGame(g *Game) {
 		{0, 2}, {-1, 2}, {-1, 2},
 		{-2, 2}, {-2, 1},
 	} // XXX: surely there is a smarter way than writing this by hand
-	for h, e := range entities.Entities {
+	for _, e := range entities.Entities {
 		if e.Identifier == "Zombie" {
 			howManyZombies := e.PropertyByIdentifier("Initial").AsInt()
 			for i := 0; i < howManyZombies; i++ {
