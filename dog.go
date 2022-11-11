@@ -39,22 +39,25 @@ const zombieSafeRadius float64 = 192
 // states of the dog
 // It would be great to map them to the frameTag.Name from JSON
 const (
-	dogWalking = iota
-	dogSniffing
-	dogSitting
+	dogWalking  int = 0
+	dogFleeing      = 0
+	dogSniffing     = 1
+	dogSitting      = 2
 )
 
 // Dog is player's companion
 type Dog struct {
-	Object   *resolv.Object
-	Angle    float64
-	Speed    float64
-	Frame    int
-	State    int
-	Path     Path
-	NextPath int
-	Sprite   *SpriteSheet
-	InDanger bool
+	Object          *resolv.Object
+	Angle           float64
+	Speed           float64
+	Frame           int
+	State           int
+	Path            Path
+	NextPath        int
+	Sprite          *SpriteSheet
+	InDanger        bool
+	OnTheWay        bool
+	SniffingCounter int
 }
 
 // Update updates the state of the dog
@@ -78,7 +81,8 @@ func (d *Dog) Update(g *Game) {
 			resultantVectorCoord.Y += yDistance
 			isSafeAgain = false
 			zombieInRange = true
-			d.State = dogWalking
+			d.State = dogFleeing
+			d.OnTheWay = false
 		} else if d.InDanger && zombieDistance < zombieSafeRadius {
 			// If the dog is running away from zombies then it will be safe again when getting far enough from the zombies
 			isSafeAgain = false
@@ -95,7 +99,6 @@ func (d *Dog) Update(g *Game) {
 		playerDistance, _, _ := CalcObjectDistance(d.Object, g.Player.Object)
 		if playerDistance < waitingRadius {
 			// If the dog is not in danger and it is close to the player then it sniffs towards next path point
-			d.State = dogSniffing
 			d.FollowPath()
 		} else {
 			// If the player is not close enough then the dog sits down
@@ -142,15 +145,42 @@ func (d *Dog) TurnTowardsPathPoint() {
 	d.TurnTowardsCoordinate(d.Path[d.NextPath])
 }
 
+// SniffNextPathPoint starts the dog sniffing for next path point
+func (d *Dog) SniffNextPathPoint() {
+	d.SniffingCounter++
+	if d.SniffingCounter == 180 {
+		d.SniffingCounter = 0
+		d.TurnTowardsPathPoint()
+		d.State = dogWalking
+	}
+}
+
 // FollowPath moves the dog along the path
 func (d *Dog) FollowPath() {
+	switch d.State {
+	case dogSitting:
+		fallthrough
+	case dogFleeing:
+		if !d.OnTheWay {
+			d.State = dogWalking
+		} else {
+			d.State = dogSniffing
+			d.SniffNextPathPoint()
+			return
+		}
+	case dogSniffing:
+		d.SniffNextPathPoint()
+		return
+	}
+
 	nextPathCoordDistance := CalcDistance(d.Path[d.NextPath].X, d.Path[d.NextPath].Y, d.Object.X, d.Object.Y)
 	if nextPathCoordDistance < 2 {
 		d.NextPath++
 		if d.NextPath == len(d.Path) {
 			d.NextPath = 0
 		}
-		d.TurnTowardsPathPoint()
+		d.State = dogSniffing
+		d.SniffNextPathPoint()
 	}
 
 	d.move(
