@@ -149,11 +149,33 @@ func NewGame(g *Game) {
 	g.Space.Add(g.Dog.Object)
 
 	// Add zombies to the game
-	for _, e := range entities.Entities {
+	zombiePositions := []struct{ X, Y int }{
+		{0, 0}, {-1, 0}, {-1, -1},
+		{0, -1}, {1, -1}, {1, 0},
+		{1, 1}, {0, 1}, {-1, 1},
+		{-2, 0}, {-2, -1}, {-2, -2},
+		{-1, -2}, {0, -2}, {1, -2},
+		{2, -2}, {2, -1}, {2, 0},
+		{2, 1}, {2, 2}, {1, 2},
+		{0, 2}, {-1, 2}, {-1, 2},
+		{-2, 2}, {-2, 1},
+	} // XXX: surely there is a smarter way than writing this by hand
+	for h, e := range entities.Entities {
 		if e.Identifier == "Zombie" {
-			z := NewZombie(e.Position, g.Sprites[spriteZombie])
-			g.Space.Add(z.Object)
-			g.Zombies = append(g.Zombies, z)
+			howManyZombies := e.PropertyByIdentifier("initial").AsInt()
+			log.Printf("%d zombies at point #%d", h, howManyZombies)
+			for i := 0; i < howManyZombies; i++ {
+				if i >= len(zombiePositions) {
+					log.Println("ran out of zombie positions, aborting spawning")
+					break
+				}
+				log.Printf("putting %d to %v", i, zombiePositions[i])
+				e.Position[0] += zombiePositions[i].X * 16 // 16px should come from Zombie
+				e.Position[1] += zombiePositions[i].Y * 16 // 16px should come from Zombie
+				z := NewZombie(e.Position, g.Sprites[spriteZombie])
+				g.Space.Add(z.Object)
+				g.Zombies = append(g.Zombies, z)
+			}
 		}
 	}
 }
