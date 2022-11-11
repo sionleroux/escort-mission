@@ -39,7 +39,7 @@ const zombieSafeRadius float64 = 192
 // states of the dog
 // It would be great to map them to the frameTag.Name from JSON
 const (
-	dogWalking  = iota
+	dogWalking = iota
 	dogSniffing
 	dogSitting
 )
@@ -91,15 +91,15 @@ func (d *Dog) Update(g *Game) {
 	}
 	d.InDanger = zombieInRange || !isSafeAgain
 
-	if (!d.InDanger) {
+	if !d.InDanger {
 		playerDistance, _, _ := CalcObjectDistance(d.Object, g.Player.Object)
 		if playerDistance < waitingRadius {
 			// If the dog is not in danger and it is close to the player then it sniffs towards next path point
 			d.State = dogSniffing
 			d.FollowPath()
 		} else {
-		// If the player is not close enough then the dog sits down
-		d.State = dogSitting
+			// If the player is not close enough then the dog sits down
+			d.State = dogSitting
 		}
 	} else {
 		// If the dog is in danger then it runs away from the zombies
