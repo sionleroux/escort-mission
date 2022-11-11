@@ -13,6 +13,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	camera "github.com/melonfunction/ebiten-camera"
 	"github.com/solarlune/ldtkgo"
 	"github.com/solarlune/resolv"
@@ -53,6 +54,7 @@ type Game struct {
 	Tick         int
 	TileRenderer *TileRenderer
 	LDTKProject  *ldtkgo.Project
+	Sounds        []*audio.Player
 	Level        int
 	Background   *ebiten.Image
 	Camera       *camera.Camera
@@ -110,6 +112,14 @@ func NewGame(g *Game) {
 			}
 		}
 	}
+
+	// Music
+	const sampleRate int = 44100 // assuming "normal" sample rate
+	context := audio.NewContext(sampleRate)
+	g.Sounds = make([]*audio.Player, 2)
+	g.Sounds[soundMusicBackground] = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context)
+	g.Sounds[soundGunShot] = NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context)
+	g.Sounds[soundMusicBackground].Play()
 
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
@@ -249,6 +259,9 @@ func clicked() bool {
 // Shoot sets shooting states and also die states for any zombies in range
 func Shoot(g *Game) {
 	if g.Player.State != playerShooting && clicked() {
+		g.Sounds[soundGunShot].Rewind()
+		g.Sounds[soundGunShot].Play()
+
 		g.Player.State = playerShooting
 		rangeOfFire := g.Player.Range
 		sX, sY := g.Space.WorldToSpace(

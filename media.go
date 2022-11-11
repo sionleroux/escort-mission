@@ -13,6 +13,8 @@ import (
 	"path"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/solarlune/ldtkgo"
 )
 
@@ -139,3 +141,51 @@ func loadMaps(name string) *ldtkgo.Project {
 
 	return maps
 }
+
+// SoundType is a unique identifier to reference sound by name
+type SoundType uint64
+
+const (
+	soundMusicBackground SoundType = iota
+	soundGunShot
+)
+
+// NewMusicPlayer loads a sound into an audio player that can be used to play it
+// as an infinite loop of music without any additional setup required
+func NewMusicPlayer(music *vorbis.Stream, context *audio.Context) *audio.Player {
+	musicLoop := audio.NewInfiniteLoop(music, music.Length())
+	musicPlayer, err := audio.NewPlayer(context, musicLoop)
+	if err != nil {
+		log.Fatalf("error making music player: %v\n", err)
+	}
+	return musicPlayer
+}
+
+// NewSoundPlayer loads a sound into an audio player that can be used to play it
+// without any additional setup required
+func NewSoundPlayer(audioFile *vorbis.Stream, context *audio.Context) *audio.Player {
+	audioPlayer, err := audio.NewPlayer(context, audioFile)
+	if err != nil {
+		log.Fatalf("error making audio player: %v\n", err)
+	}
+	return audioPlayer
+}
+
+// Load an OGG Vorbis sound file with 44100 sample rate and return its stream
+func loadSoundFile(name string, sampleRate int) *vorbis.Stream {
+	log.Printf("loading %s\n", name)
+
+	file, err := assets.Open(name)
+	if err != nil {
+		log.Fatalf("error opening file %s: %v\n", name, err)
+	}
+	defer file.Close()
+
+	music, err := vorbis.DecodeWithSampleRate(sampleRate, file)
+	if err != nil {
+		log.Fatalf("error decoding file %s as Vorbis: %v\n", name, err)
+	}
+
+	return music
+}
+
