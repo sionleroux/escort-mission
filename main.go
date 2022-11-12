@@ -47,11 +47,12 @@ func main() {
 	}
 }
 
+// GameState is global state for the whole game
 type GameState int
 
 const (
-	gameLoading GameState = iota
-	gameRunning
+	gameLoading GameState = iota // Loading files and setting up the game
+	gameRunning                  // The game is running the main game code
 )
 
 // Game represents the main game state
