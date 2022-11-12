@@ -261,6 +261,7 @@ func (d *Dog) Draw(g *Game) {
 
 	op.GeoM.Rotate(d.Angle + math.Pi/2)
 
+	cx, cy := d.Object.Center()
 	g.Camera.Surface.DrawImage(
 		s.Image.SubImage(image.Rect(
 			frame.Position.X,
@@ -270,6 +271,6 @@ func (d *Dog) Draw(g *Game) {
 		)).(*ebiten.Image),
 		g.Camera.GetTranslation(
 			op,
-			float64(d.Object.X),
-			float64(d.Object.Y)))
+			float64(cx),
+			float64(cy)))
 }
