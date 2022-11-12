@@ -102,7 +102,7 @@ func NewGame(g *Game) {
 	g.Background = bg
 
 	// Create space for collision detection
-	g.Space = resolv.NewSpace(level.Width, level.Height, 16, 16)
+	g.Space = resolv.NewSpace(level.Width, level.Height, 8, 8)
 
 	// Add wall tiles to space for collision detection
 	for _, layer := range level.Layers {
@@ -156,10 +156,10 @@ func NewGame(g *Game) {
 			Y: (pathCoord.(map[string]any)["cy"].(float64) + 0.5) * float64(entities.GridSize),
 		}
 	}
-
+	
 	// Add dog to the game
 	g.Dog = &Dog{
-		Object:   resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 16, 16, tagDog),
+		Object:   resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 8, 8, tagDog),
 		Angle:    0,
 		Sprite:   g.Sprites[spriteDog],
 		Path:     path,
@@ -268,11 +268,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Camera.Surface.Clear()
 	g.Camera.Surface.DrawImage(g.Background, g.Camera.GetTranslation(op, 0, 0))
 
-	// Player
-	g.Player.Draw(g)
-
 	// Dog
 	g.Dog.Draw(g)
+
+	// Player
+	g.Player.Draw(g)
 
 	// Zombies
 	g.Zombies.Draw(g)

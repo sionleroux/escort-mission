@@ -189,6 +189,10 @@ func (d *Dog) FollowPath() {
 		d.State = dogWalkingBackToPath
 	}
 
+	if d.SniffingCounter != 0 {
+		d.State = dogSniffing
+	}
+	
 	switch d.State {
 	case dogSitting:
 		fallthrough
