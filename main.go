@@ -516,6 +516,9 @@ func Shoot(g *Game) {
 	case playerReload:
 		interruptReload()
 		return
+	case playerIdle:
+		g.Player.State = playerReady
+		return
 	default:
 		if g.Player.Ammo < 1 {
 			interruptReload()

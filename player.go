@@ -127,6 +127,8 @@ func (p *Player) animationBasedStateChanges(g *Game) {
 		p.State = playerIdle
 	case playerDryFire: // Back to idle after reload animation
 		p.State = playerIdle
+	case playerReady:
+		p.State = playerShooting
 	}
 }
 
