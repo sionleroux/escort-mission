@@ -53,6 +53,7 @@ type GameState int
 const (
 	gameLoading GameState = iota // Loading files and setting up the game
 	gameRunning                  // The game is running the main game code
+	gameOver                     // The game has ended
 )
 
 // Game represents the main game state
@@ -226,6 +227,10 @@ func (g *Game) Update() error {
 		}
 	}
 
+	if g.State == gameOver {
+		return nil // TODO: provide a possibility to restart the game
+	}
+
 	// Gun shooting handler
 	Shoot(g)
 
@@ -241,7 +246,8 @@ func (g *Game) Update() error {
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
-			return errors.New("you died")
+			g.State = gameOver
+			return nil // return early, no point in continuing, you are dead
 		}
 	}
 
@@ -258,6 +264,11 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	if g.State == gameLoading {
 		ebitenutil.DebugPrint(screen, "Loading...")
+		return // game not loaded yet
+	}
+
+	if g.State == gameOver {
+		ebitenutil.DebugPrint(screen, "You Died, press Q to quit")
 		return // game not loaded yet
 	}
 
