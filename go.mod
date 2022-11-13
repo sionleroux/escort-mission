@@ -4,7 +4,10 @@ go 1.19
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.4.10
+	github.com/melonfunction/ebiten-camera v0.0.0-20220812153034-695003d18a6d
+	github.com/solarlune/ldtkgo v0.9.3
 	github.com/solarlune/resolv v0.5.1
+	gopkg.in/ini.v1 v1.67.0
 )
 
 require (
@@ -16,8 +19,7 @@ require (
 	github.com/jfreymuth/oggvorbis v1.0.4 // indirect
 	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/kvartborg/vector v0.0.0-20200419093813-2cba0cabb4f0 // indirect
-	github.com/melonfunction/ebiten-camera v0.0.0-20220812153034-695003d18a6d // indirect
-	github.com/solarlune/ldtkgo v0.9.3 // indirect
+	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/tidwall/gjson v1.6.4 // indirect
 	github.com/tidwall/match v1.0.1 // indirect
 	github.com/tidwall/pretty v1.0.2 // indirect

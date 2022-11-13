@@ -17,6 +17,7 @@ import (
 	camera "github.com/melonfunction/ebiten-camera"
 	"github.com/solarlune/ldtkgo"
 	"github.com/solarlune/resolv"
+	"gopkg.in/ini.v1"
 )
 
 const (
@@ -345,4 +346,18 @@ func CalcObjectDistance(obj1, obj2 *resolv.Object) (float64, float64, float64) {
 // CalcDistance calculates the distance between two coordinates
 func CalcDistance(x1, y1, x2, y2 float64) float64 {
 	return math.Sqrt(math.Pow(x1-x2, 2) + math.Pow(y1-y2, 2))
+}
+
+// ApplyConfigs overrides default values with a config file if available
+func ApplyConfigs() {
+	log.Println("Looking for INI file...")
+	cfg, err := ini.Load("escort-mission.ini")
+	log.Println(err)
+	if err == nil {
+		VelocityDenominator, _ = cfg.Section("").Key("VelocityDenominator").Int()
+		VelocityXMultiplier, _ = cfg.Section("").Key("VelocityXMultiplier").Int()
+		MaxPrime, _ = cfg.Section("").Key("MaxPrime").Int()
+		MinPrime, _ = cfg.Section("").Key("MinPrime").Int()
+		DebugMode, _ = cfg.Section("").Key("DebugMode").Bool()
+	}
 }
