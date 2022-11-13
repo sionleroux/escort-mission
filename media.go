@@ -148,6 +148,7 @@ type SoundType uint64
 const (
 	soundMusicBackground SoundType = iota
 	soundGunShot
+	soundDogBark1
 )
 
 // NewMusicPlayer loads a sound into an audio player that can be used to play it

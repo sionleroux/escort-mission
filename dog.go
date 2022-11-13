@@ -21,8 +21,8 @@ type Coord struct {
 // Path is an array of coordinates
 type Path []Coord
 
-// dogSniffingSpeed is the distance the dog moves per update cycle when sniffing
-const dogSniffingSpeed float64 = 0.7
+// dogWalkingSpeed is the distance the dog moves per update cycle when walking
+const dogWalkingSpeed float64 = 0.7
 
 // dogRunningSpeed is the distance the dog moves per update cycle when running
 const dogRunningSpeed float64 = 1.3
@@ -30,19 +30,23 @@ const dogRunningSpeed float64 = 1.3
 // waitingRadius is the maximum distance the dog walks away from the player
 const waitingRadius float64 = 96
 
+// zombieBarkRadius: if a zombie is this close to the dog, it barks
+const zombieBarkRadius float64 = 150
+
 // zombieDangerRadius: if a zombie is this close to the dog, it runs away
-const zombieDangerRadius float64 = 128
+const zombieDangerRadius float64 = 80
 
 // zombieSafeRadius: if a zombie is at least this far from the dog, it stops running
 const zombieSafeRadius float64 = 192
 
-// states of the dog
-// It would be great to map them to the frameTag.Name from JSON
+// States of the dog
 const (
-	dogWalking  int = 0
-	dogFleeing      = 0
-	dogSniffing     = 1
-	dogSitting      = 2
+	dogWalkingOnPath     = iota
+	dogFleeing
+	dogWalkingBackToPath
+	dogSniffing
+	dogBarking
+	dogSitting
 )
 
 // Dog is player's companion
@@ -56,7 +60,8 @@ type Dog struct {
 	NextPath        int
 	Sprite          *SpriteSheet
 	InDanger        bool
-	OnTheWay        bool
+	OnThePath       bool
+	LastPathCoord   Coord
 	SniffingCounter int
 }
 
@@ -64,53 +69,73 @@ type Dog struct {
 func (d *Dog) Update(g *Game) {
 	if d.NextPath < 0 {
 		d.NextPath = 0
+		d.OnThePath = true
 		d.TurnTowardsPathPoint()
 	}
 
-	isSafeAgain := true
 	zombieInRange := false
+	zombieAlert := false
 	resultantVectorCoord := Coord{
 		X: d.Object.X,
 		Y: d.Object.Y,
 	}
+	closestZombie := 1000.0
 	for _, zombie := range g.Zombies {
 		zombieDistance, xDistance, yDistance := CalcObjectDistance(d.Object, zombie.Object)
+		if zombieDistance < closestZombie {
+			closestZombie = zombieDistance
+		}
 		if zombieDistance < zombieDangerRadius {
-			// If zombies are too close then the dog is in danger and will run away
 			resultantVectorCoord.X += xDistance
 			resultantVectorCoord.Y += yDistance
-			isSafeAgain = false
-			zombieInRange = true
-			d.State = dogFleeing
-			d.OnTheWay = false
-		} else if d.InDanger && zombieDistance < zombieSafeRadius {
-			// If the dog is running away from zombies then it will be safe again when getting far enough from the zombies
-			isSafeAgain = false
 		}
 	}
 
-	// If the dog is not in danger anymore then it turn towards the next path point
-	if d.InDanger && isSafeAgain {
-		d.TurnTowardsPathPoint()
+	if closestZombie < zombieDangerRadius {
+		// If zombies are too close then the dog is in danger and will run away
+		zombieInRange = true
+		d.State = dogFleeing
+	} else if closestZombie < zombieBarkRadius && d.State != dogFleeing {
+		// If zombies gettgin closer then the dog stops walking and start barking
+		zombieAlert = true
+		if (d.State != dogBarking) {
+			g.Sounds[soundDogBark1].Rewind()
+			g.Sounds[soundDogBark1].Play()
+		}
+		d.State = dogBarking
 	}
+
+	// If the dog was in danger then it will be safe again when getting far enough from the zombies
+	isSafeAgain := !d.InDanger || (d.InDanger && closestZombie > zombieSafeRadius)
+
+	// If the dog starts fleeing away from the path then the last coordinate is saved to allow navigating back
+	if d.State == dogFleeing && d.OnThePath {
+		d.LastPathCoord.X = d.Object.X
+		d.LastPathCoord.Y = d.Object.Y
+		d.OnThePath = false
+	}
+
+	// The dog is in danger if there are zombies too close or it did not manage to run far enough
 	d.InDanger = zombieInRange || !isSafeAgain
 
-	if !d.InDanger {
-		playerDistance, _, _ := CalcObjectDistance(d.Object, g.Player.Object)
-		if playerDistance < waitingRadius {
-			// If the dog is not in danger and it is close to the player then it sniffs towards next path point
-			d.FollowPath()
+	if !zombieAlert {
+		if !d.InDanger {
+			playerDistance, _, _ := CalcObjectDistance(d.Object, g.Player.Object)
+			if playerDistance < waitingRadius {
+				// If the dog is not in danger and it is close to the player then it walks towards next path point
+				d.FollowPath()
+			} else {
+				// If the player is not close enough then the dog sits down
+				d.State = dogSitting
+			}
 		} else {
-			// If the player is not close enough then the dog sits down
-			d.State = dogSitting
+			// If the dog is in danger then it runs away from the zombies
+			if zombieInRange {
+				// If zombies are close then recalculate Angle
+				d.TurnTowardsCoordinate(resultantVectorCoord)
+			}
+			d.Run()
 		}
-	} else {
-		// If the dog is in danger then it runs away from the zombies
-		if zombieInRange {
-			//If zombies are close then recalculate Angle
-			d.TurnTowardsCoordinate(resultantVectorCoord)
-		}
-		d.Run()
 	}
 
 	d.animate(g)
@@ -123,7 +148,9 @@ func (d *Dog) animate(g *Game) {
 		return
 	}
 
-	ft := d.Sprite.Meta.FrameTags[d.State]
+	dogStateToFrame := [6]int{0, 0, 0, 1, 1, 2}
+
+	ft := d.Sprite.Meta.FrameTags[dogStateToFrame[d.State]]
 
 	if ft.From == ft.To {
 		d.Frame = ft.From
@@ -148,24 +175,49 @@ func (d *Dog) TurnTowardsPathPoint() {
 // SniffNextPathPoint starts the dog sniffing for next path point
 func (d *Dog) SniffNextPathPoint() {
 	d.SniffingCounter++
-	if d.SniffingCounter == 180 {
+	if (d.SniffingCounter == 180) {
 		d.SniffingCounter = 0
 		d.TurnTowardsPathPoint()
-		d.State = dogWalking
+		d.State = dogWalkingOnPath
 	}
 }
 
 // FollowPath moves the dog along the path
 func (d *Dog) FollowPath() {
+	if (!d.OnThePath && d.State != dogWalkingBackToPath) {
+		d.TurnTowardsCoordinate(d.LastPathCoord)
+		d.State = dogWalkingBackToPath
+	}
+
+	if d.SniffingCounter != 0 {
+		d.State = dogSniffing
+	}
+	
 	switch d.State {
 	case dogSitting:
 		fallthrough
 	case dogFleeing:
-		if !d.OnTheWay {
-			d.State = dogWalking
-		} else {
+		fallthrough
+	case dogBarking:
+		d.State = dogWalkingOnPath
+		return
+	case dogWalkingOnPath:
+		// The dog is following the path
+		nextPathCoordDistance := CalcDistance(d.Path[d.NextPath].X, d.Path[d.NextPath].Y, d.Object.X, d.Object.Y)
+		if nextPathCoordDistance < 2 {
+			d.NextPath++
+			if d.NextPath == len(d.Path) {
+				d.NextPath = 0
+			}
 			d.State = dogSniffing
-			d.SniffNextPathPoint()
+			return
+		}
+	case dogWalkingBackToPath:
+		// The dog is getting back to the last know coordinate of the path
+		lastPathCoordDistance := CalcDistance(d.LastPathCoord.X, d.LastPathCoord.Y, d.Object.X, d.Object.Y)
+		if lastPathCoordDistance < 2 {
+			d.OnThePath = true
+			d.State = dogSniffing
 			return
 		}
 	case dogSniffing:
@@ -173,19 +225,9 @@ func (d *Dog) FollowPath() {
 		return
 	}
 
-	nextPathCoordDistance := CalcDistance(d.Path[d.NextPath].X, d.Path[d.NextPath].Y, d.Object.X, d.Object.Y)
-	if nextPathCoordDistance < 2 {
-		d.NextPath++
-		if d.NextPath == len(d.Path) {
-			d.NextPath = 0
-		}
-		d.State = dogSniffing
-		d.SniffNextPathPoint()
-	}
-
 	d.move(
-		math.Cos(d.Angle)*dogSniffingSpeed,
-		math.Sin(d.Angle)*dogSniffingSpeed,
+		math.Cos(d.Angle)*dogWalkingSpeed,
+		math.Sin(d.Angle)*dogWalkingSpeed,
 	)
 }
 
@@ -199,7 +241,17 @@ func (d *Dog) Run() {
 
 // Move the Dog by the given vector if it is possible to do so
 func (d *Dog) move(dx, dy float64) {
-	// No collision detection for the time being
+	if d.OnThePath {
+		// WORKAROUND: If the dog is following the path then collision with walls is not checked
+		if collision := d.Object.Check(dx, dy, tagMob, tagPlayer); collision != nil {
+			return
+		}
+	} else {
+		if collision := d.Object.Check(dx, dy, tagWall, tagMob, tagPlayer); collision != nil {
+			return
+		}
+	}
+
 	d.Object.X += dx
 	d.Object.Y += dy
 }
@@ -217,6 +269,7 @@ func (d *Dog) Draw(g *Game) {
 
 	op.GeoM.Rotate(d.Angle + math.Pi/2)
 
+	cx, cy := d.Object.Center()
 	g.Camera.Surface.DrawImage(
 		s.Image.SubImage(image.Rect(
 			frame.Position.X,
@@ -226,6 +279,6 @@ func (d *Dog) Draw(g *Game) {
 		)).(*ebiten.Image),
 		g.Camera.GetTranslation(
 			op,
-			float64(d.Object.X),
-			float64(d.Object.Y)))
+			float64(cx),
+			float64(cy)))
 }

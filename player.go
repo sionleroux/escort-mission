@@ -53,6 +53,7 @@ func NewPlayer(position []int, sprites *SpriteSheet) *Player {
 		Object: resolv.NewObject(
 			float64(position[0]), float64(position[1]),
 			float64(dimensions.W), float64(dimensions.H),
+			tagPlayer,
 		),
 		Angle:  0,
 		Sprite: sprites,
@@ -142,7 +143,7 @@ func (p *Player) MoveBackward() {
 
 // Move the Player by the given vector if it is possible to do so
 func (p *Player) move(dx, dy float64) {
-	if collision := p.Object.Check(dx, dy, tagWall); collision == nil {
+	if collision := p.Object.Check(dx, dy, tagWall, tagDog); collision == nil {
 		p.Object.X += dx
 		p.Object.Y += dy
 	}

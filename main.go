@@ -126,13 +126,14 @@ func NewGame(g *Game) {
 	// Music
 	const sampleRate int = 44100 // assuming "normal" sample rate
 	context := audio.NewContext(sampleRate)
-	g.Sounds = make([]*audio.Player, 2)
+	g.Sounds = make([]*audio.Player, 3)
 	g.Sounds[soundMusicBackground] = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context)
 	g.Sounds[soundGunShot] = NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context)
+	g.Sounds[soundDogBark1] = NewSoundPlayer(loadSoundFile("assets/sfx/Dog-bark-1.ogg", sampleRate), context)
 	g.Sounds[soundMusicBackground].Play()
 
 	// Load sprites
-	g.Sprites = make(map[SpriteType]*SpriteSheet, 2)
+	g.Sprites = make(map[SpriteType]*SpriteSheet, 3)
 	g.Sprites[spritePlayer] = loadSprite("Player")
 	g.Sprites[spriteZombie] = loadSprite("Zombie_1")
 	g.Sprites[spriteDog] = loadSprite("Dog")
@@ -160,7 +161,7 @@ func NewGame(g *Game) {
 
 	// Add dog to the game
 	g.Dog = &Dog{
-		Object:   resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 32, 32, tagDog),
+		Object:   resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 8, 8, tagDog),
 		Angle:    0,
 		Sprite:   g.Sprites[spriteDog],
 		Path:     path,
@@ -277,11 +278,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Camera.Surface.Clear()
 	g.Camera.Surface.DrawImage(g.Background, g.Camera.GetTranslation(op, 0, 0))
 
-	// Player
-	g.Player.Draw(g)
-
 	// Dog
 	g.Dog.Draw(g)
+
+	// Player
+	g.Player.Draw(g)
 
 	// Zombies
 	g.Zombies.Draw(g)
