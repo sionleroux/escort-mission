@@ -241,11 +241,19 @@ func (d *Dog) Run() {
 
 // Move the Dog by the given vector if it is possible to do so
 func (d *Dog) move(dx, dy float64) {
-	if collision := d.Object.Check(dx, dy, tagWall, tagMob, tagPlayer); collision == nil {
-		d.Object.X += dx
-		d.Object.Y += dy
+	if d.OnThePath {
+		// WORKAROUND: If the dog is following the path then collision with walls is not checked
+		if collision := d.Object.Check(dx, dy, tagMob, tagPlayer); collision != nil {
+			return
+		}
+	} else {
+		if collision := d.Object.Check(dx, dy, tagWall, tagMob, tagPlayer); collision != nil {
+			return
+		}
 	}
 
+	d.Object.X += dx
+	d.Object.Y += dy
 }
 
 // Draw draws the Dog to the screen
