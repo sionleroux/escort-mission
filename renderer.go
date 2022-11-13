@@ -132,7 +132,7 @@ func (er *TileRenderer) Render(level *ldtkgo.Level) {
 					// er.renderTile(tile.Position[0]+layer.OffsetX, tile.Position[1]+layer.OffsetY, tile.Src[0], tile.Src[1], layer.GridSize, layer.GridSize, tile.Flip)
 
 					// Subimage the Tile from the Tileset
-					tile := er.Tilesets[er.CurrentTileset].SubImage(image.Rect(tileData.Src[0], tileData.Src[1], tileData.Src[0]+layer.GridSize, tileData.Src[1]+layer.GridSize)).(*ebiten.Image)
+					tile := er.Tilesets[er.CurrentTileset].SubImage(image.Rect(tileData.Src[0], tileData.Src[1], tileData.Src[0]+layer.Tileset.GridSize, tileData.Src[1]+layer.Tileset.GridSize)).(*ebiten.Image)
 
 					opt := &ebiten.DrawImageOptions{}
 
