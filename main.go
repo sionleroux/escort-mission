@@ -66,6 +66,7 @@ type Game struct {
 	Sounds       []*audio.Player
 	Level        int
 	Background   *ebiten.Image
+	Foreground   *ebiten.Image
 	Camera       *camera.Camera
 	Sprites      map[SpriteType]*SpriteSheet
 	Player       *Player
@@ -90,18 +91,22 @@ func NewGame(g *Game) {
 
 	level := g.LDTKProject.Levels[g.Level]
 
-	bg := ebiten.NewImage(
-		level.Width,
-		level.Height,
-	)
+	bg := ebiten.NewImage(level.Width, level.Height)
 	bg.Fill(level.BGColor)
+	fg := ebiten.NewImage(level.Width, level.Height)
 
 	// Render map
 	g.TileRenderer.Render(level)
 	for _, layer := range g.TileRenderer.RenderedLayers {
-		bg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
+		log.Println("Pre-drawing layer:", layer.Layer.Identifier)
+		if layer.Layer.Identifier == "Treetops" {
+			fg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
+		} else {
+			bg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
+		}
 	}
 	g.Background = bg
+	g.Foreground = fg
 
 	// Create space for collision detection
 	g.Space = resolv.NewSpace(level.Width, level.Height, 16, 16)
@@ -273,10 +278,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		return // game not loaded yet
 	}
 
-	op := &ebiten.DrawImageOptions{}
-
 	g.Camera.Surface.Clear()
-	g.Camera.Surface.DrawImage(g.Background, g.Camera.GetTranslation(op, 0, 0))
+
+	// Ground, walls and other lowest-level stuff needs to be drawn first
+	g.Camera.Surface.DrawImage(
+		g.Background,
+		g.Camera.GetTranslation(&ebiten.DrawImageOptions{}, 0, 0),
+	)
 
 	// Dog
 	g.Dog.Draw(g)
@@ -286,6 +294,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Zombies
 	g.Zombies.Draw(g)
+
+	// Tree tops etc. high-up stuff need to be drawn above the entities
+	g.Camera.Surface.DrawImage(
+		g.Foreground,
+		g.Camera.GetTranslation(&ebiten.DrawImageOptions{}, 0, 0),
+	)
 
 	g.Camera.Blit(screen)
 
