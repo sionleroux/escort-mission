@@ -21,7 +21,7 @@ func init() {
 }
 
 // zombieSpeed is the distance the zombie moves per update cycle
-const zombieSpeed float64 = 0.2
+const zombieSpeed float64 = 0.4
 
 // zombieRange is how far away the zombie sees something to attack
 const zombieRange float64 = 200
