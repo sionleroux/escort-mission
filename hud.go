@@ -15,7 +15,7 @@ const (
 	hudCasing
 )
 
-const hudPadding int = 5
+var hudPadding int = 5
 
 // HUD is a display showing information during the game
 // So far it only shows how much ammo you have left

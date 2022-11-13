@@ -24,28 +24,28 @@ type Path struct {
 }
 
 // dogWalkingSpeed is the distance the dog moves per update cycle when walking
-const dogWalkingSpeed float64 = 0.7
+var dogWalkingSpeed float64 = 0.7
 
 // dogRunningSpeed is the distance the dog moves per update cycle when running
-const dogRunningSpeed float64 = 1.3
+var dogRunningSpeed float64 = 1.3
 
 // waitingRadius is the maximum distance the dog walks away from the player
-const waitingRadius float64 = 96
+var waitingRadius float64 = 96
 
 // followingRadius is the distance within which the dog follows the player after the last checkpoint
-const followingRadius float64 = 96
+var followingRadius float64 = 96
 
 // zombieBarkRadius: if a zombie is this close to the dog, it barks
-const zombieBarkRadius float64 = 150
+var zombieBarkRadius float64 = 150
 
 // zombieFleeRadius: if a zombie is this close to the dog, it runs away
-const zombieFleeRadius float64 = 80
+var zombieFleeRadius float64 = 80
 
 // zombieSafeRadius: if a zombie is at least this far from the dog, it stops running
-const zombieSafeRadius float64 = 192
+var zombieSafeRadius float64 = 192
 
 // fleeingPathLength: the length of the path planned for fleeing
-const fleeingPathLength float64 = 200
+var fleeingPathLength float64 = 200
 
 // Operating modes of the dog
 const (

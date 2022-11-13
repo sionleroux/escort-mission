@@ -11,6 +11,7 @@ require (
 	github.com/solarlune/resolv v0.6.1-0.20221115185258-12370add6bd4
 	github.com/tinne26/etxt v0.0.7
 	gonum.org/v1/plot v0.12.0
+	gopkg.in/ini.v1 v1.67.0
 )
 
 require (
@@ -22,10 +23,10 @@ require (
 	github.com/jfreymuth/oggvorbis v1.0.4 // indirect
 	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/kvartborg/vector v0.1.2 // indirect
+	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/tidwall/gjson v1.6.4 // indirect
 	github.com/tidwall/match v1.0.1 // indirect
 	github.com/tidwall/pretty v1.0.2 // indirect
-	github.com/tinne26/etxt v0.0.7 // indirect
 	golang.org/x/exp/shiny v0.0.0-20220722155223-a9213eeb770e // indirect
 	golang.org/x/image v0.1.0 // indirect
 	golang.org/x/mobile v0.0.0-20220722155234-aaac322e2105 // indirect

@@ -10,10 +10,12 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"gopkg.in/ini.v1"
 )
 
 const gameWidth, gameHeight = 320, 240
-const deathCoolDownTime = 4 * 60
+
+var deathCoolDownTime = 4 * 60
 
 func main() {
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
@@ -21,6 +23,8 @@ func main() {
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowIcon([]image.Image{loadImage("assets/icon.png")})
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
+
+	ApplyConfigs()
 
 	game := &Game{Width: gameWidth, Height: gameHeight}
 	game.Screens = []Screen{
@@ -113,4 +117,33 @@ func (g *Game) Draw(screen *ebiten.Image) {
 type Screen interface {
 	Update() (GameState, error)
 	Draw(screen *ebiten.Image)
+}
+
+// ApplyConfigs overrides default values with a config file if available
+func ApplyConfigs() {
+	log.Println("Looking for INI file...")
+	cfg, err := ini.Load("escort-mission.ini")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	deathCoolDownTime, _ = cfg.Section("").Key("DeathCoolDownTime").Int()
+	hudPadding, _ = cfg.Section("").Key("HudPadding").Int()
+	playerSpeed, _ = cfg.Section("Player").Key("PlayerSpeed").Float64()
+	playerSpeedFactorReverse, _ = cfg.Section("Player").Key("PlayerSpeedFactorReverse").Float64()
+	playerSpeedFactorSideways, _ = cfg.Section("Player").Key("PlayerSpeedFactorSideways").Float64()
+	playerSpeedFactorSprint, _ = cfg.Section("Player").Key("PlayerSpeedFactorSprint").Float64()
+	playerAmmoClipMax, _ = cfg.Section("Player").Key("PlayerAmmoClipMax").Int()
+	zombieSpeed, _ = cfg.Section("Zombie").Key("ZombieSpeed").Float64()
+	zombieCrawlerSpeed, _ = cfg.Section("Zombie").Key("ZombieCrawlerSpeed").Float64()
+	zombieSprinterSpeed, _ = cfg.Section("Zombie").Key("ZombieSprinterSpeed").Float64()
+	zombieRange, _ = cfg.Section("Zombie").Key("ZombieRange").Float64()
+	dogWalkingSpeed, _ = cfg.Section("Dog").Key("DogWalkingSpeed").Float64()
+	dogRunningSpeed, _ = cfg.Section("Dog").Key("DogRunningSpeed").Float64()
+	waitingRadius, _ = cfg.Section("Dog").Key("WaitingRadius").Float64()
+	followingRadius, _ = cfg.Section("Dog").Key("FollowingRadius").Float64()
+	zombieBarkRadius, _ = cfg.Section("Dog").Key("ZombieBarkRadius").Float64()
+	zombieFleeRadius, _ = cfg.Section("Dog").Key("ZombieFleeRadius").Float64()
+	zombieSafeRadius, _ = cfg.Section("Dog").Key("ZombieSafeRadius").Float64()
+	fleeingPathLength, _ = cfg.Section("Dog").Key("FleeingPathLength").Float64()
 }

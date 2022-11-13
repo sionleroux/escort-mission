@@ -1,0 +1,58 @@
+DeathCoolDownTime = 4 * 60
+
+HudPadding = 5
+
+[Player]
+
+PlayerSpeed = 1.2
+
+# amount to change speed by when the player is reversing backwards
+# walking backwards is very slow
+PlayerSpeedFactorReverse = 0.2
+
+# amount to change speed by when the player is strafing sideways
+PlayerSpeedFactorSideways = 0.6
+
+PlayerSpeedFactorSprint = 2.4
+
+PlayerAmmoClipMax = 7
+
+[Zombie]
+
+# zombieSpeed is the distance the zombie moves per update cycle
+ZombieSpeed = 0.4
+
+# zombieCrawlerSpeed is the distance the crawler zombie moves per update cycle
+ZombieCrawlerSpeed = 0.2
+
+# zombieSprinterSpeed is the distance the sprinter zombie moves per update cycle
+ZombieSprinterSpeed = 1.2
+
+# zombieRange is how far away the zombie sees something to attack
+ZombieRange = 200
+
+[Dog]
+
+# dogWalkingSpeed is the distance the dog moves per update cycle when walking
+DogWalkingSpeed = 0.7
+
+# dogRunningSpeed is the distance the dog moves per update cycle when running
+DogRunningSpeed = 1.3
+
+# waitingRadius is the maximum distance the dog walks away from the player
+WaitingRadius = 96
+
+# followingRadius is the distance within which the dog follows the player after the last checkpoint
+FollowingRadius = 96
+
+# zombieBarkRadius: if a zombie is this close to the dog, it barks
+ZombieBarkRadius = 150
+
+# zombieFleeRadius: if a zombie is this close to the dog, it runs away
+ZombieFleeRadius = 80
+
+# zombieSafeRadius: if a zombie is at least this far from the dog, it stops running
+ZombieSafeRadius = 192
+
+# fleeingPathLength: the length of the path planned for fleeing
+FleeingPathLength = 200

@@ -12,18 +12,18 @@ import (
 )
 
 // playerSpeed is the distance the player moves per update cycle
-const playerSpeed float64 = 1.2
+var playerSpeed float64 = 1.2
 
 // amount to change speed by when the player is reversing backwards
 // walking backwards is very slow
-const playerSpeedFactorReverse float64 = 0.2
+var playerSpeedFactorReverse float64 = 0.2
 
 // amount to change speed by when the player is strafing sideways
-const playerSpeedFactorSideways float64 = 0.6
+var playerSpeedFactorSideways float64 = 0.6
 
-const playerSpeedFactorSprint float64 = 2.4
+var playerSpeedFactorSprint float64 = 2.4
 
-const playerAmmoClipMax int = 7
+var playerAmmoClipMax int = 7
 
 // states of the player
 // It would be great to map them to the frameTag.Name from JSON

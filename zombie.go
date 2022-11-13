@@ -20,16 +20,16 @@ func init() {
 }
 
 // zombieSpeed is the distance the zombie moves per update cycle
-const zombieSpeed float64 = 0.4
+var zombieSpeed float64 = 0.4
 
 // zombieCrawlerSpeed is the distance the crawler zombie moves per update cycle
-const zombieCrawlerSpeed float64 = 0.2
+var zombieCrawlerSpeed float64 = 0.2
 
 // zombieSprinterSpeed is the distance the sprinter zombie moves per update cycle
-const zombieSprinterSpeed float64 = 1.2
+var zombieSprinterSpeed float64 = 1.2
 
 // zombieRange is how far away the zombie sees something to attack
-const zombieRange float64 = 200
+var zombieRange float64 = 200
 
 // Types of zombies
 type ZombieType uint8
