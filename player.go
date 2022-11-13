@@ -24,6 +24,8 @@ const playerSpeedFactorSideways float64 = 0.6
 
 const playerSpeedFactorSprint float64 = 2.4
 
+const playerAmmoClipMax int = 7
+
 // states of the player
 // It would be great to map them to the frameTag.Name from JSON
 const (
@@ -31,6 +33,8 @@ const (
 	playerWalking         // Walking in some direction
 	playerReady           // Readying the gun to shoot
 	playerShooting        // Shooting the gun
+	playerDryFire         // Trying to shoot with no ammo
+	playerReload          // Reloading the gun
 	playerUnready         // Unreadying the gun after shooting
 )
 
@@ -43,6 +47,7 @@ type Player struct {
 	Sprinting bool           // Whether the player is sprinting or not
 	Sprite    *SpriteSheet   // Used for player animations
 	Range     float64        // How far you can shoot with the gun
+	Ammo      int            // How many shots you have left in the gun
 }
 
 // NewPlayer constructs a new Player object at the provided location and size
@@ -58,6 +63,7 @@ func NewPlayer(position []int, sprites *SpriteSheet) *Player {
 		Angle:  0,
 		Sprite: sprites,
 		Range:  200,
+		Ammo:   playerAmmoClipMax,
 	}
 	return player
 }
@@ -66,7 +72,7 @@ func NewPlayer(position []int, sprites *SpriteSheet) *Player {
 func (p *Player) Update(g *Game) {
 	p.Sprinting = false
 
-	if p.State != playerShooting {
+	if p.State == playerIdle || p.State == playerWalking {
 		p.State = playerIdle
 		p.handleControls()
 	}
@@ -98,7 +104,19 @@ func (p *Player) animate(g *Game) {
 
 	// Back to idle after shooting animation
 	if p.State == playerShooting && p.Frame == ft.To {
+		if p.Ammo < 1 {
+			p.State = playerReload
+			return
+		}
 		p.State = playerIdle
+		return
+	}
+
+	// Back to idle after reload animation
+	if p.State == playerReload && p.Frame == ft.To {
+		p.Ammo = playerAmmoClipMax
+		p.State = playerIdle
+		return
 	}
 }
 

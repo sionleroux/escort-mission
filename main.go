@@ -308,12 +308,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			"TPS: %.2f\n"+
 			"X: %.2f\n"+
 			"Y: %.2f\n"+
-			"Zombies: %d\n",
+			"Zombies: %d\n"+
+			"Ammo: %d\n"+
+			"Reloading: %t\n",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
 		g.Player.Object.X/32,
 		g.Player.Object.Y/32,
 		len(g.Zombies),
+		g.Player.Ammo,
+		(g.Player.State == playerReload),
 	))
 }
 
@@ -324,10 +328,15 @@ func clicked() bool {
 
 // Shoot sets shooting states and also die states for any zombies in range
 func Shoot(g *Game) {
-	if g.Player.State != playerShooting && clicked() {
+	if clicked() &&
+		g.Player.State != playerShooting &&
+		g.Player.State != playerReload &&
+		g.Player.State != playerReady &&
+		g.Player.State != playerUnready {
 		g.Sounds[soundGunShot].Rewind()
 		g.Sounds[soundGunShot].Play()
 
+		g.Player.Ammo--
 		g.Player.State = playerShooting
 		rangeOfFire := g.Player.Range
 		sX, sY := g.Space.WorldToSpace(
