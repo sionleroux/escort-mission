@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -150,6 +151,17 @@ func NewGame(g *Game) {
 	playerPosition := entities.EntityByIdentifier("Player").Position
 	g.Player = NewPlayer(playerPosition, g.Sprites[spritePlayer])
 	g.Space.Add(g.Player.Object)
+
+	for _, ts := range g.LDTKProject.Tilesets {
+		log.Println(ts.ID)
+	}
+	for _, e := range entities.Entities {
+		if strings.HasPrefix(e.Identifier, "Waypoint") {
+			// XXX
+			log.Println(e.Identifier, e.Position)
+		}
+	}
+	// os.Exit(1)
 
 	// Load the dog's path
 	dogEntity := entities.EntityByIdentifier("Dog")

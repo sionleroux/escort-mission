@@ -76,9 +76,24 @@ const (
 // extension)
 func loadSprite(name string) *SpriteSheet {
 	name = path.Join("assets", "sprites", name)
+	data := loadFile(name + ".json")
+
+	var ss SpriteSheet
+	err := json.Unmarshal(data, &ss)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ss.Image = loadImage(name + ".png")
+
+	return &ss
+}
+
+// Reads file data from embedded assets and returns it as a byte slice
+func loadFile(name string) []byte {
 	log.Printf("loading %s\n", name)
 
-	file, err := assets.Open(name + ".json")
+	file, err := assets.Open(name)
 	if err != nil {
 		log.Fatalf("error opening file %s: %v\n", name, err)
 	}
@@ -89,15 +104,7 @@ func loadSprite(name string) *SpriteSheet {
 		log.Fatal(err)
 	}
 
-	var ss SpriteSheet
-	json.Unmarshal(data, &ss)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ss.Image = loadImage(name + ".png")
-
-	return &ss
+	return data
 }
 
 // Load an image from embedded FS into an ebiten Image object
@@ -189,4 +196,3 @@ func loadSoundFile(name string, sampleRate int) *vorbis.Stream {
 
 	return music
 }
-
