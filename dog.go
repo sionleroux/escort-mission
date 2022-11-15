@@ -241,8 +241,9 @@ func (d *Dog) Run() {
 
 // Move the Dog by the given vector if it is possible to do so
 func (d *Dog) move(dx, dy float64) {
-	if d.OnThePath {
-		// WORKAROUND: If the dog is following the path then collision with walls is not checked
+	if d.State == dogWalkingOnPath || d.State == dogWalkingBackToPath {
+		// WORKAROUND: If the dog is following the path or going back to the path
+		// then collision with walls is not checked
 		if collision := d.Object.Check(dx, dy, tagMob, tagPlayer); collision != nil {
 			return
 		}
