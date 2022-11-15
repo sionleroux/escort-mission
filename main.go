@@ -54,6 +54,7 @@ type GameState int
 
 const (
 	gameLoading GameState = iota // Loading files and setting up the game
+	gameStart                    // Game start screen is shown
 	gameRunning                  // The game is running the main game code
 	gameOver                     // The game has ended
 )
@@ -76,6 +77,7 @@ type Game struct {
 	Zombies      Zombies
 	Space        *resolv.Space
 	State        GameState
+	StartScreen  Screen
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -205,7 +207,9 @@ func NewGame(g *Game) {
 		}
 	}
 
-	g.State = gameRunning
+	g.StartScreen = &StartScreen{}
+
+	g.State = gameStart
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -237,6 +241,12 @@ func (g *Game) Update() error {
 
 	if g.State == gameOver {
 		return nil // TODO: provide a possibility to restart the game
+	}
+
+	if g.State == gameStart {
+		state, err := g.StartScreen.Update()
+		g.State = state
+		return err
 	}
 
 	// Gun shooting handler
@@ -278,6 +288,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if g.State == gameOver {
 		ebitenutil.DebugPrint(screen, "You Died, press Q to quit")
 		return // game not loaded yet
+	}
+
+	if g.State == gameStart {
+		g.StartScreen.Draw(screen)
+		return
 	}
 
 	g.Camera.Surface.Clear()
@@ -370,4 +385,11 @@ func CalcObjectDistance(obj1, obj2 *resolv.Object) (float64, float64, float64) {
 // CalcDistance calculates the distance between two coordinates
 func CalcDistance(x1, y1, x2, y2 float64) float64 {
 	return math.Sqrt(math.Pow(x1-x2, 2) + math.Pow(y1-y2, 2))
+}
+
+// Screen is a full-screen UI Screen for some part of the game like a menu or a
+// game level
+type Screen interface {
+	Update() (GameState, error)
+	Draw(screen *ebiten.Image)
 }
