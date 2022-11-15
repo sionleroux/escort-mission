@@ -34,7 +34,6 @@ func main() {
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
 	ebiten.SetWindowTitle("eZcort mission")
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	ebiten.SetCursorMode(ebiten.CursorModeCaptured)
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
 	game := &Game{
