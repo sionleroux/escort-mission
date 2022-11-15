@@ -30,7 +30,7 @@ func main() {
 	gameWidth, gameHeight := 320, 240
 
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
-	ebiten.SetWindowTitle("Escort Mission")
+	ebiten.SetWindowTitle("eZcort mission")
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetCursorMode(ebiten.CursorModeCaptured)
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
