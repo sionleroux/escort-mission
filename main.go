@@ -26,6 +26,7 @@ const (
 	tagMob    = "mob"
 	tagWall   = "wall"
 	tagDog    = "dog"
+	tagEnd    = "end"
 )
 
 func main() {
@@ -56,7 +57,8 @@ type GameState int
 const (
 	gameLoading GameState = iota // Loading files and setting up the game
 	gameRunning                  // The game is running the main game code
-	gameOver                     // The game has ended
+	gameOver                     // The game has ended because you died
+	gameWon                      // The game has ended because you won
 )
 
 // Game represents the main game state
@@ -153,6 +155,14 @@ func NewGame(g *Game) {
 	// Load entities from map
 	entities := level.LayerByIdentifier("Entities")
 
+	// Add endpoint
+	endpoint := entities.EntityByIdentifier("End")
+	g.Space.Add(resolv.NewObject(
+		float64(endpoint.Position[0]), float64(endpoint.Position[1]),
+		float64(endpoint.Width), float64(endpoint.Height),
+		tagEnd,
+	))
+
 	// Add player to the game
 	playerPosition := entities.EntityByIdentifier("Player").Position
 	g.Player = NewPlayer(playerPosition, g.Sprites[spritePlayer])
@@ -240,7 +250,7 @@ func (g *Game) Update() error {
 		}
 	}
 
-	if g.State == gameOver {
+	if g.State == gameOver || g.State == gameWon {
 		return nil // TODO: provide a possibility to restart the game
 	}
 
@@ -264,6 +274,14 @@ func (g *Game) Update() error {
 		}
 	}
 
+	// End game when you reach the End entity
+	if collision := g.Player.Object.Check(0, 0, tagEnd); collision != nil {
+		if g.Player.Object.Overlaps(collision.Objects[0]) {
+			g.State = gameWon
+			return nil
+		}
+	}
+
 	// Position camera and clamp in to the Map dimensions
 	level := g.LDTKProject.Levels[g.Level]
 	g.Camera.SetPosition(
@@ -282,6 +300,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	if g.State == gameOver {
 		ebitenutil.DebugPrint(screen, "You Died, press Q to quit")
+		return // game not loaded yet
+	}
+
+	if g.State == gameWon {
+		ebitenutil.DebugPrint(screen, "You Won, press Q to quit")
 		return // game not loaded yet
 	}
 
