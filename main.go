@@ -63,6 +63,7 @@ type GameState int
 
 const (
 	gameLoading GameState = iota // Loading files and setting up the game
+	gameStart                    // Game start screen is shown
 	gameRunning                  // The game is running the main game code
 	gameOver                     // The game has ended because you died
 	gameWon                      // The game has ended because you won
@@ -93,6 +94,7 @@ type Game struct {
 	Checkpoint    int
 	HUD           *HUD
 	DeathRenderer *DeathRenderer
+	StartScreen   Screen
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -225,7 +227,7 @@ func NewGame(g *Game) {
 	for _, e := range entities.Entities {
 		if strings.HasPrefix(e.Identifier, "Checkpoint") {
 			eid, err := strconv.Atoi(e.Identifier[11:])
-			if (err != nil) {
+			if err != nil {
 				log.Printf("Cannot load checkpoint: %s", e.Identifier)
 				continue
 			}
@@ -271,10 +273,10 @@ func NewGame(g *Game) {
 	))
 	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
 	g.Dog = &Dog{
-		Object:     object,
-		Angle:      0,
-		Sprite:     g.Sprites[spriteDog],
-		MainPath:   &Path{ Points: dogPath, NextPoint: 0 },
+		Object:   object,
+		Angle:    0,
+		Sprite:   g.Sprites[spriteDog],
+		MainPath: &Path{Points: dogPath, NextPoint: 0},
 	}
 	g.Dog.Init()
 	g.Space.Add(g.Dog.Object)
@@ -301,8 +303,9 @@ func NewGame(g *Game) {
 
 	g.HUD = NewHUD()
 	g.DeathRenderer = NewDeathRenderer()
+	g.StartScreen = &StartScreen{}
 
-	g.State = gameRunning
+	g.State = gameStart
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -343,6 +346,12 @@ func (g *Game) Update() error {
 
 	if g.State == gameOver || g.State == gameWon {
 		return nil // TODO: provide a possibility to restart the game
+	}
+
+	if g.State == gameStart {
+		state, err := g.StartScreen.Update()
+		g.State = state
+		return err
 	}
 
 	// Gun shooting handler
@@ -439,6 +448,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if g.State == gameWon {
 		ebitenutil.DebugPrint(screen, "You Won, press Q to quit")
 		return // game not loaded yet
+	}
+
+	if g.State == gameStart {
+		g.StartScreen.Draw(screen)
+		return
 	}
 
 	g.Camera.Surface.Clear()
@@ -558,5 +572,12 @@ func CalcDistance(x1, y1, x2, y2 float64) float64 {
 // NormalizeVector normalizes the vector
 func NormalizeVector(vector Coord) Coord {
 	magnitude := CalcDistance(vector.X, vector.Y, 0, 0)
-	return Coord{ X: vector.X / magnitude, Y: vector.Y / magnitude }
+	return Coord{X: vector.X / magnitude, Y: vector.Y / magnitude}
+}
+
+// Screen is a full-screen UI Screen for some part of the game like a menu or a
+// game level
+type Screen interface {
+	Update() (GameState, error)
+	Draw(screen *ebiten.Image)
 }
