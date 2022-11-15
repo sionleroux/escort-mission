@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"math/rand"
+	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -60,22 +62,23 @@ const (
 
 // Game represents the main game state
 type Game struct {
-	Width        int
-	Height       int
-	Tick         int
-	TileRenderer *TileRenderer
-	LDTKProject  *ldtkgo.Project
-	Sounds       []*audio.Player
-	Level        int
-	Background   *ebiten.Image
-	Foreground   *ebiten.Image
-	Camera       *camera.Camera
-	Sprites      map[SpriteType]*SpriteSheet
-	Player       *Player
-	Dog          *Dog
-	Zombies      Zombies
-	Space        *resolv.Space
-	State        GameState
+	Width         int
+	Height        int
+	Tick          int
+	TileRenderer  *TileRenderer
+	LDTKProject   *ldtkgo.Project
+	Sounds        []*audio.Player
+	Level         int
+	Background    *ebiten.Image
+	Foreground    *ebiten.Image
+	Camera        *camera.Camera
+	Sprites       map[SpriteType]*SpriteSheet
+	ZombieSprites []*SpriteSheet
+	Player        *Player
+	Dog           *Dog
+	Zombies       Zombies
+	Space         *resolv.Space
+	State         GameState
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -142,8 +145,11 @@ func NewGame(g *Game) {
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 3)
 	g.Sprites[spritePlayer] = loadSprite("Player")
-	g.Sprites[spriteZombie] = loadSprite("Zombie_1")
 	g.Sprites[spriteDog] = loadSprite("Dog")
+	g.ZombieSprites = make([]*SpriteSheet, zombieTypes)
+	for index := 1; index <= zombieTypes; index++ {
+		g.ZombieSprites[index-1] = loadSprite("Zombie_" + strconv.Itoa(index))
+	}
 
 	// Load entities from map
 	entities := level.LayerByIdentifier("Entities")
@@ -198,7 +204,7 @@ func NewGame(g *Game) {
 				}
 				e.Position[0] += zombiePositions[i].X * 16 // 16px should come from Zombie
 				e.Position[1] += zombiePositions[i].Y * 16 // 16px should come from Zombie
-				z := NewZombie(e.Position, g.Sprites[spriteZombie])
+				z := NewZombie(e.Position, g.ZombieSprites[rand.Intn(zombieTypes)])
 				g.Space.Add(z.Object)
 				g.Zombies = append(g.Zombies, z)
 			}
