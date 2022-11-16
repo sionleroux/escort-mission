@@ -23,11 +23,12 @@ import (
 )
 
 const (
-	tagPlayer = "player"
-	tagMob    = "mob"
-	tagWall   = "wall"
-	tagDog    = "dog"
-	tagEnd    = "end"
+	tagPlayer     = "player"
+	tagMob        = "mob"
+	tagWall       = "wall"
+	tagDog        = "dog"
+	tagEnd        = "end"
+	tagCheckpoint = "check"
 )
 
 func main() {
@@ -81,6 +82,7 @@ type Game struct {
 	Zombies       Zombies
 	Space         *resolv.Space
 	State         GameState
+	Checkpoint    int
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -169,12 +171,23 @@ func NewGame(g *Game) {
 	g.Player = NewPlayer(playerPosition, g.Sprites[spritePlayer])
 	g.Space.Add(g.Player.Object)
 
+	eid := 0
 	for _, e := range entities.Entities {
 		if strings.HasPrefix(e.Identifier, "Waypoint") {
+			eid++
 			log.Println(e.Identifier, e.Position)
+			img := loadEntityImage(e.Identifier)
+			w, h := img.Size()
 			op := &ebiten.DrawImageOptions{}
 			op.GeoM.Translate(float64(e.Position[0]), float64(e.Position[1]))
-			g.Background.DrawImage(loadEntityImage(e.Identifier), op)
+			g.Background.DrawImage(img, op)
+			obj := resolv.NewObject(
+				float64(e.Position[0]), float64(e.Position[1]),
+				float64(w), float64(h),
+				tagCheckpoint,
+			)
+			obj.Data = eid
+			g.Space.Add(obj)
 		}
 	}
 
@@ -284,6 +297,14 @@ func (g *Game) Update() error {
 		}
 	}
 
+	// Do something special when you find a Checkpoint entity
+	g.Checkpoint = 0 // maybe we should use actions instead of global state
+	if collision := g.Player.Object.Check(0, 0, tagCheckpoint); collision != nil {
+		if o := collision.Objects[0]; g.Player.Object.Overlaps(o) {
+			g.Checkpoint = o.Data.(int)
+		}
+	}
+
 	// End game when you reach the End entity
 	if collision := g.Player.Object.Check(0, 0, tagEnd); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
@@ -350,7 +371,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			"Y: %.2f\n"+
 			"Zombies: %d\n"+
 			"Ammo: %d\n"+
-			"Reloading: %t\n",
+			"Reloading: %t\n"+
+			"Checkpoint: %d\n",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
 		g.Player.Object.X/32,
@@ -358,6 +380,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		len(g.Zombies),
 		g.Player.Ammo,
 		(g.Player.State == playerReload),
+		g.Checkpoint,
 	))
 }
 
