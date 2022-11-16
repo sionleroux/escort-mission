@@ -101,6 +101,12 @@ func loadSprite(name string) *SpriteSheet {
 	return &ss
 }
 
+// Convenience function to load entity/waypoint PNGs from the maps folder
+func loadEntityImage(name string) *ebiten.Image {
+	name = path.Join("assets", "maps", name) + ".png"
+	return loadImage(name)
+}
+
 // Load an image from embedded FS into an ebiten Image object
 func loadImage(name string) *ebiten.Image {
 	log.Printf("loading %s\n", name)
@@ -190,4 +196,3 @@ func loadSoundFile(name string, sampleRate int) *vorbis.Stream {
 
 	return music
 }
-

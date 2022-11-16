@@ -11,6 +11,7 @@ import (
 	"math"
 	"math/rand"
 	"strconv"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -167,6 +168,15 @@ func NewGame(g *Game) {
 	playerPosition := entities.EntityByIdentifier("Player").Position
 	g.Player = NewPlayer(playerPosition, g.Sprites[spritePlayer])
 	g.Space.Add(g.Player.Object)
+
+	for _, e := range entities.Entities {
+		if strings.HasPrefix(e.Identifier, "Waypoint") {
+			log.Println(e.Identifier, e.Position)
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(e.Position[0]), float64(e.Position[1]))
+			g.Background.DrawImage(loadEntityImage(e.Identifier), op)
+		}
+	}
 
 	// Load the dog's path
 	dogEntity := entities.EntityByIdentifier("Dog")
