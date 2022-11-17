@@ -64,7 +64,7 @@ type Dog struct {
 	InDanger          bool
 	OnThePath         bool
 	LastPathCoord     Coord
-	LastCheckpoint    int
+	PrevCheckpoint    int
 	SniffingCounter   int
 	OutOfSightCounter int
 }
@@ -279,8 +279,8 @@ func (d *Dog) move(dx, dy float64) {
 	if (d.State == dogWalkingOnPath) {
 		if collision := d.Object.Check(dx, dy, tagCheckpoint); collision != nil {
 			o := collision.Objects[0];
-			if o.Data.(int) > d.LastCheckpoint {
-				d.LastCheckpoint = o.Data.(int)
+			if o.Data.(int) > d.PrevCheckpoint {
+				d.PrevCheckpoint = o.Data.(int)
 				d.State = dogSniffing
 			}
 		}
