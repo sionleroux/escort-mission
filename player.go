@@ -68,6 +68,13 @@ func NewPlayer(position []int, sprites *SpriteSheet) *Player {
 	return player
 }
 
+// Reload reloads the ammo
+func (p *Player) Reload(g *Game) {
+	p.State = playerReload
+	g.Sounds[soundGunReload].Rewind()
+	g.Sounds[soundGunReload].Play()	
+}
+
 // Update updates the state of the player
 func (p *Player) Update(g *Game) {
 	p.Sprinting = false
@@ -105,9 +112,7 @@ func (p *Player) animate(g *Game) {
 	// Back to idle after shooting animation
 	if p.State == playerShooting && p.Frame == ft.To {
 		if p.Ammo < 1 {
-			p.State = playerReload
-			g.Sounds[soundGunReload].Rewind()
-			g.Sounds[soundGunReload].Play()	
+			p.Reload(g)
 			return
 		}
 		p.State = playerIdle

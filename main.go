@@ -282,6 +282,11 @@ func (g *Game) Update() error {
 		}
 	}
 
+	// Pressing R reloads the ammo
+	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
+		g.Player.Reload(g)
+	}
+	
 	if g.State == gameOver || g.State == gameWon {
 		return nil // TODO: provide a possibility to restart the game
 	}
