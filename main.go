@@ -140,11 +140,12 @@ func NewGame(g *Game) {
 	// Music
 	const sampleRate int = 44100 // assuming "normal" sample rate
 	context := audio.NewContext(sampleRate)
-	g.Sounds = make([]*audio.Player, 4)
+	g.Sounds = make([]*audio.Player, 5)
 	g.Sounds[soundMusicBackground] = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context)
 	g.Sounds[soundGunShot] = NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context)
 	g.Sounds[soundGunReload] = NewSoundPlayer(loadSoundFile("assets/sfx/Reload.ogg", sampleRate), context)
 	g.Sounds[soundDogBark1] = NewSoundPlayer(loadSoundFile("assets/sfx/Dog-bark-1.ogg", sampleRate), context)
+	g.Sounds[soundPlayerDies] = NewSoundPlayer(loadSoundFile("assets/sfx/PlayerDies.ogg", sampleRate), context)
 	g.Sounds[soundMusicBackground].Play()
 
 	// Load sprites
@@ -300,6 +301,8 @@ func (g *Game) Update() error {
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
+			g.Sounds[soundPlayerDies].Rewind()
+			g.Sounds[soundPlayerDies].Play()
 			g.State = gameOver
 			return nil // return early, no point in continuing, you are dead
 		}

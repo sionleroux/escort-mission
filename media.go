@@ -157,6 +157,7 @@ const (
 	soundGunShot
 	soundGunReload
 	soundDogBark1
+	soundPlayerDies
 )
 
 // NewMusicPlayer loads a sound into an audio player that can be used to play it
