@@ -313,6 +313,12 @@ func (g *Game) Update() error {
 		}
 	}
 
+	// Game over if the dog dies
+	if g.Dog.State == dogDied {
+		g.State = gameOver
+		return nil
+	}
+		
 	// Position camera and clamp in to the Map dimensions
 	level := g.LDTKProject.Levels[g.Level]
 	g.Camera.SetPosition(
@@ -330,7 +336,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	if g.State == gameOver {
-		ebitenutil.DebugPrint(screen, "You Died, press Q to quit")
+		if (g.Dog.State == dogDied) {
+			ebitenutil.DebugPrint(screen, "Your dog died, press Q to quit")
+		} else {
+			ebitenutil.DebugPrint(screen, "You Died, press Q to quit")
+		}
 		return // game not loaded yet
 	}
 

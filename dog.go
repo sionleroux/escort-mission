@@ -48,27 +48,33 @@ const (
 	dogBarking
 	dogSitting
 	dogFinished
+	dogDied
 )
 
 // Dog is player's companion
 type Dog struct {
-	Object          *resolv.Object
-	Angle           float64
-	Speed           float64
-	Frame           int
-	State           int
-	Path            Path
-	NextPath        int
-	Sprite          *SpriteSheet
-	InDanger        bool
-	OnThePath       bool
-	LastPathCoord   Coord
-	LastCheckpoint  int
-	SniffingCounter int
+	Object            *resolv.Object
+	Angle             float64
+	Speed             float64
+	Frame             int
+	State             int
+	Path              Path
+	NextPath          int
+	Sprite            *SpriteSheet
+	InDanger          bool
+	OnThePath         bool
+	LastPathCoord     Coord
+	LastCheckpoint    int
+	SniffingCounter   int
+	OutOfSightCounter int
 }
 
 // Update updates the state of the dog
 func (d *Dog) Update(g *Game) {
+	if d.State == dogDied {
+		return
+	}
+
 	if d.State != dogFinished {
 		if d.NextPath < 0 {
 			d.NextPath = 0
@@ -141,9 +147,20 @@ func (d *Dog) Update(g *Game) {
 			}
 		}
 	}
-	
+
 	d.animate(g)
 	d.Object.Update()
+
+	sx, sy := g.Camera.GetScreenCoords(d.Object.X, d.Object.Y)
+	if (sx < 0 || sy < 0 || sx > float64(g.Width) || sy > float64(g.Height)) {
+		d.OutOfSightCounter++
+		if d.OutOfSightCounter > 300 {
+			g.Dog.State = dogDied
+		}
+	} else {
+		d.OutOfSightCounter = 0
+	}
+
 }
 
 func (d *Dog) animate(g *Game) {
