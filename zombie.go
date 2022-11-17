@@ -59,12 +59,13 @@ const (
 
 // Zombie is a monster that's trying to eat the player character
 type Zombie struct {
-	Object *resolv.Object // Used for collision detection with other objects
-	Angle  float64        // The angle the zombies is facing at
-	Frame  int            // The current animation frame
-	State  int            // The current animation state
-	Sprite *SpriteSheet   // Used for zombie animations
-	Speed  float64        // The speed this zombie walks at
+	Object    *resolv.Object // Used for collision detection with other objects
+	Angle     float64        // The angle the zombies is facing at
+	Frame     int            // The current animation frame
+	State     int            // The current animation state
+	Sprite    *SpriteSheet   // Used for zombie animations
+	Speed     float64        // The speed this zombie walks at
+	Target    *resolv.Object // Target object (player or dog)
 }
 
 // NewZombie constructs a new Zombie object
@@ -95,9 +96,9 @@ func (z *Zombie) Update(g *Game) error {
 		return nil
 	}
 
-	playerDistance, _, _ := CalcObjectDistance(z.Object, g.Player.Object)
-	if playerDistance < zombieRange {
-		z.walk(g)
+	targetDistance, _, _ := CalcObjectDistance(z.Object, z.Target)
+	if targetDistance < zombieRange {
+		z.walk()
 	} else {
 		z.State = zombieIdle
 	}
@@ -107,24 +108,24 @@ func (z *Zombie) Update(g *Game) error {
 	return nil
 }
 
-func (z *Zombie) walk(g *Game) {
-	// Zombies rotate towards player
-	adjacent := g.Player.Object.X - z.Object.X
-	opposite := g.Player.Object.Y - z.Object.Y
+func (z *Zombie) walk() {
+	// Zombies rotate towards their target
+	adjacent := z.Target.X - z.Object.X
+	opposite := z.Target.Y - z.Object.Y
 	z.Angle = math.Atan2(opposite, adjacent)
 
 	// Zombie movement logic
 	// TODO: this could be simplified using maths
-	if z.Object.X < g.Player.Object.X {
+	if z.Object.X < z.Target.X {
 		z.MoveRight()
 	}
-	if z.Object.X > g.Player.Object.X {
+	if z.Object.X > z.Target.X {
 		z.MoveLeft()
 	}
-	if z.Object.Y < g.Player.Object.Y {
+	if z.Object.Y < z.Target.Y {
 		z.MoveDown()
 	}
-	if z.Object.Y > g.Player.Object.Y {
+	if z.Object.Y > z.Target.Y {
 		z.MoveUp()
 	}
 }

@@ -237,6 +237,13 @@ func NewGame(g *Game) {
 				e.Position[0] += zombiePositions[i].X * 16 // 16px should come from Zombie
 				e.Position[1] += zombiePositions[i].Y * 16 // 16px should come from Zombie
 				z := NewZombie(e.Position, g.ZombieSprites[rand.Intn(zombieTypes)])
+
+				if math.Round(rand.Float64()) > 0 {
+					z.Target = g.Dog.Object
+				} else {
+					z.Target = g.Player.Object
+				}
+			
 				g.Space.Add(z.Object)
 				g.Zombies = append(g.Zombies, z)
 			}
