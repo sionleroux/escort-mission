@@ -441,7 +441,7 @@ func Shoot(g *Game) {
 			for _, o := range c.Objects {
 				if o.HasTags(tagMob) {
 					log.Println("HIT!")
-					o.Data.(*Zombie).Die()
+					o.Data.(*Zombie).Hit()
 					return // stop at the first zombie
 				}
 			}

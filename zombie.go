@@ -53,6 +53,7 @@ func (zs Zombies) Draw(g *Game) {
 const (
 	zombieIdle    = iota // Doesn't have any target to attack
 	zombieWalking        // Walking in some direction
+	zombieHit            // Hit by a shot, but not deadly
 	zombieDeath          // Plays the death animation
 	zombieDead           // Marked as dead, will be removed on next Update
 )
@@ -66,6 +67,7 @@ type Zombie struct {
 	Sprite    *SpriteSheet   // Used for zombie animations
 	Speed     float64        // The speed this zombie walks at
 	Target    *resolv.Object // Target object (player or dog)
+	HitToDie  int            // Number of hits needed to die
 }
 
 // NewZombie constructs a new Zombie object
@@ -77,9 +79,10 @@ func NewZombie(position []int, sprites *SpriteSheet) *Zombie {
 			float64(dimensions.W), float64(dimensions.H),
 			tagMob,
 		),
-		Angle:  0,
-		Sprite: sprites,
-		Speed:  zombieSpeed * (1 + rand.Float64()),
+		Angle:    0,
+		Sprite:   sprites,
+		Speed:    zombieSpeed * (1 + rand.Float64()),
+		HitToDie: 1 + rand.Intn(2),
 	}
 	zombie.Object.Data = zombie // self-reference for later
 	return zombie
@@ -91,7 +94,7 @@ func (z *Zombie) Update(g *Game) error {
 		return errors.New("Zombie died")
 	}
 
-	if z.State == zombieDeath {
+	if z.State == zombieDeath || z.State == zombieHit {
 		z.animate(g)
 		return nil
 	}
@@ -144,6 +147,11 @@ func (z *Zombie) animate(g *Game) {
 	} else {
 		// Contiuously increase the Frame counter between From and To
 		z.Frame = (z.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
+	}
+
+	// Set as walking after hit animation
+	if z.State == zombieHit && z.Frame == ft.To {
+		z.State = zombieWalking
 	}
 
 	// Set as dead after death animation
@@ -210,7 +218,16 @@ func (z *Zombie) Draw(g *Game) {
 
 }
 
-// Die changes zombie state and updates game data in response to it getting shot
+// Hit changes zombie state and updates game data in response to it getting shot
+func (z *Zombie) Hit() {
+	z.State = zombieHit
+	z.HitToDie--
+	if z.HitToDie == 0 {
+		z.Die()
+	}
+}
+
+// Die changes zombie state and updates game data in case of a deadly shot
 func (z *Zombie) Die() {
 	z.Object.Space.Remove(z.Object)
 	z.State = zombieDeath
