@@ -69,18 +69,29 @@ type Zombie struct {
 
 // NewZombie constructs a new Zombie object
 func NewZombie(position []int, sprites *SpriteSheet) *Zombie {
+	// the head and shoulders are about 3px from the middle
+	const collisionBoxSize float64 = 6
+
 	dimensions := sprites.Sprite[0].Position
+	object := resolv.NewObject(
+		float64(position[0]), float64(position[1]),
+		float64(dimensions.W), float64(dimensions.H),
+		tagMob,
+	)
+	object.SetShape(resolv.NewRectangle(
+		0, 0, // origin
+		collisionBoxSize, collisionBoxSize,
+	))
+	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
+
 	zombie := &Zombie{
-		Object: resolv.NewObject(
-			float64(position[0]), float64(position[1]),
-			float64(dimensions.W), float64(dimensions.H),
-			tagMob,
-		),
+		Object: object,
 		Angle:  0,
 		Sprite: sprites,
 		Speed:  zombieSpeed * (1 + rand.Float64()),
 	}
 	zombie.Object.Data = zombie // self-reference for later
+
 	return zombie
 }
 
@@ -103,6 +114,7 @@ func (z *Zombie) Update(g *Game) error {
 	}
 
 	z.animate(g)
+	z.Object.Shape.SetRotation(-z.Angle)
 	z.Object.Update()
 	return nil
 }
@@ -182,15 +194,18 @@ func (z *Zombie) move(dx, dy float64) {
 
 // Draw draws the Zombie to the screen
 func (z *Zombie) Draw(g *Game) {
+	// -2, // the centre of the zombie's head is 2px up from the middle
+	const centerOffset float64 = 2
+
 	s := z.Sprite
 	frame := s.Sprite[z.Frame]
 	op := &ebiten.DrawImageOptions{}
 
+	// Centre and rotate
 	op.GeoM.Translate(
 		float64(-frame.Position.W/2),
-		float64(-frame.Position.H/2),
+		float64(-frame.Position.H/2)+centerOffset/2,
 	)
-
 	op.GeoM.Rotate(z.Angle + math.Pi/2)
 
 	g.Camera.Surface.DrawImage(
@@ -202,8 +217,8 @@ func (z *Zombie) Draw(g *Game) {
 		)).(*ebiten.Image),
 		g.Camera.GetTranslation(
 			op,
-			float64(z.Object.X)+float64(frame.Position.W/2),
-			float64(z.Object.Y)+float64(frame.Position.H/2),
+			float64(z.Object.X),
+			float64(z.Object.Y),
 		),
 	)
 

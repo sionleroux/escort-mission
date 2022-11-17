@@ -52,19 +52,30 @@ type Player struct {
 
 // NewPlayer constructs a new Player object at the provided location and size
 func NewPlayer(position []int, sprites *SpriteSheet) *Player {
+	// the head and shoulders are about 4px from the middle
+	const collisionBoxSize float64 = 8
+
 	dimensions := sprites.Sprite[0].Position
+	object := resolv.NewObject(
+		float64(position[0]), float64(position[1]),
+		float64(dimensions.W), float64(dimensions.H),
+		tagPlayer,
+	)
+	object.SetShape(resolv.NewRectangle(
+		0, 0, // origin
+		collisionBoxSize, collisionBoxSize,
+	))
+	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
+
 	player := &Player{
-		State: playerIdle,
-		Object: resolv.NewObject(
-			float64(position[0]), float64(position[1]),
-			float64(dimensions.W), float64(dimensions.H),
-			tagPlayer,
-		),
+		State:  playerIdle,
+		Object: object,
 		Angle:  0,
 		Sprite: sprites,
 		Range:  200,
 		Ammo:   playerAmmoClipMax,
 	}
+
 	return player
 }
 
@@ -84,6 +95,7 @@ func (p *Player) Update(g *Game) {
 	p.Angle = math.Atan2(opposite, adjacent)
 
 	p.animate(g)
+	p.Object.Shape.SetRotation(-p.Angle)
 	p.Object.Update()
 }
 
@@ -161,24 +173,30 @@ func (p *Player) MoveBackward() {
 
 // Move the Player by the given vector if it is possible to do so
 func (p *Player) move(dx, dy float64) {
-	if collision := p.Object.Check(dx, dy, tagWall, tagDog); collision == nil {
-		p.Object.X += dx
-		p.Object.Y += dy
-	}
 	p.State = playerWalking
+	if collision := p.Object.Check(dx, dy, tagWall, tagDog); collision != nil {
+		if p.Object.Shape.Intersection(dx, dy, collision.Objects[0].Shape) != nil {
+			return
+		}
+	}
+	p.Object.X += dx
+	p.Object.Y += dy
 }
 
 // Draw draws the Player to the screen
 func (p *Player) Draw(g *Game) {
+	// the centre of the player's head is 2px down from the middle
+	const centerOffset float64 = -2
+
 	s := p.Sprite
 	frame := s.Sprite[p.Frame]
 	op := &ebiten.DrawImageOptions{}
 
+	// Centre and rotate
 	op.GeoM.Translate(
 		float64(-frame.Position.W/2),
-		float64(-frame.Position.H/2),
+		float64(-frame.Position.H/2)+centerOffset/2,
 	)
-
 	op.GeoM.Rotate(p.Angle + math.Pi/2)
 
 	g.Camera.Surface.DrawImage(
@@ -190,8 +208,10 @@ func (p *Player) Draw(g *Game) {
 		)).(*ebiten.Image),
 		g.Camera.GetTranslation(
 			op,
-			float64(p.Object.X)+float64(frame.Position.W/2),
-			float64(p.Object.Y)+float64(frame.Position.H/2)))
+			float64(p.Object.X),
+			float64(p.Object.Y),
+		),
+	)
 }
 
 func (p *Player) handleControls() {
