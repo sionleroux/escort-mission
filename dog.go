@@ -62,6 +62,7 @@ type Dog struct {
 	InDanger        bool
 	OnThePath       bool
 	LastPathCoord   Coord
+	LastCheckpoint  int
 	SniffingCounter int
 }
 
@@ -172,8 +173,8 @@ func (d *Dog) TurnTowardsPathPoint() {
 	d.TurnTowardsCoordinate(d.Path[d.NextPath])
 }
 
-// SniffNextPathPoint starts the dog sniffing for next path point
-func (d *Dog) SniffNextPathPoint() {
+// SniffNextCheckpoint starts the dog sniffing for next checkpoint
+func (d *Dog) SniffNextCheckpoint() {
 	d.SniffingCounter++
 	if (d.SniffingCounter == 180) {
 		d.SniffingCounter = 0
@@ -209,7 +210,7 @@ func (d *Dog) FollowPath() {
 			if d.NextPath == len(d.Path) {
 				d.NextPath = 0
 			}
-			d.State = dogSniffing
+			d.TurnTowardsPathPoint()
 			return
 		}
 	case dogWalkingBackToPath:
@@ -217,11 +218,12 @@ func (d *Dog) FollowPath() {
 		lastPathCoordDistance := CalcDistance(d.LastPathCoord.X, d.LastPathCoord.Y, d.Object.X, d.Object.Y)
 		if lastPathCoordDistance < 2 {
 			d.OnThePath = true
-			d.State = dogSniffing
+			d.TurnTowardsPathPoint()
+			d.State = dogWalkingOnPath
 			return
 		}
 	case dogSniffing:
-		d.SniffNextPathPoint()
+		d.SniffNextCheckpoint()
 		return
 	}
 
@@ -253,6 +255,15 @@ func (d *Dog) move(dx, dy float64) {
 		}
 	}
 
+	if (d.State == dogWalkingOnPath) {
+		if collision := d.Object.Check(dx, dy, tagCheckpoint); collision != nil {
+			o := collision.Objects[0];
+			if o.Data.(int) > d.LastCheckpoint {
+				d.LastCheckpoint = o.Data.(int)
+				d.State = dogSniffing
+			}
+		}
+	}
 	d.Object.X += dx
 	d.Object.Y += dy
 }
