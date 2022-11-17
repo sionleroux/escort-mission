@@ -329,6 +329,13 @@ func (g *Game) Update() error {
 		}
 	}
 
+	// Collision detection and response between zombie and player
+	if collision := g.Dog.Object.Check(0, 0, tagMob); collision != nil {
+		if g.Dog.Object.Overlaps(collision.Objects[0]) {
+			g.Dog.State = dogDied
+		}
+	}
+
 	// Game over if the dog dies
 	if g.Dog.State == dogDied {
 		g.State = gameOver
