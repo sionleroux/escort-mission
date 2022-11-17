@@ -140,9 +140,10 @@ func NewGame(g *Game) {
 	// Music
 	const sampleRate int = 44100 // assuming "normal" sample rate
 	context := audio.NewContext(sampleRate)
-	g.Sounds = make([]*audio.Player, 3)
+	g.Sounds = make([]*audio.Player, 4)
 	g.Sounds[soundMusicBackground] = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context)
 	g.Sounds[soundGunShot] = NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context)
+	g.Sounds[soundGunReload] = NewSoundPlayer(loadSoundFile("assets/sfx/Reload.ogg", sampleRate), context)
 	g.Sounds[soundDogBark1] = NewSoundPlayer(loadSoundFile("assets/sfx/Dog-bark-1.ogg", sampleRate), context)
 	g.Sounds[soundMusicBackground].Play()
 

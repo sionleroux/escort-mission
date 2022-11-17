@@ -106,6 +106,8 @@ func (p *Player) animate(g *Game) {
 	if p.State == playerShooting && p.Frame == ft.To {
 		if p.Ammo < 1 {
 			p.State = playerReload
+			g.Sounds[soundGunReload].Rewind()
+			g.Sounds[soundGunReload].Play()	
 			return
 		}
 		p.State = playerIdle

@@ -155,6 +155,7 @@ type SoundType uint64
 const (
 	soundMusicBackground SoundType = iota
 	soundGunShot
+	soundGunReload
 	soundDogBark1
 )
 
