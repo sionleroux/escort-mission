@@ -47,6 +47,7 @@ const (
 	dogSniffing
 	dogBarking
 	dogSitting
+	dogFinished
 )
 
 // Dog is player's companion
@@ -68,77 +69,79 @@ type Dog struct {
 
 // Update updates the state of the dog
 func (d *Dog) Update(g *Game) {
-	if d.NextPath < 0 {
-		d.NextPath = 0
-		d.OnThePath = true
-		d.TurnTowardsPathPoint()
-	}
-
-	zombieInRange := false
-	zombieAlert := false
-	resultantVectorCoord := Coord{
-		X: d.Object.X,
-		Y: d.Object.Y,
-	}
-	closestZombie := 1000.0
-	for _, zombie := range g.Zombies {
-		zombieDistance, xDistance, yDistance := CalcObjectDistance(d.Object, zombie.Object)
-		if zombieDistance < closestZombie {
-			closestZombie = zombieDistance
+	if d.State != dogFinished {
+		if d.NextPath < 0 {
+			d.NextPath = 0
+			d.OnThePath = true
+			d.TurnTowardsPathPoint()
 		}
-		if zombieDistance < zombieDangerRadius {
-			resultantVectorCoord.X += xDistance
-			resultantVectorCoord.Y += yDistance
+
+		zombieInRange := false
+		zombieAlert := false
+		resultantVectorCoord := Coord{
+			X: d.Object.X,
+			Y: d.Object.Y,
 		}
-	}
-
-	if closestZombie < zombieDangerRadius {
-		// If zombies are too close then the dog is in danger and will run away
-		zombieInRange = true
-		d.State = dogFleeing
-	} else if closestZombie < zombieBarkRadius && d.State != dogFleeing {
-		// If zombies gettgin closer then the dog stops walking and start barking
-		zombieAlert = true
-		if (d.State != dogBarking) {
-			g.Sounds[soundDogBark1].Rewind()
-			g.Sounds[soundDogBark1].Play()
+		closestZombie := 1000.0
+		for _, zombie := range g.Zombies {
+			zombieDistance, xDistance, yDistance := CalcObjectDistance(d.Object, zombie.Object)
+			if zombieDistance < closestZombie {
+				closestZombie = zombieDistance
+			}
+			if zombieDistance < zombieDangerRadius {
+				resultantVectorCoord.X += xDistance
+				resultantVectorCoord.Y += yDistance
+			}
 		}
-		d.State = dogBarking
-	}
 
-	// If the dog was in danger then it will be safe again when getting far enough from the zombies
-	isSafeAgain := !d.InDanger || (d.InDanger && closestZombie > zombieSafeRadius)
+		if closestZombie < zombieDangerRadius {
+			// If zombies are too close then the dog is in danger and will run away
+			zombieInRange = true
+			d.State = dogFleeing
+		} else if closestZombie < zombieBarkRadius && d.State != dogFleeing {
+			// If zombies gettgin closer then the dog stops walking and start barking
+			zombieAlert = true
+			if (d.State != dogBarking) {
+				g.Sounds[soundDogBark1].Rewind()
+				g.Sounds[soundDogBark1].Play()
+			}
+			d.State = dogBarking
+		}
 
-	// If the dog starts fleeing away from the path then the last coordinate is saved to allow navigating back
-	if d.State == dogFleeing && d.OnThePath {
-		d.LastPathCoord.X = d.Object.X
-		d.LastPathCoord.Y = d.Object.Y
-		d.OnThePath = false
-	}
+		// If the dog was in danger then it will be safe again when getting far enough from the zombies
+		isSafeAgain := !d.InDanger || (d.InDanger && closestZombie > zombieSafeRadius)
 
-	// The dog is in danger if there are zombies too close or it did not manage to run far enough
-	d.InDanger = zombieInRange || !isSafeAgain
+		// If the dog starts fleeing away from the path then the last coordinate is saved to allow navigating back
+		if d.State == dogFleeing && d.OnThePath {
+			d.LastPathCoord.X = d.Object.X
+			d.LastPathCoord.Y = d.Object.Y
+			d.OnThePath = false
+		}
 
-	if !zombieAlert {
-		if !d.InDanger {
-			playerDistance, _, _ := CalcObjectDistance(d.Object, g.Player.Object)
-			if playerDistance < waitingRadius {
-				// If the dog is not in danger and it is close to the player then it walks towards next path point
-				d.FollowPath()
+		// The dog is in danger if there are zombies too close or it did not manage to run far enough
+		d.InDanger = zombieInRange || !isSafeAgain
+
+		if !zombieAlert {
+			if !d.InDanger {
+				playerDistance, _, _ := CalcObjectDistance(d.Object, g.Player.Object)
+				if playerDistance < waitingRadius {
+					// If the dog is not in danger and it is close to the player then it walks towards next path point
+					d.FollowPath()
+				} else {
+					// If the player is not close enough then the dog sits down
+					d.State = dogSitting
+				}
 			} else {
-				// If the player is not close enough then the dog sits down
-				d.State = dogSitting
+				// If the dog is in danger then it runs away from the zombies
+				if zombieInRange {
+					// If zombies are close then recalculate Angle
+					d.TurnTowardsCoordinate(resultantVectorCoord)
+				}
+				d.Run()
 			}
-		} else {
-			// If the dog is in danger then it runs away from the zombies
-			if zombieInRange {
-				// If zombies are close then recalculate Angle
-				d.TurnTowardsCoordinate(resultantVectorCoord)
-			}
-			d.Run()
 		}
 	}
-
+	
 	d.animate(g)
 	d.Object.Update()
 }
@@ -149,7 +152,7 @@ func (d *Dog) animate(g *Game) {
 		return
 	}
 
-	dogStateToFrame := [6]int{0, 0, 0, 1, 1, 2}
+	dogStateToFrame := [7]int{0, 0, 0, 1, 1, 2, 2}
 
 	ft := d.Sprite.Meta.FrameTags[dogStateToFrame[d.State]]
 
@@ -208,7 +211,8 @@ func (d *Dog) FollowPath() {
 		if nextPathCoordDistance < 2 {
 			d.NextPath++
 			if d.NextPath == len(d.Path) {
-				d.NextPath = 0
+				d.State = dogFinished
+				return
 			}
 			d.TurnTowardsPathPoint()
 			return
