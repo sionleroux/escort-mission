@@ -29,6 +29,7 @@ type SpawnPoint struct {
 	Zombies        Zombies
 	InitialSpawned bool
 	PrevPosition   int
+	NextSpawn      int
 }
 
 // NextPosition gives the offset of the next spawning to the center of the point
@@ -63,6 +64,7 @@ func (s *SpawnPoint) SpawnZombie(g *Game) {
 	g.Space.Add(z.Object)
 	g.Zombies = append(g.Zombies, z)
 	s.Zombies = append(s.Zombies, z)
+	s.NextSpawn = 180 + rand.Intn(180)
 }
 
 // Update updates the state of the spawn point
@@ -83,7 +85,7 @@ func (s *SpawnPoint) Update(g *Game) {
 			s.InitialSpawned = true
 		} else {
 			// Continuous spawning one zombie if needed after a while
-			if (g.Tick % 120 == 0) {
+			if (g.Tick % s.NextSpawn == 0) {
 				if len(s.Zombies) < s.InitialCount {
 					s.SpawnZombie(g)
 				}
