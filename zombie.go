@@ -104,16 +104,12 @@ func (z *Zombie) Update(g *Game) error {
 
 	if playerDistance < zombieRange {
 		z.Target = g.Player.Object
-		z.State = zombieWalking
+		z.walk()
 	} else if dogDistance < zombieRange * 1.2 {
 		z.Target = g.Dog.Object
-		z.State = zombieWalking
+		z.walk()
 	} else {
 		z.State = zombieIdle
-	}
-
-	if z.State == zombieWalking {
-		z.walk()
 	}
 
 	z.animate(g)
