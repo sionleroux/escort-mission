@@ -71,11 +71,11 @@ type Zombie struct {
 }
 
 // NewZombie constructs a new Zombie object
-func NewZombie(position []int, sprites *SpriteSheet) *Zombie {
+func NewZombie(position Coord, sprites *SpriteSheet) *Zombie {
 	dimensions := sprites.Sprite[0].Position
 	zombie := &Zombie{
 		Object: resolv.NewObject(
-			float64(position[0]), float64(position[1]),
+			position.X, position.Y,
 			float64(dimensions.W), float64(dimensions.H),
 			tagMob,
 		),

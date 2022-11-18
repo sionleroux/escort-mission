@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"math/rand"
 	"strconv"
 	"strings"
 
@@ -226,38 +225,8 @@ func NewGame(g *Game) {
 				Position:     Coord{X: float64(e.Position[0]),Y: float64(e.Position[1])},
 				InitialCount: initialCount,
 				Continuous:   continuous,
+				PrevPosition: 0,
 			})
-		}
-	}
-
-	// Add zombies to the game
-	zombiePositions := []struct{ X, Y int }{
-		{0, 0}, {-1, 0}, {-1, -1},
-		{0, -1}, {1, -1}, {1, 0},
-		{1, 1}, {0, 1}, {-1, 1},
-		{-2, 0}, {-2, -1}, {-2, -2},
-		{-1, -2}, {0, -2}, {1, -2},
-		{2, -2}, {2, -1}, {2, 0},
-		{2, 1}, {2, 2}, {1, 2},
-		{0, 2}, {-1, 2}, {-1, 2},
-		{-2, 2}, {-2, 1},
-	} // XXX: surely there is a smarter way than writing this by hand
-	for _, e := range entities.Entities {
-		if e.Identifier == "Zombie" {
-			howManyZombies := e.PropertyByIdentifier("Initial").AsInt()
-			for i := 0; i < howManyZombies; i++ {
-				if i >= len(zombiePositions) {
-					log.Println("ran out of zombie positions, aborting spawning")
-					break
-				}
-				e.Position[0] += zombiePositions[i].X * 16 // 16px should come from Zombie
-				e.Position[1] += zombiePositions[i].Y * 16 // 16px should come from Zombie
-				z := NewZombie(e.Position, g.ZombieSprites[rand.Intn(zombieTypes)])
-				z.Target = g.Player.Object
-			
-				g.Space.Add(z.Object)
-				g.Zombies = append(g.Zombies, z)
-			}
 		}
 	}
 
@@ -311,6 +280,9 @@ func (g *Game) Update() error {
 
 	// Update zombies
 	g.Zombies.Update(g)
+
+	// Update spawn points
+	g.SpawnPoints.Update(g)
 
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
