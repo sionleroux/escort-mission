@@ -72,24 +72,6 @@ type Zombie struct {
 	SpawnPoint *SpawnPoint     // Reference for the SpawnPoint where the zombie was spawned
 }
 
-// NewZombie constructs a new Zombie object
-func NewZombie(position Coord, sprites *SpriteSheet) *Zombie {
-	dimensions := sprites.Sprite[0].Position
-	zombie := &Zombie{
-		Object: resolv.NewObject(
-			position.X, position.Y,
-			float64(dimensions.W), float64(dimensions.H),
-			tagMob,
-		),
-		Angle:    0,
-		Sprite:   sprites,
-		Speed:    zombieSpeed * (1 + rand.Float64()),
-		HitToDie: 1 + rand.Intn(2),
-	}
-	zombie.Object.Data = zombie // self-reference for later
-	return zombie
-}
-
 // Update updates the state of the zombie
 func (z *Zombie) Update(g *Game) error {
 	if z.State == zombieDead {

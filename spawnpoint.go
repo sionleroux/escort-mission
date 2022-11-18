@@ -7,6 +7,8 @@ package main
 import (
 	"math"
 	"math/rand"
+
+	"github.com/solarlune/resolv"
 )
 
 // spawnDistance is the distance where the point is activated
@@ -60,7 +62,20 @@ func (s *SpawnPoint) NextPosition() Coord {
 func (s *SpawnPoint) SpawnZombie(g *Game) {
 	np := s.NextPosition()
 
-	z := NewZombie(Coord{ X: s.Position.X + np.X * 16, Y: s.Position.Y + np.Y * 16 }, g.ZombieSprites[rand.Intn(zombieTypes)])
+	sprites := g.ZombieSprites[rand.Intn(zombieTypes)]
+	dimensions := sprites.Sprite[0].Position
+	z := &Zombie{
+		Object: resolv.NewObject(
+			s.Position.X + np.X * 32, s.Position.Y + np.Y * 32,
+			float64(dimensions.W), float64(dimensions.H),
+			tagMob,
+		),
+		Angle:    0,
+		Sprite:   sprites,
+		Speed:    zombieSpeed * (1 + rand.Float64()),
+		HitToDie: 1 + rand.Intn(2),
+	}
+	z.Object.Data = z // self-reference for later
 	z.Target = g.Player.Object
 	z.SpawnPoint = s
 
