@@ -31,6 +31,7 @@ type SpawnPoint struct {
 	PrevPosition   int
 }
 
+// NextPosition gives the offset of the next spawning to the center of the point
 func (s *SpawnPoint) NextPosition() Coord {
 	zombiePositions := []Coord{
 		{0, 0}, {-1, 0}, {-1, -1},
@@ -52,7 +53,7 @@ func (s *SpawnPoint) NextPosition() Coord {
 }
 
 // Update updates the state of the spawn point
-func (s *SpawnPoint) Update(g *Game) error {
+func (s *SpawnPoint) Update(g *Game) {
 	// If the player is close to the spawn point then it is activated
 	playerDistance := CalcDistance(s.Position.X, s.Position.Y, g.Player.Object.X, g.Player.Object.Y)
 
@@ -64,13 +65,23 @@ func (s *SpawnPoint) Update(g *Game) error {
 
 				z := NewZombie(Coord{ X: s.Position.X + np.X * 16, Y: s.Position.Y + np.Y * 16 }, g.ZombieSprites[rand.Intn(zombieTypes)])
 				z.Target = g.Player.Object
+				z.SpawnPoint = s
 			
 				g.Space.Add(z.Object)
 				g.Zombies = append(g.Zombies, z)
+				s.Zombies = append(s.Zombies, z)
 			}
 			s.InitialSpawned = true
 		}
 	}
-	
-	return nil
+}
+
+// RemoveZombie removes a dead zombie from the zombie array of the SpawnPoint
+func (s *SpawnPoint) RemoveZombie(z *Zombie) {
+	for i, sz := range s.Zombies {
+		if sz == z {
+			s.Zombies[i] = nil
+			s.Zombies = append((s.Zombies)[:i], (s.Zombies)[i+1:]...)
+		}
+	}
 }

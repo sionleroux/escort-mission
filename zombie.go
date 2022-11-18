@@ -38,6 +38,7 @@ func (zs *Zombies) Update(g *Game) {
 			log.Println(err)
 			g.Zombies[i] = nil
 			g.Zombies = append((*zs)[:i], (*zs)[i+1:]...)
+			z.SpawnPoint.RemoveZombie(z)
 		}
 	}
 }
@@ -60,14 +61,15 @@ const (
 
 // Zombie is a monster that's trying to eat the player character
 type Zombie struct {
-	Object    *resolv.Object // Used for collision detection with other objects
-	Angle     float64        // The angle the zombies is facing at
-	Frame     int            // The current animation frame
-	State     int            // The current animation state
-	Sprite    *SpriteSheet   // Used for zombie animations
-	Speed     float64        // The speed this zombie walks at
-	Target    *resolv.Object // Target object (player or dog)
-	HitToDie  int            // Number of hits needed to die
+	Object     *resolv.Object  // Used for collision detection with other objects
+	Angle      float64         // The angle the zombies is facing at
+	Frame      int             // The current animation frame
+	State      int             // The current animation state
+	Sprite     *SpriteSheet    // Used for zombie animations
+	Speed      float64         // The speed this zombie walks at
+	Target     *resolv.Object  // Target object (player or dog)
+	HitToDie   int             // Number of hits needed to die
+	SpawnPoint *SpawnPoint     // Reference for the SpawnPoint where the zombie was spawned
 }
 
 // NewZombie constructs a new Zombie object
