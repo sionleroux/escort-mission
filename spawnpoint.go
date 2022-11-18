@@ -62,7 +62,15 @@ func (s *SpawnPoint) NextPosition() Coord {
 func (s *SpawnPoint) SpawnZombie(g *Game) {
 	np := s.NextPosition()
 
-	sprites := g.ZombieSprites[rand.Intn(zombieTypes)]
+	zombieType := rand.Intn(zombieTypes)
+	speed := zombieSpeed
+	if zombieType == 2 {
+		speed = zombieRunnerSpeed
+	} else if zombieType == 3 {
+		speed = zombieCrawlerSpeed
+	}
+
+	sprites := g.ZombieSprites[zombieType]
 	dimensions := sprites.Sprite[0].Position
 	z := &Zombie{
 		Object: resolv.NewObject(
@@ -72,7 +80,7 @@ func (s *SpawnPoint) SpawnZombie(g *Game) {
 		),
 		Angle:    0,
 		Sprite:   sprites,
-		Speed:    zombieSpeed * (1 + rand.Float64()),
+		Speed:    speed * (1 + rand.Float64()),
 		HitToDie: 1 + rand.Intn(2),
 	}
 	z.Object.Data = z // self-reference for later
