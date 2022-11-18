@@ -52,8 +52,25 @@ func (s *SpawnPoint) NextPosition() Coord {
 	return zombiePositions[s.PrevPosition]
 }
 
+// SpawnZombie spawns one zombie
+func (s *SpawnPoint) SpawnZombie(g *Game) {
+	np := s.NextPosition()
+
+	z := NewZombie(Coord{ X: s.Position.X + np.X * 16, Y: s.Position.Y + np.Y * 16 }, g.ZombieSprites[rand.Intn(zombieTypes)])
+	z.Target = g.Player.Object
+	z.SpawnPoint = s
+
+	g.Space.Add(z.Object)
+	g.Zombies = append(g.Zombies, z)
+	s.Zombies = append(s.Zombies, z)
+}
+
 // Update updates the state of the spawn point
 func (s *SpawnPoint) Update(g *Game) {
+	if s.InitialSpawned && !s.Continuous {
+		return
+	}
+
 	// If the player is close to the spawn point then it is activated
 	playerDistance := CalcDistance(s.Position.X, s.Position.Y, g.Player.Object.X, g.Player.Object.Y)
 
@@ -61,17 +78,16 @@ func (s *SpawnPoint) Update(g *Game) {
 		// Intial spawning
 		if !s.InitialSpawned {
 			for i := 0; i < s.InitialCount; i++ {
-				np := s.NextPosition()
-
-				z := NewZombie(Coord{ X: s.Position.X + np.X * 16, Y: s.Position.Y + np.Y * 16 }, g.ZombieSprites[rand.Intn(zombieTypes)])
-				z.Target = g.Player.Object
-				z.SpawnPoint = s
-			
-				g.Space.Add(z.Object)
-				g.Zombies = append(g.Zombies, z)
-				s.Zombies = append(s.Zombies, z)
+				s.SpawnZombie(g)
 			}
 			s.InitialSpawned = true
+		} else {
+			// Continuous spawning one zombie if needed after a while
+			if (g.Tick % 120 == 0) {
+				if len(s.Zombies) < s.InitialCount {
+					s.SpawnZombie(g)
+				}
+			}		
 		}
 	}
 }
