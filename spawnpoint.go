@@ -53,8 +53,8 @@ func (s *SpawnPoint) NextPosition() Coord {
 	s.PrevPosition.Angle = (s.PrevPosition.Angle + 1) % 6
 
 	return Coord{
-		X: math.Cos(2*math.Pi / 6 * float64(s.PrevPosition.Angle)) * float64(s.PrevPosition.Distance),
-		Y: math.Sin(2*math.Pi / 6 * float64(s.PrevPosition.Angle)) * float64(s.PrevPosition.Distance),
+		X: math.Cos(-2*math.Pi / 6 * float64(s.PrevPosition.Angle)) * float64(s.PrevPosition.Distance),
+		Y: math.Sin(-2*math.Pi / 6 * float64(s.PrevPosition.Angle)) * float64(s.PrevPosition.Distance),
 	}
 }
 
