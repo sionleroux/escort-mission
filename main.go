@@ -79,6 +79,7 @@ type Game struct {
 	ZombieSprites []*SpriteSheet
 	Player        *Player
 	Dog           *Dog
+	SpawnPoints   SpawnPoints
 	Zombies       Zombies
 	Space         *resolv.Space
 	State         GameState
@@ -215,6 +216,19 @@ func NewGame(g *Game) {
 		NextPath: -1,
 	}
 	g.Space.Add(g.Dog.Object)
+
+	// Add spawnpoints to the game
+	for _, e := range entities.Entities {
+		if e.Identifier == "Zombie" {
+			initialCount := e.PropertyByIdentifier("Initial").AsInt()
+			continuous := e.PropertyByIdentifier("Continuous").AsBool()
+			g.SpawnPoints = append(g.SpawnPoints, &SpawnPoint{
+				Position:     Coord{X: float64(e.Position[0]),Y: float64(e.Position[1])},
+				InitialCount: initialCount,
+				Continuous:   continuous,
+			})
+		}
+	}
 
 	// Add zombies to the game
 	zombiePositions := []struct{ X, Y int }{
