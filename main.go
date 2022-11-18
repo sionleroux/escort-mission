@@ -225,7 +225,6 @@ func NewGame(g *Game) {
 				Position:     Coord{X: float64(e.Position[0]),Y: float64(e.Position[1])},
 				InitialCount: initialCount,
 				Continuous:   continuous,
-				PrevPosition: 0,
 			})
 		}
 	}

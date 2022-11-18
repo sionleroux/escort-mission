@@ -5,6 +5,7 @@
 package main
 
 import (
+	"math"
 	"math/rand"
 )
 
@@ -21,6 +22,12 @@ func (sps *SpawnPoints) Update(g *Game) {
 	}
 }
 
+// SpawnPosition describes the spawning position related to the SpawnPoint center
+type SpawnPosition struct {
+	Distance int // Distance of the position from the center
+	Angle    int // Angle of the position
+}
+
 // SpawnPoint is a point on the map where zombies are spawn
 type SpawnPoint struct {
 	Position       Coord
@@ -28,29 +35,25 @@ type SpawnPoint struct {
 	Continuous     bool
 	Zombies        Zombies
 	InitialSpawned bool
-	PrevPosition   int
+	PrevPosition   SpawnPosition
 	NextSpawn      int
 }
 
 // NextPosition gives the offset of the next spawning to the center of the point
 func (s *SpawnPoint) NextPosition() Coord {
-	zombiePositions := []Coord{
-		{0, 0}, {-1, 0}, {-1, -1},
-		{0, -1}, {1, -1}, {1, 0},
-		{1, 1}, {0, 1}, {-1, 1},
-		{-2, 0}, {-2, -1}, {-2, -2},
-		{-1, -2}, {0, -2}, {1, -2},
-		{2, -2}, {2, -1}, {2, 0},
-		{2, 1}, {2, 2}, {1, 2},
-		{0, 2}, {-1, 2},
-		{-2, 2}, {-2, 1},
-	}
-	s.PrevPosition++
-	if s.PrevPosition == 25 {
-		s.PrevPosition = 0
+	
+	// Move further if zombies have been spwaned around the whole circle
+	if s.PrevPosition.Angle == 0 {
+		s.PrevPosition.Distance++
 	}
 
-	return zombiePositions[s.PrevPosition]
+	// Spawn positions in every 60 degress (360 / 6)
+	s.PrevPosition.Angle = (s.PrevPosition.Angle + 1) % 6
+
+	return Coord{
+		X: math.Cos(2*math.Pi / 6 * float64(s.PrevPosition.Angle)) * float64(s.PrevPosition.Distance),
+		Y: math.Sin(2*math.Pi / 6 * float64(s.PrevPosition.Angle)) * float64(s.PrevPosition.Distance),
+	}
 }
 
 // SpawnZombie spawns one zombie
