@@ -20,6 +20,10 @@ import (
 	camera "github.com/melonfunction/ebiten-camera"
 	"github.com/solarlune/ldtkgo"
 	"github.com/solarlune/resolv"
+	
+	"image"
+	"image/color"
+	"github.com/fzipp/astar"
 )
 
 const (
@@ -32,7 +36,7 @@ const (
 )
 
 func main() {
-	gameWidth, gameHeight := 320, 240
+	gameWidth, gameHeight := 640, 480
 
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
 	ebiten.SetWindowTitle("eZcort mission")
@@ -81,6 +85,7 @@ type Game struct {
 	Dog           *Dog
 	Zombies       Zombies
 	Space         *resolv.Space
+	LevelMap      LevelMap
 	State         GameState
 	Checkpoint    int
 }
@@ -120,11 +125,13 @@ func NewGame(g *Game) {
 	// Create space for collision detection
 	g.Space = resolv.NewSpace(level.Width, level.Height, 16, 16)
 
+	// Create level map for A* path planning
+	g.LevelMap = CreateMap(level.Width, level.Height)
+
 	// Add wall tiles to space for collision detection
 	for _, layer := range level.Layers {
 		switch layer.Type {
 		case ldtkgo.LayerTypeIntGrid:
-
 			for _, intData := range layer.IntGrid {
 				g.Space.Add(resolv.NewObject(
 					float64(intData.Position[0]+layer.OffsetX),
@@ -133,8 +140,18 @@ func NewGame(g *Game) {
 					float64(layer.GridSize),
 					tagWall,
 				))
+
+				g.LevelMap.SetObstacle(intData.Position[0]/32, intData.Position[1]/32)
 			}
 		}
+	}
+
+	// DEBUG purposes
+	start := image.Pt(80, 11)
+	dest := image.Pt(64, 3)
+	apath := astar.FindPath[image.Point](g.LevelMap, start, dest, distance, distance)
+	for _, p := range apath {
+		ebitenutil.DrawCircle(g.Background, float64(p.X)*32+16, float64(p.Y)*32+16, 4, color.Black)
 	}
 
 	// Music
