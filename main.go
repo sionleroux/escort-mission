@@ -149,12 +149,15 @@ func NewGame(g *Game) {
 	g.Sounds[soundMusicBackground].Play()
 
 	// Load sprites
-	g.Sprites = make(map[SpriteType]*SpriteSheet, 3)
+	g.Sprites = make(map[SpriteType]*SpriteSheet, 5)
 	g.Sprites[spritePlayer] = loadSprite("Player")
 	g.Sprites[spriteDog] = loadSprite("Dog")
-	g.ZombieSprites = make([]*SpriteSheet, zombieTypes)
-	for index := 1; index <= zombieTypes; index++ {
-		g.ZombieSprites[index-1] = loadSprite("Zombie_" + strconv.Itoa(index))
+	g.Sprites[spriteZombieSprinter] = loadSprite("Zombie_sprinter")
+	g.Sprites[spriteZombieBig] = loadSprite("Zombie_big")
+	g.Sprites[spriteZombieCrawler] = loadSprite("Zombie_crawler")
+	g.ZombieSprites = make([]*SpriteSheet, zombieVariants)
+	for index := 0; index < zombieVariants; index++ {
+		g.ZombieSprites[index] = loadSprite("Zombie_" + strconv.Itoa(index))
 	}
 
 	// Load entities from map
@@ -218,13 +221,20 @@ func NewGame(g *Game) {
 
 	// Add spawnpoints to the game
 	for _, e := range entities.Entities {
-		if e.Identifier == "Zombie" {
+		if e.Identifier == "Zombie" || e.Identifier == "Zombie_sprinter" || e.Identifier == "Zombie_big" {
+			ztype := zombieNormal
+			if e.Identifier == "Zombie_sprinter" {
+				ztype = zombieSprinter
+			} else if e.Identifier == "Zombie_big" {
+				ztype = zombieBig
+			}
 			initialCount := e.PropertyByIdentifier("Initial").AsInt()
 			continuous := e.PropertyByIdentifier("Continuous").AsBool()
 			g.SpawnPoints = append(g.SpawnPoints, &SpawnPoint{
 				Position:     Coord{X: float64(e.Position[0]),Y: float64(e.Position[1])},
 				InitialCount: initialCount,
 				Continuous:   continuous,
+				ZombieType:   ztype,
 			})
 		}
 	}

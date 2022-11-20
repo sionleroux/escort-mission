@@ -14,6 +14,15 @@ import (
 // spawnDistance is the distance where the point is activated
 const spawnDistance = 250
 
+// Types of zombies
+type ZombieType uint64
+
+const (
+	zombieNormal ZombieType = iota
+	zombieSprinter
+	zombieBig
+)
+
 // SpawnPoints is an array of SpawnPoint
 type SpawnPoints []*SpawnPoint
 
@@ -39,6 +48,7 @@ type SpawnPoint struct {
 	InitialSpawned bool
 	PrevPosition   SpawnPosition
 	NextSpawn      int
+	ZombieType     ZombieType
 }
 
 // NextPosition gives the offset of the next spawning to the center of the point
@@ -46,7 +56,7 @@ func (s *SpawnPoint) NextPosition() Coord {
 	
 	// Move further if zombies have been spwaned around the whole circle
 	if s.PrevPosition.Angle == 0 {
-		s.PrevPosition.Distance++
+		s.PrevPosition.Distance = (s.PrevPosition.Distance + 1) % 2 + 1
 	}
 
 	// Spawn positions in every 60 degress (360 / 6)
@@ -62,15 +72,31 @@ func (s *SpawnPoint) NextPosition() Coord {
 func (s *SpawnPoint) SpawnZombie(g *Game) {
 	np := s.NextPosition()
 
-	zombieType := rand.Intn(zombieTypes)
+	var sprites *SpriteSheet
 	speed := zombieSpeed
-	if zombieType == 2 {
-		speed = zombieRunnerSpeed
-	} else if zombieType == 3 {
-		speed = zombieCrawlerSpeed
+	hitToDie := 1 + rand.Intn(2)
+
+	switch s.ZombieType {
+	case zombieNormal:
+		zv := rand.Intn(zombieVariants + 1)
+		if zv == zombieVariants {
+			// Crawler zombie
+			speed = zombieCrawlerSpeed
+			sprites = g.Sprites[spriteZombieCrawler]
+		} else {
+			// Normal zombie
+			sprites = g.ZombieSprites[zv]
+		}
+	case zombieSprinter:
+		speed = zombieSprinterSpeed
+		sprites = g.Sprites[spriteZombieSprinter]
+		hitToDie = 1
+	case zombieBig:
+		speed = zombieSpeed
+		sprites = g.Sprites[spriteZombieBig]
+		hitToDie = 10
 	}
 
-	sprites := g.ZombieSprites[zombieType]
 	dimensions := sprites.Sprite[0].Position
 	z := &Zombie{
 		Object: resolv.NewObject(
@@ -81,9 +107,9 @@ func (s *SpawnPoint) SpawnZombie(g *Game) {
 		Angle:    0,
 		Sprite:   sprites,
 		Speed:    speed * (1 + rand.Float64()),
-		HitToDie: 1 + rand.Intn(2),
+		HitToDie: hitToDie,
 	}
-	z.Object.Data = z // self-reference for later
+	z.Object.Data = z
 	z.Target = g.Player.Object
 	z.SpawnPoint = s
 
