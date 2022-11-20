@@ -11,8 +11,11 @@ import (
 	"github.com/solarlune/resolv"
 )
 
-// spawnDistance is the distance where the point is activated
-const spawnDistance = 250
+// spawnMaxDistance is the distance where the point is activated, if the player is close enough
+const spawnMaxDistance = 250
+
+// spawnMinDistance is the distance where the point is deactivated, if the player is too close
+const spawnMinDistance = 200
 
 // Types of zombies
 type ZombieType uint64
@@ -48,6 +51,7 @@ type SpawnPoint struct {
 	InitialSpawned bool
 	PrevPosition   SpawnPosition
 	NextSpawn      int
+	CanSpawn       bool
 	ZombieType     ZombieType
 }
 
@@ -128,7 +132,7 @@ func (s *SpawnPoint) Update(g *Game) {
 	// If the player is close to the spawn point then it is activated
 	playerDistance := CalcDistance(s.Position.X, s.Position.Y, g.Player.Object.X, g.Player.Object.Y)
 
-	if playerDistance < spawnDistance {
+	if playerDistance < spawnMaxDistance {
 		// Intial spawning
 		if !s.InitialSpawned {
 			for i := 0; i < s.InitialCount; i++ {
@@ -139,11 +143,16 @@ func (s *SpawnPoint) Update(g *Game) {
 			// Continuous spawning one zombie if needed after a while
 			if (g.Tick % s.NextSpawn == 0) {
 				if len(s.Zombies) < s.InitialCount {
-					s.SpawnZombie(g)
+					s.CanSpawn = true
 				}
-			}		
+			}
 		}
 	}
+	// Zombie is spawned only if the player is not too close
+	if playerDistance > spawnMinDistance && s.CanSpawn {
+		s.SpawnZombie(g)
+		s.CanSpawn = false
+	}	
 }
 
 // RemoveZombie removes a dead zombie from the zombie array of the SpawnPoint
