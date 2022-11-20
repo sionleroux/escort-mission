@@ -20,10 +20,6 @@ import (
 	camera "github.com/melonfunction/ebiten-camera"
 	"github.com/solarlune/ldtkgo"
 	"github.com/solarlune/resolv"
-	
-	"image"
-	"image/color"
-	"github.com/fzipp/astar"
 )
 
 const (
@@ -146,14 +142,6 @@ func NewGame(g *Game) {
 		}
 	}
 
-	// DEBUG purposes
-	start := image.Pt(80, 11)
-	dest := image.Pt(64, 3)
-	apath := astar.FindPath[image.Point](g.LevelMap, start, dest, distance, distance)
-	for _, p := range apath {
-		ebitenutil.DrawCircle(g.Background, float64(p.X)*32+16, float64(p.Y)*32+16, 4, color.Black)
-	}
-
 	// Music
 	const sampleRate int = 44100 // assuming "normal" sample rate
 	context := audio.NewContext(sampleRate)
@@ -223,6 +211,19 @@ func NewGame(g *Game) {
 		}
 	}
 
+	// The dog's path is planned by A*
+	// var path []Coord
+	// prevCoord := Coord{float64(dogEntity.Position[0]), float64(dogEntity.Position[1])}
+	// for _, pathCoord := range pathArray {
+	// 	nextCoord := Coord{
+	// 		X: (pathCoord.(map[string]any)["cx"].(float64) + 0.5) * float64(entities.GridSize),
+	// 		Y: (pathCoord.(map[string]any)["cy"].(float64) + 0.5) * float64(entities.GridSize),
+	// 	}
+	// 	apath := g.LevelMap.FindPath(prevCoord, nextCoord)
+	// 	path = append(path, apath...)
+	// 	prevCoord = nextCoord
+	// }
+
 	// Add dog to the game
 	g.Dog = &Dog{
 		Object:   resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 8, 8, tagDog),
@@ -232,6 +233,7 @@ func NewGame(g *Game) {
 		NextPath: -1,
 	}
 	g.Space.Add(g.Dog.Object)
+
 
 	// Add zombies to the game
 	zombiePositions := []struct{ X, Y int }{

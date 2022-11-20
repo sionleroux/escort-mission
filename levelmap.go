@@ -7,6 +7,8 @@ package main
 import (
 	"image"
 	"math"
+
+	"github.com/fzipp/astar"
 )
 
 type LevelMap [][]int
@@ -71,4 +73,37 @@ func distance(p, q image.Point) float64 {
 // SetObstacle sets the cell as obstacle
 func (m LevelMap) SetObstacle(x, y int) {
 	m[y][x] = 1
+}
+
+// FindPath finds path between two coordinates on map
+func (m LevelMap) FindPath(start, dest Coord) []Coord {
+	var result []Coord
+
+	startCell := image.Pt(int(start.X / 32), int(start.Y / 32))
+	destCell := image.Pt(int(dest.X / 32), int(dest.Y / 32))
+	apath := astar.FindPath[image.Point](m, startCell, destCell, distance, distance)
+	apath = simplifyPath(apath)
+	for _, p := range apath {
+		result = append(result, Coord{X: float64(p.X)*32+16, Y: float64(p.Y)*32+16})
+	}
+	return result
+}
+
+// simplifyPath removes unnecessary points from the path
+func simplifyPath(path []image.Point) []image.Point {
+	var result []image.Point
+	
+	prev := image.Pt(0, 0)
+	for i, p := range path {
+		if i+1 < len(path) {
+			next := path[i+1].Sub(p)
+			if prev == next {
+				continue
+			} else {
+				prev = next
+			}
+		}
+		result = append(result, p)
+	}
+	return result
 }
