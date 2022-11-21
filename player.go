@@ -28,14 +28,16 @@ const playerAmmoClipMax int = 7
 
 // states of the player
 // It would be great to map them to the frameTag.Name from JSON
+type playerState int
+
 const (
-	playerIdle     = iota // Waiting for input from the player
-	playerWalking         // Walking in some direction
-	playerReady           // Readying the gun to shoot
-	playerShooting        // Shooting the gun
-	playerDryFire         // Trying to shoot with no ammo
-	playerReload          // Reloading the gun
-	playerUnready         // Unreadying the gun after shooting
+	playerIdle     playerState = iota // Waiting for input from the player
+	playerWalking                     // Walking in some direction
+	playerReady                       // Readying the gun to shoot
+	playerShooting                    // Shooting the gun
+	playerDryFire                     // Trying to shoot with no ammo
+	playerReload                      // Reloading the gun
+	playerUnready                     // Unreadying the gun after shooting
 )
 
 // Player is the player character in the game
@@ -43,7 +45,8 @@ type Player struct {
 	Object    *resolv.Object // Used for collision detection with other objects
 	Angle     float64        // The angle the player is facing at
 	Frame     int            // The current animation frame
-	State     int            // The current animation state
+	State     playerState    // The current animation state
+	PrevState playerState    // The previous animation state
 	Sprinting bool           // Whether the player is sprinting or not
 	Sprite    *SpriteSheet   // Used for player animations
 	Range     float64        // How far you can shoot with the gun
@@ -88,11 +91,16 @@ func (p *Player) Reload(g *Game) {
 
 // Update updates the state of the player
 func (p *Player) Update(g *Game) {
+	p.PrevState = p.State
 	p.Sprinting = false
 
 	if p.State == playerIdle || p.State == playerWalking {
 		p.State = playerIdle
 		p.handleControls()
+	}
+
+	if p.Frame == p.Sprite.Meta.FrameTags[p.State].To {
+		p.animationBasedStateChanges(g)
 	}
 
 	// Player gun rotation
@@ -106,43 +114,39 @@ func (p *Player) Update(g *Game) {
 	p.Object.Update()
 }
 
+// Animation-trigged state changes
+func (p *Player) animationBasedStateChanges(g *Game) {
+	switch p.State {
+	case playerShooting: // Back to idle after shooting animation
+		p.State = playerIdle
+		if p.Ammo < 1 {
+			p.Reload(g) // Automatic reload if out of ammo
+		}
+	case playerReload: // Back to idle after reload animation
+		p.Ammo = playerAmmoClipMax
+		p.State = playerIdle
+	case playerDryFire: // Back to idle after reload animation
+		p.State = playerIdle
+	}
+}
+
 func (p *Player) animate(g *Game) {
+	ft := p.Sprite.Meta.FrameTags[p.State]
+	from, to := ft.From, ft.To
+
+	// Instantly start animation if state changed
+	if p.Frame < from || p.Frame >= to {
+		p.Frame = from
+		return
+	}
+
 	// Update only in every 5th cycle
 	if g.Tick%5 != 0 {
 		return
 	}
 
-	ft := p.Sprite.Meta.FrameTags[p.State]
-
-	if ft.From == ft.To {
-		p.Frame = ft.From
-	} else {
-		// Continuously increase the Frame counter between From and To
-		p.Frame = (p.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
-	}
-
-	// Back to idle after shooting animation
-	if p.State == playerShooting && p.Frame == ft.To {
-		if p.Ammo < 1 {
-			p.Reload(g)
-			return
-		}
-		p.State = playerIdle
-		return
-	}
-
-	// Back to idle after reload animation
-	if p.State == playerReload && p.Frame == ft.To {
-		p.Ammo = playerAmmoClipMax
-		p.State = playerIdle
-		return
-	}
-
-	// Back to idle after reload animation
-	if p.State == playerDryFire && p.Frame == ft.To {
-		p.State = playerIdle
-		return
-	}
+	// Continuously increase the Frame counter between from and to
+	p.Frame++
 }
 
 // MoveLeft moves the player left
