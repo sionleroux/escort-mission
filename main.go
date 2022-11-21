@@ -457,12 +457,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		(g.Player.State == playerReload),
 		g.Checkpoint,
 	))
-
-	debugPosition(g, screen, g.Player.Object)
-	debugPosition(g, screen, g.Dog.Object)
-	for _, z := range g.Zombies {
-		debugPosition(g, screen, z.Object)
-	}
 }
 
 func debugPosition(g *Game, screen *ebiten.Image, o *resolv.Object) {
