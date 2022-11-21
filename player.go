@@ -132,10 +132,11 @@ func (p *Player) animationBasedStateChanges(g *Game) {
 
 func (p *Player) animate(g *Game) {
 	ft := p.Sprite.Meta.FrameTags[p.State]
+	from, to := ft.From, ft.To
 
 	// Instantly start animation if state changed
 	if p.State != p.PrevState {
-		p.Frame = ft.From
+		p.Frame = from
 		return
 	}
 
@@ -144,11 +145,13 @@ func (p *Player) animate(g *Game) {
 		return
 	}
 
-	if ft.From == ft.To {
-		p.Frame = ft.From
-	} else {
-		// Continuously increase the Frame counter between From and To
-		p.Frame = (p.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
+	// Continuously increase the Frame counter between from and to
+	if p.Frame < from || p.Frame >= to {
+		p.Frame = from
+		return
+	}
+	if p.Frame < to {
+		p.Frame++
 	}
 }
 
