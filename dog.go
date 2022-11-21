@@ -41,7 +41,7 @@ const zombieSafeRadius float64 = 192
 
 // States of the dog
 const (
-	dogWalkingOnPath     = iota
+	dogWalkingOnPath = iota
 	dogFleeing
 	dogWalkingBackToPath
 	dogSniffing
@@ -107,7 +107,7 @@ func (d *Dog) Update(g *Game) {
 		} else if closestZombie < zombieBarkRadius && d.State != dogFleeing {
 			// If zombies gettgin closer then the dog stops walking and start barking
 			zombieAlert = true
-			if (d.State != dogBarking) {
+			if d.State != dogBarking {
 				g.Sounds[soundDogBark1].Rewind()
 				g.Sounds[soundDogBark1].Play()
 			}
@@ -148,11 +148,12 @@ func (d *Dog) Update(g *Game) {
 		}
 	}
 
+	d.Object.Shape.SetRotation(-d.Angle)
 	d.animate(g)
 	d.Object.Update()
 
 	sx, sy := g.Camera.GetScreenCoords(d.Object.X, d.Object.Y)
-	if (sx < 0 || sy < 0 || sx > float64(g.Width) || sy > float64(g.Height)) {
+	if sx < 0 || sy < 0 || sx > float64(g.Width) || sy > float64(g.Height) {
 		d.OutOfSightCounter++
 		if d.OutOfSightCounter > 300 {
 			g.Dog.State = dogDied
@@ -196,7 +197,7 @@ func (d *Dog) TurnTowardsPathPoint() {
 // SniffNextCheckpoint starts the dog sniffing for next checkpoint
 func (d *Dog) SniffNextCheckpoint() {
 	d.SniffingCounter++
-	if (d.SniffingCounter == 180) {
+	if d.SniffingCounter == 180 {
 		d.SniffingCounter = 0
 		d.TurnTowardsPathPoint()
 		d.State = dogWalkingOnPath
@@ -205,7 +206,7 @@ func (d *Dog) SniffNextCheckpoint() {
 
 // FollowPath moves the dog along the path
 func (d *Dog) FollowPath() {
-	if (!d.OnThePath && d.State != dogWalkingBackToPath) {
+	if !d.OnThePath && d.State != dogWalkingBackToPath {
 		d.TurnTowardsCoordinate(d.LastPathCoord)
 		d.State = dogWalkingBackToPath
 	}
@@ -213,7 +214,7 @@ func (d *Dog) FollowPath() {
 	if d.SniffingCounter != 0 {
 		d.State = dogSniffing
 	}
-	
+
 	switch d.State {
 	case dogSitting:
 		fallthrough
@@ -276,9 +277,9 @@ func (d *Dog) move(dx, dy float64) {
 		}
 	}
 
-	if (d.State == dogWalkingOnPath) {
+	if d.State == dogWalkingOnPath {
 		if collision := d.Object.Check(dx, dy, tagCheckpoint); collision != nil {
-			o := collision.Objects[0];
+			o := collision.Objects[0]
 			if o.Data.(int) > d.PrevCheckpoint {
 				d.PrevCheckpoint = o.Data.(int)
 				d.State = dogSniffing
@@ -291,18 +292,20 @@ func (d *Dog) move(dx, dy float64) {
 
 // Draw draws the Dog to the screen
 func (d *Dog) Draw(g *Game) {
+	// the centre of the dog's shoulders is 5px down from the middle
+	const centerOffset float64 = 5
+
 	s := d.Sprite
 	frame := s.Sprite[d.Frame]
 	op := &ebiten.DrawImageOptions{}
 
+	// Centre and rotate
 	op.GeoM.Translate(
 		float64(-frame.Position.W/2),
-		float64(-frame.Position.H/2),
+		float64(-frame.Position.H/2)+centerOffset/2,
 	)
-
 	op.GeoM.Rotate(d.Angle + math.Pi/2)
 
-	cx, cy := d.Object.Center()
 	g.Camera.Surface.DrawImage(
 		s.Image.SubImage(image.Rect(
 			frame.Position.X,
@@ -312,6 +315,8 @@ func (d *Dog) Draw(g *Game) {
 		)).(*ebiten.Image),
 		g.Camera.GetTranslation(
 			op,
-			float64(cx),
-			float64(cy)))
+			float64(d.Object.X),
+			float64(d.Object.Y),
+		),
+	)
 }

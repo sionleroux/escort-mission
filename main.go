@@ -7,6 +7,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"image/color"
 	"log"
 	"math"
 	"math/rand"
@@ -126,13 +127,20 @@ func NewGame(g *Game) {
 		case ldtkgo.LayerTypeIntGrid:
 
 			for _, intData := range layer.IntGrid {
-				g.Space.Add(resolv.NewObject(
+				object := resolv.NewObject(
 					float64(intData.Position[0]+layer.OffsetX),
 					float64(intData.Position[1]+layer.OffsetY),
 					float64(layer.GridSize),
 					float64(layer.GridSize),
 					tagWall,
+				)
+				object.SetShape(resolv.NewRectangle(
+					float64(intData.Position[0]+layer.OffsetX),
+					float64(intData.Position[1]+layer.OffsetY),
+					float64(layer.GridSize),
+					float64(layer.GridSize),
 				))
+				g.Space.Add(object)
 			}
 		}
 	}
@@ -208,8 +216,18 @@ func NewGame(g *Game) {
 	}
 
 	// Add dog to the game
+	object := resolv.NewObject(
+		float64(dogEntity.Position[0]), float64(dogEntity.Position[1]),
+		16, 16,
+		tagDog,
+	)
+	object.SetShape(resolv.NewRectangle(
+		0, 0,
+		15, 8,
+	))
+	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
 	g.Dog = &Dog{
-		Object:   resolv.NewObject(float64(dogEntity.Position[0]), float64(dogEntity.Position[1]), 8, 8, tagDog),
+		Object:   object,
 		Angle:    0,
 		Sprite:   g.Sprites[spriteDog],
 		Path:     path,
@@ -302,10 +320,12 @@ func (g *Game) Update() error {
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
-			g.Sounds[soundPlayerDies].Rewind()
-			g.Sounds[soundPlayerDies].Play()
-			g.State = gameOver
-			return nil // return early, no point in continuing, you are dead
+			if g.Player.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
+				g.Sounds[soundPlayerDies].Rewind()
+				g.Sounds[soundPlayerDies].Play()
+				g.State = gameOver
+				return nil // return early, no point in continuing, you are dead
+			}
 		}
 	}
 
@@ -411,6 +431,26 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		(g.Player.State == playerReload),
 		g.Checkpoint,
 	))
+
+	debugPosition(g, screen, g.Player.Object)
+	debugPosition(g, screen, g.Dog.Object)
+	for _, z := range g.Zombies {
+		debugPosition(g, screen, z.Object)
+	}
+}
+
+func debugPosition(g *Game, screen *ebiten.Image, o *resolv.Object) {
+	verts := o.Shape.(*resolv.ConvexPolygon).Transformed()
+	for i := 0; i < len(verts); i++ {
+		vert := verts[i]
+		next := verts[0]
+		if i < len(verts)-1 {
+			next = verts[i+1]
+		}
+		vX, vY := g.Camera.GetScreenCoords(vert.X(), vert.Y())
+		nX, nY := g.Camera.GetScreenCoords(next.X(), next.Y())
+		ebitenutil.DrawLine(screen, vX, vY, nX, nY, color.White)
+	}
 }
 
 // Clicked is shorthand for when the left mouse button has just been clicked
