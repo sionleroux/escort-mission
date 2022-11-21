@@ -67,6 +67,12 @@ func (m LevelMap) isFreeAt(p image.Point) bool {
 	return m[p.Y][p.X] == 0
 }
 
+// isFreeAtCoord returns if the tile under the coordinate is free
+func (m LevelMap) isFreeAtCoord(c Coord) bool {
+	p := image.Pt(int(c.X / gridSize), int(c.Y / gridSize))
+	return m[p.Y][p.X] == 0
+}
+
 // distance calculates Euclidean distance between the points
 func distance(p, q image.Point) float64 {
 	d := q.Sub(p)

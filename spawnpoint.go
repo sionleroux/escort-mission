@@ -63,7 +63,16 @@ func (s *SpawnPoint) NextPosition() Coord {
 
 // SpawnZombie spawns one zombie
 func (s *SpawnPoint) SpawnZombie(g *Game) {
-	np := s.NextPosition()
+	var np, nc Coord
+
+	// At least one of the 12 positions should be OK
+	for i := 0; i<12; i++ {
+		np = s.NextPosition()
+		nc = Coord{s.Position.X + np.X * 32, s.Position.Y + np.Y * 32}
+		if g.LevelMap.isFreeAtCoord(nc) {
+			break
+		}
+	}
 
 	var sprites *SpriteSheet
 	switch s.ZombieType {
@@ -86,7 +95,7 @@ func (s *SpawnPoint) SpawnZombie(g *Game) {
 		sprites = g.Sprites[spriteZombieBig]
 	}
 
-	z := NewZombie(s, Coord{s.Position.X + np.X * 32, s.Position.Y + np.Y * 32}, s.ZombieType, sprites)
+	z := NewZombie(s, nc, s.ZombieType, sprites)
 	
 	z.Target = g.Player.Object
 	g.Space.Add(z.Object)
