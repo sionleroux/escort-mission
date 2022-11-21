@@ -357,10 +357,12 @@ func (g *Game) Update() error {
 	}
 
 	// Do something special when you find a Checkpoint entity
-	g.Checkpoint = 0 // maybe we should use actions instead of global state
 	if collision := g.Player.Object.Check(0, 0, tagCheckpoint); collision != nil {
 		if o := collision.Objects[0]; g.Player.Object.Overlaps(o) {
-			g.Checkpoint = o.Data.(int)
+			if (g.Checkpoint < o.Data.(int)) {
+				g.Checkpoint = o.Data.(int)
+			}
+
 		}
 	}
 
