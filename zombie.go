@@ -78,7 +78,6 @@ func NewZombie(spawnpoint *SpawnPoint, position Coord, zombieType ZombieType, sp
 		hitToDie = 10
 	}
 
-	log.Println(zombieType)
 	dimensions := sprites.Sprite[0].Position
 	z := &Zombie{
 		Object: resolv.NewObject(

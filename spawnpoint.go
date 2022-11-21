@@ -10,10 +10,10 @@ import (
 )
 
 // spawnMaxDistance is the distance where the point is activated, if the player is close enough
-const spawnMaxDistance = 250
+const spawnMaxDistance = gameWidth / 2 + 100
 
 // spawnMinDistance is the distance where the point is deactivated, if the player is too close
-const spawnMinDistance = 200
+const spawnMinDistance = gameWidth / 2 + 50
 
 // SpawnPoints is an array of SpawnPoint
 type SpawnPoints []*SpawnPoint

@@ -30,8 +30,9 @@ const (
 	tagCheckpoint = "check"
 )
 
+const gameWidth, gameHeight = 320, 240
+
 func main() {
-	gameWidth, gameHeight := 320, 240
 
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
 	ebiten.SetWindowTitle("eZcort mission")
