@@ -21,6 +21,11 @@ import (
 	camera "github.com/melonfunction/ebiten-camera"
 	"github.com/solarlune/ldtkgo"
 	"github.com/solarlune/resolv"
+
+	beziercp "github.com/brothertoad/bezier"
+	beziercurve "gonum.org/v1/plot/tools/bezier"
+	"gonum.org/v1/plot/vg"
+	"gonum.org/v1/plot/font"
 )
 
 const (
@@ -82,6 +87,7 @@ type Game struct {
 	Dog           *Dog
 	Zombies       Zombies
 	Space         *resolv.Space
+	LevelMap      LevelMap
 	State         GameState
 	Checkpoint    int
 }
@@ -121,11 +127,13 @@ func NewGame(g *Game) {
 	// Create space for collision detection
 	g.Space = resolv.NewSpace(level.Width, level.Height, 16, 16)
 
+	// Create level map for A* path planning
+	g.LevelMap = CreateMap(level.Width, level.Height)
+
 	// Add wall tiles to space for collision detection
 	for _, layer := range level.Layers {
 		switch layer.Type {
 		case ldtkgo.LayerTypeIntGrid:
-
 			for _, intData := range layer.IntGrid {
 				object := resolv.NewObject(
 					float64(intData.Position[0]+layer.OffsetX),
@@ -141,6 +149,8 @@ func NewGame(g *Game) {
 					float64(layer.GridSize),
 				))
 				g.Space.Add(object)
+
+				g.LevelMap.SetObstacle(intData.Position[0] / layer.GridSize, intData.Position[1] / layer.GridSize)
 			}
 		}
 	}
@@ -204,14 +214,31 @@ func NewGame(g *Game) {
 
 	// Load the dog's path
 	dogEntity := entities.EntityByIdentifier("Dog")
-
 	pathArray := dogEntity.PropertyByIdentifier("Path").AsArray()
-	path := make([]Coord, len(pathArray))
-	for index, pathCoord := range pathArray {
-		// Do we really need to make these crazy castings?
-		path[index] = Coord{
+	// Start with the dog's current position
+	pathPoints := []beziercp.PointF{{X: float64(dogEntity.Position[0]), Y: float64(dogEntity.Position[1])}}
+	for _, pathCoord := range pathArray {
+		pathPoints = append(pathPoints, beziercp.PointF{
 			X: (pathCoord.(map[string]any)["cx"].(float64) + 0.5) * float64(entities.GridSize),
 			Y: (pathCoord.(map[string]any)["cy"].(float64) + 0.5) * float64(entities.GridSize),
+		})
+	}
+	// Get Bezier control points from the path
+	curveCPs := beziercp.GetControlPointsF(pathPoints)
+	// Get the Bezier curves through the origiunal path points based on the control points
+	var dogpath []Coord
+	for _, c := range curveCPs {
+		curve := beziercurve.New(
+			vg.Point{X: font.Length(int(c.P0.X)), Y: font.Length(c.P0.Y)},
+			vg.Point{X: font.Length(int(c.P1.X)), Y: font.Length(c.P1.Y)},
+			vg.Point{X: font.Length(int(c.P2.X)), Y: font.Length(c.P2.Y)},
+			vg.Point{X: font.Length(int(c.P3.X)), Y: font.Length(c.P3.Y)},
+		)
+
+		// 4 points per curve
+		for i:=0.0; i<1 ; i = i + 0.25 {
+			bp:= curve.Point(i)
+			dogpath = append(dogpath, Coord{X: float64(bp.X), Y: float64(bp.Y)})
 		}
 	}
 
@@ -230,10 +257,11 @@ func NewGame(g *Game) {
 		Object:   object,
 		Angle:    0,
 		Sprite:   g.Sprites[spriteDog],
-		Path:     path,
+		Path:     dogpath,
 		NextPath: -1,
 	}
 	g.Space.Add(g.Dog.Object)
+
 
 	// Add zombies to the game
 	zombiePositions := []struct{ X, Y int }{
