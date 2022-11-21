@@ -46,6 +46,7 @@ type Player struct {
 	Angle     float64        // The angle the player is facing at
 	Frame     int            // The current animation frame
 	State     playerState    // The current animation state
+	PrevState playerState    // The previous animation state
 	Sprinting bool           // Whether the player is sprinting or not
 	Sprite    *SpriteSheet   // Used for player animations
 	Range     float64        // How far you can shoot with the gun
@@ -90,6 +91,7 @@ func (p *Player) Reload(g *Game) {
 
 // Update updates the state of the player
 func (p *Player) Update(g *Game) {
+	p.PrevState = p.State
 	p.Sprinting = false
 
 	if p.State == playerIdle || p.State == playerWalking {
@@ -129,12 +131,18 @@ func (p *Player) animationBasedStateChanges(g *Game) {
 }
 
 func (p *Player) animate(g *Game) {
+	ft := p.Sprite.Meta.FrameTags[p.State]
+
+	// Instantly start animation if state changed
+	if p.State != p.PrevState {
+		p.Frame = ft.From
+		return
+	}
+
 	// Update only in every 5th cycle
 	if g.Tick%5 != 0 {
 		return
 	}
-
-	ft := p.Sprite.Meta.FrameTags[p.State]
 
 	if ft.From == ft.To {
 		p.Frame = ft.From
