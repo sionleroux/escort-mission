@@ -60,14 +60,14 @@ const (
 
 // Zombie is a monster that's trying to eat the player character
 type Zombie struct {
-	Object    *resolv.Object // Used for collision detection with other objects
-	Angle     float64        // The angle the zombies is facing at
-	Frame     int            // The current animation frame
-	State     int            // The current animation state
-	Sprite    *SpriteSheet   // Used for zombie animations
-	Speed     float64        // The speed this zombie walks at
-	Target    *resolv.Object // Target object (player or dog)
-	HitToDie  int            // Number of hits needed to die
+	Object   *resolv.Object // Used for collision detection with other objects
+	Angle    float64        // The angle the zombies is facing at
+	Frame    int            // The current animation frame
+	State    int            // The current animation state
+	Sprite   *SpriteSheet   // Used for zombie animations
+	Speed    float64        // The speed this zombie walks at
+	Target   *resolv.Object // Target object (player or dog)
+	HitToDie int            // Number of hits needed to die
 }
 
 // NewZombie constructs a new Zombie object
@@ -105,7 +105,7 @@ func (z *Zombie) Update(g *Game) error {
 	if playerDistance < zombieRange {
 		z.Target = g.Player.Object
 		z.walk()
-	} else if dogDistance < zombieRange * 1.2 {
+	} else if dogDistance < zombieRange*1.2 {
 		z.Target = g.Dog.Object
 		z.walk()
 	} else {

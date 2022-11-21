@@ -140,12 +140,13 @@ func NewGame(g *Game) {
 	// Music
 	const sampleRate int = 44100 // assuming "normal" sample rate
 	context := audio.NewContext(sampleRate)
-	g.Sounds = make([]*audio.Player, 5)
+	g.Sounds = make([]*audio.Player, 6)
 	g.Sounds[soundMusicBackground] = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context)
 	g.Sounds[soundGunShot] = NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context)
 	g.Sounds[soundGunReload] = NewSoundPlayer(loadSoundFile("assets/sfx/Reload.ogg", sampleRate), context)
 	g.Sounds[soundDogBark1] = NewSoundPlayer(loadSoundFile("assets/sfx/Dog-bark-1.ogg", sampleRate), context)
 	g.Sounds[soundPlayerDies] = NewSoundPlayer(loadSoundFile("assets/sfx/PlayerDies.ogg", sampleRate), context)
+	g.Sounds[soundHit1] = NewSoundPlayer(loadSoundFile("assets/sfx/Hit-1.ogg", sampleRate), context)
 	g.Sounds[soundMusicBackground].Play()
 
 	// Load sprites
@@ -240,7 +241,7 @@ func NewGame(g *Game) {
 				e.Position[1] += zombiePositions[i].Y * 16 // 16px should come from Zombie
 				z := NewZombie(e.Position, g.ZombieSprites[rand.Intn(zombieTypes)])
 				z.Target = g.Player.Object
-			
+
 				g.Space.Add(z.Object)
 				g.Zombies = append(g.Zombies, z)
 			}
@@ -281,7 +282,7 @@ func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		g.Player.Reload(g)
 	}
-	
+
 	if g.State == gameOver || g.State == gameWon {
 		return nil // TODO: provide a possibility to restart the game
 	}
@@ -336,7 +337,7 @@ func (g *Game) Update() error {
 		g.State = gameOver
 		return nil
 	}
-		
+
 	// Position camera and clamp in to the Map dimensions
 	level := g.LDTKProject.Levels[g.Level]
 	g.Camera.SetPosition(
@@ -354,7 +355,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	if g.State == gameOver {
-		if (g.Dog.State == dogDied) {
+		if g.Dog.State == dogDied {
 			ebitenutil.DebugPrint(screen, "Your dog died, press Q to quit")
 		} else {
 			ebitenutil.DebugPrint(screen, "You Died, press Q to quit")
@@ -443,6 +444,8 @@ func Shoot(g *Game) {
 			for _, o := range c.Objects {
 				if o.HasTags(tagMob) {
 					log.Println("HIT!")
+					g.Sounds[soundHit1].Rewind()
+					g.Sounds[soundHit1].Play()
 					o.Data.(*Zombie).Hit()
 					return // stop at the first zombie
 				}
