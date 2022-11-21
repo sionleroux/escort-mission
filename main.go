@@ -167,6 +167,7 @@ func NewGame(g *Game) {
 	g.Sounds[soundPlayerDies] = NewSoundPlayer(loadSoundFile("assets/sfx/PlayerDies.ogg", sampleRate), context)
 	g.Sounds[soundHit1] = NewSoundPlayer(loadSoundFile("assets/sfx/Hit-1.ogg", sampleRate), context)
 	g.Sounds[soundDryFire] = NewSoundPlayer(loadSoundFile("assets/sfx/DryFire.ogg", sampleRate), context)
+	g.Sounds[soundMusicBackground].SetVolume(0.5)
 	g.Sounds[soundMusicBackground].Play()
 
 	// Voice
