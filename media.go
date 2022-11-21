@@ -101,7 +101,7 @@ func loadSprite(name string) *SpriteSheet {
 	return &ss
 }
 
-// Convenience function to load entity/waypoint PNGs from the maps folder
+// Convenience function to load entity/checkpoint PNGs from the maps folder
 func loadEntityImage(name string) *ebiten.Image {
 	name = path.Join("assets", "maps", name) + ".png"
 	return loadImage(name)

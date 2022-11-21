@@ -1615,7 +1615,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Waypoint_1",
+			"identifier": "Checkpoint_1",
 			"uid": 73,
 			"tags": [],
 			"width": 32,
@@ -1643,7 +1643,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Waypoint_2",
+			"identifier": "Checkpoint_2",
 			"uid": 32,
 			"tags": [],
 			"width": 32,
@@ -1671,35 +1671,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Waypoint_3",
-			"uid": 74,
-			"tags": [],
-			"width": 32,
-			"height": 32,
-			"resizableX": false,
-			"resizableY": false,
-			"keepAspectRatio": false,
-			"tileOpacity": 1,
-			"fillOpacity": 0.08,
-			"lineOpacity": 0,
-			"hollow": false,
-			"color": "#94D9B3",
-			"renderMode": "Tile",
-			"showName": true,
-			"tilesetId": 31,
-			"tileId": 39,
-			"tileRenderMode": "FitInside",
-			"tileRect": { "tilesetUid": 31, "x": 288, "y": 96, "w": 32, "h": 32 },
-			"nineSliceBorders": [],
-			"maxCount": 0,
-			"limitScope": "PerLevel",
-			"limitBehavior": "MoveLastOne",
-			"pivotX": 0,
-			"pivotY": 0,
-			"fieldDefs": []
-		},
-		{
-			"identifier": "Waypoint_4",
+			"identifier": "Checkpoint_3",
 			"uid": 75,
 			"tags": [],
 			"width": 32,
@@ -1727,7 +1699,35 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Waypoint_5",
+			"identifier": "Checkpoint_4",
+			"uid": 74,
+			"tags": [],
+			"width": 32,
+			"height": 32,
+			"resizableX": false,
+			"resizableY": false,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#94D9B3",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 31,
+			"tileId": 39,
+			"tileRenderMode": "FitInside",
+			"tileRect": { "tilesetUid": 31, "x": 288, "y": 96, "w": 32, "h": 32 },
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
+		},
+		{
+			"identifier": "Checkpoint_5",
 			"uid": 76,
 			"tags": [],
 			"width": 32,
@@ -1755,7 +1755,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Waypoint_6",
+			"identifier": "Checkpoint_6",
 			"uid": 77,
 			"tags": [],
 			"width": 32,
@@ -1783,7 +1783,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Waypoint_7",
+			"identifier": "Checkpoint_7",
 			"uid": 78,
 			"tags": [],
 			"width": 32,
@@ -2696,10 +2696,12 @@
 						{ "px": [448,2816], "src": [0,0], "f": 0, "t": 0, "d": [8814] },
 						{ "px": [608,2848], "src": [192,192], "f": 0, "t": 10, "d": [8919] },
 						{ "px": [864,2848], "src": [96,0], "f": 0, "t": 1, "d": [8927] },
+						{ "px": [2272,2848], "src": [0,0], "f": 0, "t": 0, "d": [8971] },
 						{ "px": [2784,2848], "src": [0,192], "f": 0, "t": 8, "d": [8987] },
 						{ "px": [128,2912], "src": [192,0], "f": 0, "t": 2, "d": [9104] },
 						{ "px": [384,2944], "src": [192,96], "f": 0, "t": 6, "d": [9212] },
 						{ "px": [1216,2944], "src": [96,192], "f": 0, "t": 9, "d": [9238] },
+						{ "px": [2304,2944], "src": [0,0], "f": 0, "t": 0, "d": [9272] },
 						{ "px": [3104,2944], "src": [288,288], "f": 0, "t": 15, "d": [9297] },
 						{ "px": [736,3008], "src": [0,0], "f": 0, "t": 0, "d": [9423] }
 					],
@@ -3042,7 +3044,7 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "Waypoint_1",
+							"__identifier": "Checkpoint_1",
 							"__grid": [68,9],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -3056,7 +3058,7 @@
 							"fieldInstances": []
 						},
 						{
-							"__identifier": "Waypoint_2",
+							"__identifier": "Checkpoint_2",
 							"__grid": [91,44],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -3070,7 +3072,7 @@
 							"fieldInstances": []
 						},
 						{
-							"__identifier": "Waypoint_3",
+							"__identifier": "Checkpoint_4",
 							"__grid": [35,8],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -3084,7 +3086,7 @@
 							"fieldInstances": []
 						},
 						{
-							"__identifier": "Waypoint_5",
+							"__identifier": "Checkpoint_5",
 							"__grid": [14,36],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -3098,7 +3100,7 @@
 							"fieldInstances": []
 						},
 						{
-							"__identifier": "Waypoint_6",
+							"__identifier": "Checkpoint_6",
 							"__grid": [14,86],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -3112,7 +3114,7 @@
 							"fieldInstances": []
 						},
 						{
-							"__identifier": "Waypoint_7",
+							"__identifier": "Checkpoint_7",
 							"__grid": [57,62],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -3402,7 +3404,7 @@
 						},
 						{
 							"__identifier": "Zombie",
-							"__grid": [65,10],
+							"__grid": [74,5],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -3411,7 +3413,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 83,
-							"px": [2080,320],
+							"px": [2368,160],
 							"fieldInstances": [
 								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
@@ -3419,7 +3421,7 @@
 						},
 						{
 							"__identifier": "Zombie",
-							"__grid": [69,14],
+							"__grid": [68,12],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -3428,7 +3430,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 83,
-							"px": [2208,448],
+							"px": [2176,384],
 							"fieldInstances": [
 								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
@@ -4976,6 +4978,20 @@
 							"height": 32,
 							"defUid": 97,
 							"px": [3168,2976],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Checkpoint_3",
+							"__grid": [53,28],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 31, "x": 224, "y": 64, "w": 32, "h": 32 },
+							"__smartColor": "#94D9B3",
+							"iid": "d13ee010-5110-11ed-9369-ef162f380689",
+							"width": 32,
+							"height": 32,
+							"defUid": 75,
+							"px": [1696,896],
 							"fieldInstances": []
 						}
 					]
