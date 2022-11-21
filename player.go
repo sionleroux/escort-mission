@@ -95,6 +95,10 @@ func (p *Player) Update(g *Game) {
 		p.handleControls()
 	}
 
+	if p.Frame == p.Sprite.Meta.FrameTags[p.State].To {
+		p.animationBasedStateChanges(g)
+	}
+
 	// Player gun rotation
 	cx, cy := g.Camera.GetCursorCoords()
 	adjacent := float64(cx) - p.Object.X
@@ -104,6 +108,22 @@ func (p *Player) Update(g *Game) {
 	p.animate(g)
 	p.Object.Shape.SetRotation(-p.Angle)
 	p.Object.Update()
+}
+
+// Animation-trigged state changes
+func (p *Player) animationBasedStateChanges(g *Game) {
+	switch p.State {
+	case playerShooting: // Back to idle after shooting animation
+		p.State = playerIdle
+		if p.Ammo < 1 {
+			p.Reload(g) // Automatic reload if out of ammo
+		}
+	case playerReload: // Back to idle after reload animation
+		p.Ammo = playerAmmoClipMax
+		p.State = playerIdle
+	case playerDryFire: // Back to idle after reload animation
+		p.State = playerIdle
+	}
 }
 
 func (p *Player) animate(g *Game) {
@@ -119,29 +139,6 @@ func (p *Player) animate(g *Game) {
 	} else {
 		// Continuously increase the Frame counter between From and To
 		p.Frame = (p.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
-	}
-
-	// Back to idle after shooting animation
-	if p.State == playerShooting && p.Frame == ft.To {
-		if p.Ammo < 1 {
-			p.Reload(g)
-			return
-		}
-		p.State = playerIdle
-		return
-	}
-
-	// Back to idle after reload animation
-	if p.State == playerReload && p.Frame == ft.To {
-		p.Ammo = playerAmmoClipMax
-		p.State = playerIdle
-		return
-	}
-
-	// Back to idle after reload animation
-	if p.State == playerDryFire && p.Frame == ft.To {
-		p.State = playerIdle
-		return
 	}
 }
 
