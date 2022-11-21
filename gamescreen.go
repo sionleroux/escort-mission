@@ -32,6 +32,13 @@ const (
 	tagCheckpoint = "check"
 )
 
+const (
+	wallCorner = "Corner"
+	wallEdge   = "Edge"
+	wallInner  = "Inner"
+	wallRock   = "Rock"
+)
+
 type GameScreen struct {
 	Width         int
 	Height        int
@@ -104,20 +111,44 @@ func NewGameScreen(game *Game) {
 	// Add wall tiles to space for collision detection
 	for _, layer := range level.Layers {
 		if layer.Type == ldtkgo.LayerTypeIntGrid && layer.Identifier == "Desert" {
-			for _, intData := range layer.IntGrid {
+
+			tiles := layer.AllTiles()
+
+			for i := 0; i < len(layer.IntGrid); i++ {
+				tile := tiles[i]
+				intData := layer.IntGrid[i]
+				origin := struct{ X, Y float64 }{
+					float64(intData.Position[0] + layer.OffsetX),
+					float64(intData.Position[1] + layer.OffsetY),
+				}
+				size := struct{ W, H float64 }{
+					float64(layer.GridSize),
+					float64(layer.GridSize),
+				}
+
 				object := resolv.NewObject(
-					float64(intData.Position[0]+layer.OffsetX),
-					float64(intData.Position[1]+layer.OffsetY),
-					float64(layer.GridSize),
-					float64(layer.GridSize),
+					origin.X, origin.Y,
+					size.W, size.H,
 					tagWall,
 				)
-				object.SetShape(resolv.NewRectangle(
-					float64(intData.Position[0]+layer.OffsetX),
-					float64(intData.Position[1]+layer.OffsetY),
-					float64(layer.GridSize),
-					float64(layer.GridSize),
-				))
+
+				log.Println(tile)
+				enums := layer.Tileset.EnumsForTile(tile.ID)
+
+				if enums.Contains(wallCorner) {
+					object.SetShape(resolv.NewConvexPolygon( // triangle
+						0, 0, // start at origin
+						0, 0,
+						size.W, size.H,
+						0, size.H,
+					))
+				} else {
+					object.SetShape(resolv.NewRectangle( // square
+						0, 0,
+						size.W, size.H,
+					))
+				}
+
 				g.Space.Add(object)
 
 				g.LevelMap.SetObstacle(intData.Position[0]/layer.GridSize, intData.Position[1]/layer.GridSize)
@@ -297,10 +328,10 @@ func (g *GameScreen) Update() (GameState, error) {
 	g.Player.Update(g)
 
 	// Update dog
-	g.Dog.Update(g)
+	// g.Dog.Update(g)
 
 	// Update zombies
-	g.Zombies.Update(g)
+	// g.Zombies.Update(g)
 
 	// Update spawn points
 	g.SpawnPoints.Update(g)
