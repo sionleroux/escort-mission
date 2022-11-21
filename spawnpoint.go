@@ -10,10 +10,10 @@ import (
 )
 
 // spawnMaxDistance is the distance where the point is activated, if the player is close enough
-const spawnMaxDistance = gameWidth / 2 + 100
+const spawnMaxDistance = gameWidth/2 + 100
 
 // spawnMinDistance is the distance where the point is deactivated, if the player is too close
-const spawnMinDistance = gameWidth / 2 + 50
+const spawnMinDistance = gameWidth/2 + 50
 
 // SpawnPoints is an array of SpawnPoint
 type SpawnPoints []*SpawnPoint
@@ -46,18 +46,18 @@ type SpawnPoint struct {
 
 // NextPosition gives the offset of the next spawning to the center of the point
 func (s *SpawnPoint) NextPosition() Coord {
-	
+
 	// Move further if zombies have been spwaned around the whole circle
 	if s.PrevPosition.Angle == 0 {
-		s.PrevPosition.Distance = (s.PrevPosition.Distance + 1) % 2 + 1
+		s.PrevPosition.Distance = (s.PrevPosition.Distance+1)%2 + 1
 	}
 
 	// Spawn positions in every 60 degress (360 / 6)
 	s.PrevPosition.Angle = (s.PrevPosition.Angle + 1) % 6
 
 	return Coord{
-		X: math.Cos(-2*math.Pi / 6 * float64(s.PrevPosition.Angle)) * float64(s.PrevPosition.Distance),
-		Y: math.Sin(-2*math.Pi / 6 * float64(s.PrevPosition.Angle)) * float64(s.PrevPosition.Distance),
+		X: math.Cos(-2*math.Pi/6*float64(s.PrevPosition.Angle)) * float64(s.PrevPosition.Distance),
+		Y: math.Sin(-2*math.Pi/6*float64(s.PrevPosition.Angle)) * float64(s.PrevPosition.Distance),
 	}
 }
 
@@ -66,9 +66,9 @@ func (s *SpawnPoint) SpawnZombie(g *Game) {
 	var np, nc Coord
 
 	// At least one of the 12 positions should be OK
-	for i := 0; i<12; i++ {
+	for i := 0; i < 12; i++ {
 		np = s.NextPosition()
-		nc = Coord{s.Position.X + np.X * 32, s.Position.Y + np.Y * 32}
+		nc = Coord{s.Position.X + np.X*32, s.Position.Y + np.Y*32}
 		if g.LevelMap.isFreeAtCoord(nc) {
 			break
 		}
@@ -80,7 +80,7 @@ func (s *SpawnPoint) SpawnZombie(g *Game) {
 		fallthrough
 	case zombieCrawler:
 		zs := rand.Intn(zombieVariants + 1)
-		if (zs == zombieVariants) {
+		if zs == zombieVariants {
 			// Crawler
 			sprites = g.Sprites[spriteZombieCrawler]
 			s.ZombieType = zombieCrawler
@@ -96,7 +96,7 @@ func (s *SpawnPoint) SpawnZombie(g *Game) {
 	}
 
 	z := NewZombie(s, nc, s.ZombieType, sprites)
-	
+
 	z.Target = g.Player.Object
 	g.Space.Add(z.Object)
 	g.Zombies = append(g.Zombies, z)
@@ -122,7 +122,7 @@ func (s *SpawnPoint) Update(g *Game) {
 			s.InitialSpawned = true
 		} else {
 			// Continuous spawning one zombie if needed after a while
-			if (g.Tick % s.NextSpawn == 0) {
+			if g.Tick%s.NextSpawn == 0 {
 				if len(s.Zombies) < s.InitialCount {
 					s.CanSpawn = true
 				}
@@ -133,7 +133,7 @@ func (s *SpawnPoint) Update(g *Game) {
 	if playerDistance > spawnMinDistance && s.CanSpawn {
 		s.SpawnZombie(g)
 		s.CanSpawn = false
-	}	
+	}
 }
 
 // RemoveZombie removes a dead zombie from the zombie array of the SpawnPoint

@@ -62,7 +62,7 @@ func (zs *Zombies) Update(g *Game) {
 func NewZombie(spawnpoint *SpawnPoint, position Coord, zombieType ZombieType, sprites *SpriteSheet) *Zombie {
 	// the head and shoulders are about 3px from the middle
 	const collisionBoxSize float64 = 6
-	
+
 	var speed float64
 	var hitToDie int
 
@@ -124,15 +124,15 @@ const (
 
 // Zombie is a monster that's trying to eat the player character
 type Zombie struct {
-	Object   *resolv.Object // Used for collision detection with other objects
-	Angle    float64        // The angle the zombies is facing at
-	Frame    int            // The current animation frame
-	State    int            // The current animation state
-	Sprite   *SpriteSheet   // Used for zombie animations
-	Speed    float64        // The speed this zombie walks at
-	Target   *resolv.Object // Target object (player or dog)
-	HitToDie int            // Number of hits needed to die
-	SpawnPoint *SpawnPoint  // Reference for the SpawnPoint where the zombie was spawned
+	Object     *resolv.Object // Used for collision detection with other objects
+	Angle      float64        // The angle the zombies is facing at
+	Frame      int            // The current animation frame
+	State      int            // The current animation state
+	Sprite     *SpriteSheet   // Used for zombie animations
+	Speed      float64        // The speed this zombie walks at
+	Target     *resolv.Object // Target object (player or dog)
+	HitToDie   int            // Number of hits needed to die
+	SpawnPoint *SpawnPoint    // Reference for the SpawnPoint where the zombie was spawned
 }
 
 // Update updates the state of the zombie

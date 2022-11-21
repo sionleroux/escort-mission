@@ -22,7 +22,7 @@ func CreateMap(w, h int) LevelMap {
 	for i := range lmap {
 		lmap[i] = make([]int, w)
 	}
-	
+
 	return lmap
 }
 
@@ -41,7 +41,7 @@ func (m LevelMap) Neighbours(p image.Point) []image.Point {
 		image.Pt(-1, -1), // NorthWest
 	}
 	neighbours := make([]image.Point, 0, 8)
-	
+
 	// Check avaialable diagonal neighbours (free only if there is a wide enough corridor)
 	for _, o := range offsetsDiag {
 		q := p.Add(o)
@@ -69,7 +69,7 @@ func (m LevelMap) isFreeAt(p image.Point) bool {
 
 // isFreeAtCoord returns if the tile under the coordinate is free
 func (m LevelMap) isFreeAtCoord(c Coord) bool {
-	p := image.Pt(int(c.X / gridSize), int(c.Y / gridSize))
+	p := image.Pt(int(c.X/gridSize), int(c.Y/gridSize))
 	return m[p.Y][p.X] == 0
 }
 
@@ -88,13 +88,13 @@ func (m LevelMap) SetObstacle(x, y int) {
 func (m LevelMap) FindPath(start, dest Coord) []Coord {
 	var result []Coord
 
-	startTile := image.Pt(int(start.X / gridSize), int(start.Y / gridSize))
-	destTile := image.Pt(int(dest.X / gridSize), int(dest.Y / gridSize))
+	startTile := image.Pt(int(start.X/gridSize), int(start.Y/gridSize))
+	destTile := image.Pt(int(dest.X/gridSize), int(dest.Y/gridSize))
 	apath := astar.FindPath[image.Point](m, startTile, destTile, distance, distance)
 	apath = simplifyPath(apath)
 	for _, p := range apath {
 		// Use the center of the tile as path point
-		result = append(result, Coord{X: (float64(p.X) + 0.5)*gridSize, Y: (float64(p.Y) + 0.5)*gridSize})
+		result = append(result, Coord{X: (float64(p.X) + 0.5) * gridSize, Y: (float64(p.Y) + 0.5) * gridSize})
 	}
 	return result
 }
@@ -102,7 +102,7 @@ func (m LevelMap) FindPath(start, dest Coord) []Coord {
 // simplifyPath removes unnecessary points from the path
 func simplifyPath(path []image.Point) []image.Point {
 	var result []image.Point
-	
+
 	prev := image.Pt(0, 0)
 	for i, p := range path {
 		if i+1 < len(path) {

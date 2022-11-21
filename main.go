@@ -22,9 +22,9 @@ import (
 	"github.com/solarlune/resolv"
 
 	beziercp "github.com/brothertoad/bezier"
+	"gonum.org/v1/plot/font"
 	beziercurve "gonum.org/v1/plot/tools/bezier"
 	"gonum.org/v1/plot/vg"
-	"gonum.org/v1/plot/font"
 )
 
 const (
@@ -150,7 +150,7 @@ func NewGame(g *Game) {
 				))
 				g.Space.Add(object)
 
-				g.LevelMap.SetObstacle(intData.Position[0] / layer.GridSize, intData.Position[1] / layer.GridSize)
+				g.LevelMap.SetObstacle(intData.Position[0]/layer.GridSize, intData.Position[1]/layer.GridSize)
 			}
 		}
 	}
@@ -239,8 +239,8 @@ func NewGame(g *Game) {
 		)
 
 		// 4 points per curve
-		for i:=0.0; i<1 ; i = i + 0.25 {
-			bp:= curve.Point(i)
+		for i := 0.0; i < 1; i = i + 0.25 {
+			bp := curve.Point(i)
 			dogpath = append(dogpath, Coord{X: float64(bp.X), Y: float64(bp.Y)})
 		}
 	}
@@ -277,7 +277,7 @@ func NewGame(g *Game) {
 			initialCount := e.PropertyByIdentifier("Initial").AsInt()
 			continuous := e.PropertyByIdentifier("Continuous").AsBool()
 			g.SpawnPoints = append(g.SpawnPoints, &SpawnPoint{
-				Position:     Coord{X: float64(e.Position[0]),Y: float64(e.Position[1])},
+				Position:     Coord{X: float64(e.Position[0]), Y: float64(e.Position[1])},
 				InitialCount: initialCount,
 				Continuous:   continuous,
 				ZombieType:   ztype,
