@@ -137,6 +137,12 @@ func (p *Player) animate(g *Game) {
 		p.State = playerIdle
 		return
 	}
+
+	// Back to idle after reload animation
+	if p.State == playerDryFire && p.Frame == ft.To {
+		p.State = playerIdle
+		return
+	}
 }
 
 // MoveLeft moves the player left

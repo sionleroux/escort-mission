@@ -158,13 +158,14 @@ func NewGame(g *Game) {
 	// Music
 	const sampleRate int = 44100 // assuming "normal" sample rate
 	context := audio.NewContext(sampleRate)
-	g.Sounds = make([]*audio.Player, 6)
+	g.Sounds = make([]*audio.Player, 7)
 	g.Sounds[soundMusicBackground] = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context)
 	g.Sounds[soundGunShot] = NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context)
 	g.Sounds[soundGunReload] = NewSoundPlayer(loadSoundFile("assets/sfx/Reload.ogg", sampleRate), context)
 	g.Sounds[soundDogBark1] = NewSoundPlayer(loadSoundFile("assets/sfx/Dog-bark-1.ogg", sampleRate), context)
 	g.Sounds[soundPlayerDies] = NewSoundPlayer(loadSoundFile("assets/sfx/PlayerDies.ogg", sampleRate), context)
 	g.Sounds[soundHit1] = NewSoundPlayer(loadSoundFile("assets/sfx/Hit-1.ogg", sampleRate), context)
+	g.Sounds[soundDryFire] = NewSoundPlayer(loadSoundFile("assets/sfx/DryFire.ogg", sampleRate), context)
 	g.Sounds[soundMusicBackground].Play()
 
 	// Load sprites
@@ -482,10 +483,25 @@ func clicked() bool {
 
 // Shoot sets shooting states and also die states for any zombies in range
 func Shoot(g *Game) {
+	interruptReload := func() {
+		g.Sounds[soundGunReload].Pause()
+		g.Sounds[soundDryFire].Rewind()
+		g.Sounds[soundDryFire].Play()
+		g.Player.State = playerDryFire
+	}
+
 	switch g.Player.State {
-	case playerShooting, playerReady, playerUnready, playerReload:
+	case playerShooting, playerReady, playerUnready:
 		return // no-op
+	case playerReload:
+		interruptReload()
+		return
 	default:
+		if g.Player.Ammo < 1 {
+			interruptReload()
+			return
+		}
+
 		g.Sounds[soundGunShot].Rewind()
 		g.Sounds[soundGunShot].Play()
 

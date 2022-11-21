@@ -162,6 +162,7 @@ const (
 	soundDogBark1
 	soundPlayerDies
 	soundHit1
+	soundDryFire
 )
 
 // NewMusicPlayer loads a sound into an audio player that can be used to play it
