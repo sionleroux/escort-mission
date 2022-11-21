@@ -325,7 +325,9 @@ func (g *Game) Update() error {
 	}
 
 	// Gun shooting handler
-	Shoot(g)
+	if clicked() {
+		Shoot(g)
+	}
 
 	// Update player
 	g.Player.Update(g)
@@ -480,11 +482,10 @@ func clicked() bool {
 
 // Shoot sets shooting states and also die states for any zombies in range
 func Shoot(g *Game) {
-	if clicked() &&
-		g.Player.State != playerShooting &&
-		g.Player.State != playerReload &&
-		g.Player.State != playerReady &&
-		g.Player.State != playerUnready {
+	switch g.Player.State {
+	case playerShooting, playerReady, playerUnready, playerReload:
+		return // no-op
+	default:
 		g.Sounds[soundGunShot].Rewind()
 		g.Sounds[soundGunShot].Play()
 
