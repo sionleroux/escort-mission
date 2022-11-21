@@ -28,14 +28,16 @@ const playerAmmoClipMax int = 7
 
 // states of the player
 // It would be great to map them to the frameTag.Name from JSON
+type playerState int
+
 const (
-	playerIdle     = iota // Waiting for input from the player
-	playerWalking         // Walking in some direction
-	playerReady           // Readying the gun to shoot
-	playerShooting        // Shooting the gun
-	playerDryFire         // Trying to shoot with no ammo
-	playerReload          // Reloading the gun
-	playerUnready         // Unreadying the gun after shooting
+	playerIdle     playerState = iota // Waiting for input from the player
+	playerWalking                     // Walking in some direction
+	playerReady                       // Readying the gun to shoot
+	playerShooting                    // Shooting the gun
+	playerDryFire                     // Trying to shoot with no ammo
+	playerReload                      // Reloading the gun
+	playerUnready                     // Unreadying the gun after shooting
 )
 
 // Player is the player character in the game
@@ -43,7 +45,7 @@ type Player struct {
 	Object    *resolv.Object // Used for collision detection with other objects
 	Angle     float64        // The angle the player is facing at
 	Frame     int            // The current animation frame
-	State     int            // The current animation state
+	State     playerState    // The current animation state
 	Sprinting bool           // Whether the player is sprinting or not
 	Sprite    *SpriteSheet   // Used for player animations
 	Range     float64        // How far you can shoot with the gun
