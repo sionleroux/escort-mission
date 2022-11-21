@@ -46,7 +46,8 @@ const (
 	dogWalkingBackToPath
 	dogSniffing
 	dogBarking
-	dogSitting
+	dogWaiting
+	dogBlocked
 	dogFinished
 	dogDied
 )
@@ -135,7 +136,7 @@ func (d *Dog) Update(g *Game) {
 					d.FollowPath()
 				} else {
 					// If the player is not close enough then the dog sits down
-					d.State = dogSitting
+					d.State = dogWaiting
 				}
 			} else {
 				// If the dog is in danger then it runs away from the zombies
@@ -170,7 +171,7 @@ func (d *Dog) animate(g *Game) {
 		return
 	}
 
-	dogStateToFrame := [7]int{0, 0, 0, 1, 1, 2, 2}
+	dogStateToFrame := [8]int{0, 0, 0, 1, 1, 2, 2, 2}
 
 	ft := d.Sprite.Meta.FrameTags[dogStateToFrame[d.State]]
 
@@ -216,7 +217,7 @@ func (d *Dog) FollowPath() {
 	}
 
 	switch d.State {
-	case dogSitting:
+	case dogWaiting:
 		fallthrough
 	case dogFleeing:
 		fallthrough
@@ -268,9 +269,18 @@ func (d *Dog) move(dx, dy float64) {
 	if d.State == dogWalkingOnPath || d.State == dogWalkingBackToPath {
 		// WORKAROUND: If the dog is following the path or going back to the path
 		// then collision with walls is not checked
-		if collision := d.Object.Check(dx, dy, tagMob, tagPlayer); collision != nil {
+		if collision := d.Object.Check(dx, dy, tagPlayer); collision != nil {
+			d.State = dogBlocked
 			return
 		}
+		if collision := d.Object.Check(dx, dy, tagMob); collision != nil {
+			return
+		}
+	} else if d.State == dogBlocked {
+		if collision := d.Object.Check(dx, dy, tagPlayer); collision == nil {
+			d.State = dogWalkingOnPath
+		}
+		return
 	} else {
 		if collision := d.Object.Check(dx, dy, tagWall, tagMob, tagPlayer); collision != nil {
 			return
