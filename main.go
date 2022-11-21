@@ -175,7 +175,7 @@ func NewGame(g *Game) {
 	g.Voices[voiceCheckpoint] = make([]*audio.Player, 7)
 	for index := 0; index < 7; index++ {
 		g.Voices[voiceCheckpoint][index] = NewSoundPlayer(
-			loadSoundFile("assets/voice/checkpoint_" + strconv.Itoa(index + 1) + ".ogg", sampleRate),
+			loadSoundFile("assets/voice/checkpoint_"+strconv.Itoa(index+1)+".ogg", sampleRate),
 			context,
 		)
 	}
@@ -371,10 +371,10 @@ func (g *Game) Update() error {
 	// Do something special when you find a Checkpoint entity
 	if collision := g.Player.Object.Check(0, 0, tagCheckpoint); collision != nil {
 		if o := collision.Objects[0]; g.Player.Object.Overlaps(o) {
-			if (g.Checkpoint < o.Data.(int)) {
+			if g.Checkpoint < o.Data.(int) {
 				g.Checkpoint = o.Data.(int)
-				g.Voices[voiceCheckpoint][g.Checkpoint - 1].Rewind()
-				g.Voices[voiceCheckpoint][g.Checkpoint - 1].Play()
+				g.Voices[voiceCheckpoint][g.Checkpoint-1].Rewind()
+				g.Voices[voiceCheckpoint][g.Checkpoint-1].Play()
 			}
 
 		}
