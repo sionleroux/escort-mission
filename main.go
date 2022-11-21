@@ -343,6 +343,8 @@ func (g *Game) Update() error {
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
 			if g.Player.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
+				g.Sounds[soundMusicBackground].Pause()
+				g.Sounds[soundMusicBackground].Rewind()
 				g.Sounds[soundPlayerDies].Rewind()
 				g.Sounds[soundPlayerDies].Play()
 				g.State = gameOver
@@ -376,6 +378,8 @@ func (g *Game) Update() error {
 
 	// Game over if the dog dies
 	if g.Dog.State == dogDied {
+		g.Sounds[soundMusicBackground].Pause()
+		g.Sounds[soundMusicBackground].Rewind()
 		g.State = gameOver
 		return nil
 	}
