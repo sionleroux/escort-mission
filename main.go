@@ -142,7 +142,7 @@ func NewGame(g *Game) {
 					tagWall,
 				))
 
-				g.LevelMap.SetObstacle(intData.Position[0]/32, intData.Position[1]/32)
+				g.LevelMap.SetObstacle(intData.Position[0] / layer.GridSize, intData.Position[1] / layer.GridSize)
 			}
 		}
 	}
@@ -206,7 +206,8 @@ func NewGame(g *Game) {
 	// Load the dog's path
 	dogEntity := entities.EntityByIdentifier("Dog")
 	pathArray := dogEntity.PropertyByIdentifier("Path").AsArray()
-	var pathPoints []beziercp.PointF
+	// Start with the dog's current position
+	pathPoints := []beziercp.PointF{{X: float64(dogEntity.Position[0]), Y: float64(dogEntity.Position[1])}}
 	for _, pathCoord := range pathArray {
 		pathPoints = append(pathPoints, beziercp.PointF{
 			X: (pathCoord.(map[string]any)["cx"].(float64) + 0.5) * float64(entities.GridSize),
