@@ -197,7 +197,7 @@ func NewGame(g *Game) {
 
 	eid := 0
 	for _, e := range entities.Entities {
-		if strings.HasPrefix(e.Identifier, "Waypoint") {
+		if strings.HasPrefix(e.Identifier, "Checkpoint") {
 			eid++
 			log.Println(e.Identifier, e.Position)
 			img := loadEntityImage(e.Identifier)
