@@ -23,8 +23,24 @@ func init() {
 // zombieSpeed is the distance the zombie moves per update cycle
 const zombieSpeed float64 = 0.4
 
+// zombieCrawlerSpeed is the distance the crawler zombie moves per update cycle
+const zombieCrawlerSpeed float64 = 0.2
+
+// zombieSprinterSpeed is the distance the sprinter zombie moves per update cycle
+const zombieSprinterSpeed float64 = 0.6
+
 // zombieRange is how far away the zombie sees something to attack
 const zombieRange float64 = 200
+
+// Types of zombies
+type ZombieType uint64
+
+const (
+	zombieNormal ZombieType = iota
+	zombieCrawler
+	zombieSprinter
+	zombieBig
+)
 
 // Zombies is an array of Zombie
 type Zombies []*Zombie
@@ -38,8 +54,56 @@ func (zs *Zombies) Update(g *Game) {
 			log.Println(err)
 			g.Zombies[i] = nil
 			g.Zombies = append((*zs)[:i], (*zs)[i+1:]...)
+			z.SpawnPoint.RemoveZombie(z)
 		}
 	}
+}
+
+func NewZombie(spawnpoint *SpawnPoint, position Coord, zombieType ZombieType, sprites *SpriteSheet) *Zombie {
+	// the head and shoulders are about 3px from the middle
+	const collisionBoxSize float64 = 6
+	
+	var speed float64
+	var hitToDie int
+
+	switch zombieType {
+	case zombieNormal:
+		speed = zombieSpeed
+		hitToDie = 1 + rand.Intn(2)
+	case zombieCrawler:
+		speed = zombieCrawlerSpeed
+		hitToDie = 1 + rand.Intn(2)
+	case zombieSprinter:
+		speed = zombieSprinterSpeed
+		hitToDie = 1
+	case zombieBig:
+		speed = zombieSpeed
+		hitToDie = 10
+	}
+
+	dimensions := sprites.Sprite[0].Position
+	object := resolv.NewObject(
+		position.X, position.Y,
+		float64(dimensions.W), float64(dimensions.H),
+		tagMob,
+	)
+	object.SetShape(resolv.NewRectangle(
+		0, 0, // origin
+		collisionBoxSize, collisionBoxSize,
+	))
+	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
+
+	z := &Zombie{
+		Object:   object,
+		Angle:    0,
+		Sprite:   sprites,
+		Speed:    speed * (1 + rand.Float64()),
+		HitToDie: hitToDie,
+	}
+	z.Object.Data = z
+	z.SpawnPoint = spawnpoint
+
+	return z
 }
 
 // Draw draws all the zombies
@@ -68,35 +132,7 @@ type Zombie struct {
 	Speed    float64        // The speed this zombie walks at
 	Target   *resolv.Object // Target object (player or dog)
 	HitToDie int            // Number of hits needed to die
-}
-
-// NewZombie constructs a new Zombie object
-func NewZombie(position []int, sprites *SpriteSheet) *Zombie {
-	// the head and shoulders are about 3px from the middle
-	const collisionBoxSize float64 = 6
-
-	dimensions := sprites.Sprite[0].Position
-	object := resolv.NewObject(
-		float64(position[0]), float64(position[1]),
-		float64(dimensions.W), float64(dimensions.H),
-		tagMob,
-	)
-	object.SetShape(resolv.NewRectangle(
-		0, 0, // origin
-		collisionBoxSize, collisionBoxSize,
-	))
-	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
-
-	zombie := &Zombie{
-		Object:   object,
-		Angle:    0,
-		Sprite:   sprites,
-		Speed:    zombieSpeed * (1 + rand.Float64()),
-		HitToDie: 1 + rand.Intn(2),
-	}
-	zombie.Object.Data = zombie // self-reference for later
-
-	return zombie
+	SpawnPoint *SpawnPoint  // Reference for the SpawnPoint where the zombie was spawned
 }
 
 // Update updates the state of the zombie

@@ -10,7 +10,6 @@ import (
 	"image/color"
 	"log"
 	"math"
-	"math/rand"
 	"strconv"
 	"strings"
 
@@ -37,8 +36,9 @@ const (
 	tagCheckpoint = "check"
 )
 
+const gameWidth, gameHeight = 320, 240
+
 func main() {
-	gameWidth, gameHeight := 320, 240
 
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
 	ebiten.SetWindowTitle("eZcort mission")
@@ -85,6 +85,7 @@ type Game struct {
 	ZombieSprites []*SpriteSheet
 	Player        *Player
 	Dog           *Dog
+	SpawnPoints   SpawnPoints
 	Zombies       Zombies
 	Space         *resolv.Space
 	LevelMap      LevelMap
@@ -168,12 +169,15 @@ func NewGame(g *Game) {
 	g.Sounds[soundMusicBackground].Play()
 
 	// Load sprites
-	g.Sprites = make(map[SpriteType]*SpriteSheet, 3)
+	g.Sprites = make(map[SpriteType]*SpriteSheet, 5)
 	g.Sprites[spritePlayer] = loadSprite("Player")
 	g.Sprites[spriteDog] = loadSprite("Dog")
-	g.ZombieSprites = make([]*SpriteSheet, zombieTypes)
-	for index := 1; index <= zombieTypes; index++ {
-		g.ZombieSprites[index-1] = loadSprite("Zombie_" + strconv.Itoa(index))
+	g.Sprites[spriteZombieSprinter] = loadSprite("Zombie_sprinter")
+	g.Sprites[spriteZombieBig] = loadSprite("Zombie_big")
+	g.Sprites[spriteZombieCrawler] = loadSprite("Zombie_crawler")
+	g.ZombieSprites = make([]*SpriteSheet, zombieVariants)
+	for index := 0; index < zombieVariants; index++ {
+		g.ZombieSprites[index] = loadSprite("Zombie_" + strconv.Itoa(index))
 	}
 
 	// Load entities from map
@@ -262,35 +266,23 @@ func NewGame(g *Game) {
 	}
 	g.Space.Add(g.Dog.Object)
 
-
-	// Add zombies to the game
-	zombiePositions := []struct{ X, Y int }{
-		{0, 0}, {-1, 0}, {-1, -1},
-		{0, -1}, {1, -1}, {1, 0},
-		{1, 1}, {0, 1}, {-1, 1},
-		{-2, 0}, {-2, -1}, {-2, -2},
-		{-1, -2}, {0, -2}, {1, -2},
-		{2, -2}, {2, -1}, {2, 0},
-		{2, 1}, {2, 2}, {1, 2},
-		{0, 2}, {-1, 2}, {-1, 2},
-		{-2, 2}, {-2, 1},
-	} // XXX: surely there is a smarter way than writing this by hand
+	// Add spawnpoints to the game
 	for _, e := range entities.Entities {
-		if e.Identifier == "Zombie" {
-			howManyZombies := e.PropertyByIdentifier("Initial").AsInt()
-			for i := 0; i < howManyZombies; i++ {
-				if i >= len(zombiePositions) {
-					log.Println("ran out of zombie positions, aborting spawning")
-					break
-				}
-				e.Position[0] += zombiePositions[i].X * 16 // 16px should come from Zombie
-				e.Position[1] += zombiePositions[i].Y * 16 // 16px should come from Zombie
-				z := NewZombie(e.Position, g.ZombieSprites[rand.Intn(zombieTypes)])
-				z.Target = g.Player.Object
-
-				g.Space.Add(z.Object)
-				g.Zombies = append(g.Zombies, z)
+		if e.Identifier == "Zombie" || e.Identifier == "Zombie_sprinter" || e.Identifier == "Zombie_big" {
+			ztype := zombieNormal
+			if e.Identifier == "Zombie_sprinter" {
+				ztype = zombieSprinter
+			} else if e.Identifier == "Zombie_big" {
+				ztype = zombieBig
 			}
+			initialCount := e.PropertyByIdentifier("Initial").AsInt()
+			continuous := e.PropertyByIdentifier("Continuous").AsBool()
+			g.SpawnPoints = append(g.SpawnPoints, &SpawnPoint{
+				Position:     Coord{X: float64(e.Position[0]),Y: float64(e.Position[1])},
+				InitialCount: initialCount,
+				Continuous:   continuous,
+				ZombieType:   ztype,
+			})
 		}
 	}
 
@@ -344,6 +336,9 @@ func (g *Game) Update() error {
 
 	// Update zombies
 	g.Zombies.Update(g)
+
+	// Update spawn points
+	g.SpawnPoints.Update(g)
 
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {

@@ -69,9 +69,12 @@ type SpriteType uint64
 const (
 	spritePlayer SpriteType = iota
 	spriteDog
+	spriteZombieSprinter
+	spriteZombieBig
+	spriteZombieCrawler
 )
 
-const zombieTypes = 5
+const zombieVariants = 4
 
 // Load a sprite image and associated meta-data given a file name (without
 // extension)
