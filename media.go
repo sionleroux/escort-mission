@@ -165,6 +165,15 @@ const (
 	soundDryFire
 )
 
+// VoiceType is a unique identifier to reference voices by name
+type VoiceType uint64
+
+const (
+	voiceCheckpoint VoiceType = iota
+)
+
+type Voices [][]*audio.Player
+
 // NewMusicPlayer loads a sound into an audio player that can be used to play it
 // as an infinite loop of music without any additional setup required
 func NewMusicPlayer(music *vorbis.Stream, context *audio.Context) *audio.Player {

@@ -77,6 +77,7 @@ type Game struct {
 	TileRenderer  *TileRenderer
 	LDTKProject   *ldtkgo.Project
 	Sounds        []*audio.Player
+	Voices        Voices
 	Level         int
 	Background    *ebiten.Image
 	Foreground    *ebiten.Image
@@ -167,6 +168,16 @@ func NewGame(g *Game) {
 	g.Sounds[soundHit1] = NewSoundPlayer(loadSoundFile("assets/sfx/Hit-1.ogg", sampleRate), context)
 	g.Sounds[soundDryFire] = NewSoundPlayer(loadSoundFile("assets/sfx/DryFire.ogg", sampleRate), context)
 	g.Sounds[soundMusicBackground].Play()
+
+	// Voice
+	g.Voices = make([][]*audio.Player, 1)
+	g.Voices[voiceCheckpoint] = make([]*audio.Player, 7)
+	for index := 0; index < 7; index++ {
+		g.Voices[voiceCheckpoint][index] = NewSoundPlayer(
+			loadSoundFile("assets/voice/checkpoint_" + strconv.Itoa(index + 1) + ".ogg", sampleRate),
+			context,
+		)
+	}
 
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 5)
@@ -361,6 +372,8 @@ func (g *Game) Update() error {
 		if o := collision.Objects[0]; g.Player.Object.Overlaps(o) {
 			if (g.Checkpoint < o.Data.(int)) {
 				g.Checkpoint = o.Data.(int)
+				g.Voices[voiceCheckpoint][g.Checkpoint - 1].Rewind()
+				g.Voices[voiceCheckpoint][g.Checkpoint - 1].Play()
 			}
 
 		}
