@@ -32,6 +32,16 @@ const zombieSprinterSpeed float64 = 0.6
 // zombieRange is how far away the zombie sees something to attack
 const zombieRange float64 = 200
 
+// Types of zombies
+type ZombieType uint64
+
+const (
+	zombieNormal ZombieType = iota
+	zombieCrawler
+	zombieSprinter
+	zombieBig
+)
+
 // Zombies is an array of Zombie
 type Zombies []*Zombie
 
@@ -47,6 +57,44 @@ func (zs *Zombies) Update(g *Game) {
 			z.SpawnPoint.RemoveZombie(z)
 		}
 	}
+}
+
+func NewZombie(spawnpoint *SpawnPoint, position Coord, zombieType ZombieType, sprites *SpriteSheet) *Zombie {
+	var speed float64
+	var hitToDie int
+
+	switch zombieType {
+	case zombieNormal:
+		speed = zombieSpeed
+		hitToDie = 1 + rand.Intn(2)
+	case zombieCrawler:
+		speed = zombieCrawlerSpeed
+		hitToDie = 1 + rand.Intn(2)
+	case zombieSprinter:
+		speed = zombieSprinterSpeed
+		hitToDie = 1
+	case zombieBig:
+		speed = zombieSpeed
+		hitToDie = 10
+	}
+
+	log.Println(zombieType)
+	dimensions := sprites.Sprite[0].Position
+	z := &Zombie{
+		Object: resolv.NewObject(
+			position.X, position.Y,
+			float64(dimensions.W), float64(dimensions.H),
+			tagMob,
+		),
+		Angle:    0,
+		Sprite:   sprites,
+		Speed:    speed * (1 + rand.Float64()),
+		HitToDie: hitToDie,
+	}
+	z.Object.Data = z
+	z.SpawnPoint = spawnpoint
+
+	return z
 }
 
 // Draw draws all the zombies

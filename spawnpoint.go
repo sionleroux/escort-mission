@@ -7,8 +7,6 @@ package main
 import (
 	"math"
 	"math/rand"
-
-	"github.com/solarlune/resolv"
 )
 
 // spawnMaxDistance is the distance where the point is activated, if the player is close enough
@@ -16,15 +14,6 @@ const spawnMaxDistance = 250
 
 // spawnMinDistance is the distance where the point is deactivated, if the player is too close
 const spawnMinDistance = 200
-
-// Types of zombies
-type ZombieType uint64
-
-const (
-	zombieNormal ZombieType = iota
-	zombieSprinter
-	zombieBig
-)
 
 // SpawnPoints is an array of SpawnPoint
 type SpawnPoints []*SpawnPoint
@@ -77,46 +66,29 @@ func (s *SpawnPoint) SpawnZombie(g *Game) {
 	np := s.NextPosition()
 
 	var sprites *SpriteSheet
-	speed := zombieSpeed
-	hitToDie := 1 + rand.Intn(2)
-
 	switch s.ZombieType {
 	case zombieNormal:
-		zv := rand.Intn(zombieVariants + 1)
-		if zv == zombieVariants {
-			// Crawler zombie
-			speed = zombieCrawlerSpeed
+		fallthrough
+	case zombieCrawler:
+		zs := rand.Intn(zombieVariants + 1)
+		if (zs == zombieVariants) {
+			// Crawler
 			sprites = g.Sprites[spriteZombieCrawler]
+			s.ZombieType = zombieCrawler
 		} else {
-			// Normal zombie
-			sprites = g.ZombieSprites[zv]
+			// Normal
+			sprites = g.ZombieSprites[zs]
+			s.ZombieType = zombieNormal
 		}
 	case zombieSprinter:
-		speed = zombieSprinterSpeed
 		sprites = g.Sprites[spriteZombieSprinter]
-		hitToDie = 1
 	case zombieBig:
-		speed = zombieSpeed
 		sprites = g.Sprites[spriteZombieBig]
-		hitToDie = 10
 	}
 
-	dimensions := sprites.Sprite[0].Position
-	z := &Zombie{
-		Object: resolv.NewObject(
-			s.Position.X + np.X * 32, s.Position.Y + np.Y * 32,
-			float64(dimensions.W), float64(dimensions.H),
-			tagMob,
-		),
-		Angle:    0,
-		Sprite:   sprites,
-		Speed:    speed * (1 + rand.Float64()),
-		HitToDie: hitToDie,
-	}
-	z.Object.Data = z
+	z := NewZombie(s, Coord{s.Position.X + np.X * 32, s.Position.Y + np.Y * 32}, s.ZombieType, sprites)
+	
 	z.Target = g.Player.Object
-	z.SpawnPoint = s
-
 	g.Space.Add(z.Object)
 	g.Zombies = append(g.Zombies, z)
 	s.Zombies = append(s.Zombies, z)
