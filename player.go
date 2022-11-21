@@ -135,7 +135,7 @@ func (p *Player) animate(g *Game) {
 	from, to := ft.From, ft.To
 
 	// Instantly start animation if state changed
-	if p.State != p.PrevState {
+	if p.Frame < from || p.Frame >= to {
 		p.Frame = from
 		return
 	}
@@ -146,13 +146,7 @@ func (p *Player) animate(g *Game) {
 	}
 
 	// Continuously increase the Frame counter between from and to
-	if p.Frame < from || p.Frame >= to {
-		p.Frame = from
-		return
-	}
-	if p.Frame < to {
-		p.Frame++
-	}
+	p.Frame++
 }
 
 // MoveLeft moves the player left
