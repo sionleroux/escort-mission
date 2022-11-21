@@ -133,8 +133,7 @@ func NewGame(g *Game) {
 
 	// Add wall tiles to space for collision detection
 	for _, layer := range level.Layers {
-		switch layer.Type {
-		case ldtkgo.LayerTypeIntGrid:
+		if layer.Type == ldtkgo.LayerTypeIntGrid && layer.Identifier == "Desert" {
 			for _, intData := range layer.IntGrid {
 				object := resolv.NewObject(
 					float64(intData.Position[0]+layer.OffsetX),
