@@ -7,6 +7,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"image"
 	"image/color"
 	"log"
 	"math"
@@ -43,6 +44,7 @@ func main() {
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
 	ebiten.SetWindowTitle("eZcort mission")
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+	ebiten.SetWindowIcon([]image.Image{loadImage("assets/icon.png")})
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
 	game := &Game{
