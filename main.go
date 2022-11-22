@@ -22,9 +22,6 @@ import (
 	"github.com/solarlune/resolv"
 
 	beziercp "github.com/brothertoad/bezier"
-	"gonum.org/v1/plot/font"
-	beziercurve "gonum.org/v1/plot/tools/bezier"
-	"gonum.org/v1/plot/vg"
 )
 
 const (
@@ -239,24 +236,8 @@ func NewGame(g *Game) {
 			Y: (pathCoord.(map[string]any)["cy"].(float64) + 0.5) * float64(entities.GridSize),
 		})
 	}
-	// Get Bezier control points from the path
-	curveCPs := beziercp.GetControlPointsF(pathPoints)
-	// Get the Bezier curves through the origiunal path points based on the control points
-	var dogpath []Coord
-	for _, c := range curveCPs {
-		curve := beziercurve.New(
-			vg.Point{X: font.Length(int(c.P0.X)), Y: font.Length(c.P0.Y)},
-			vg.Point{X: font.Length(int(c.P1.X)), Y: font.Length(c.P1.Y)},
-			vg.Point{X: font.Length(int(c.P2.X)), Y: font.Length(c.P2.Y)},
-			vg.Point{X: font.Length(int(c.P3.X)), Y: font.Length(c.P3.Y)},
-		)
 
-		// 4 points per curve
-		for i := 0.0; i < 1; i = i + 0.25 {
-			bp := curve.Point(i)
-			dogpath = append(dogpath, Coord{X: float64(bp.X), Y: float64(bp.Y)})
-		}
-	}
+	dogPath := GetBezierPath(pathPoints, 4)
 
 	// Add dog to the game
 	object := resolv.NewObject(
@@ -270,12 +251,12 @@ func NewGame(g *Game) {
 	))
 	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
 	g.Dog = &Dog{
-		Object:   object,
-		Angle:    0,
-		Sprite:   g.Sprites[spriteDog],
-		Path:     dogpath,
-		NextPath: -1,
+		Object:     object,
+		Angle:      0,
+		Sprite:     g.Sprites[spriteDog],
+		MainPath:   &Path{ Points: dogPath, NextPoint: 0 },
 	}
+	g.Dog.Init()
 	g.Space.Add(g.Dog.Object)
 
 	// Add spawnpoints to the game
@@ -392,15 +373,15 @@ func (g *Game) Update() error {
 		}
 	}
 
-	// Collision detection and response between zombie and player
+	// Collision detection and response between zombie and dog
 	if collision := g.Dog.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Dog.Object.Overlaps(collision.Objects[0]) {
-			g.Dog.State = dogDied
+			g.Dog.Mode = dogDead
 		}
 	}
 
 	// Game over if the dog dies
-	if g.Dog.State == dogDied {
+	if g.Dog.Mode == dogDead {
 		g.Sounds[soundMusicBackground].Pause()
 		g.Sounds[soundMusicBackground].Rewind()
 		g.State = gameOver
@@ -424,7 +405,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	if g.State == gameOver {
-		if g.Dog.State == dogDied {
+		if g.Dog.Mode == dogDead {
 			ebitenutil.DebugPrint(screen, "Your dog died, press Q to quit")
 		} else {
 			ebitenutil.DebugPrint(screen, "You Died, press Q to quit")
@@ -559,4 +540,10 @@ func CalcObjectDistance(obj1, obj2 *resolv.Object) (float64, float64, float64) {
 // CalcDistance calculates the distance between two coordinates
 func CalcDistance(x1, y1, x2, y2 float64) float64 {
 	return math.Sqrt(math.Pow(x1-x2, 2) + math.Pow(y1-y2, 2))
+}
+
+// NormalizeVector normalizes the vector
+func NormalizeVector(vector Coord) Coord {
+	magnitude := CalcDistance(vector.X, vector.Y, 0, 0)
+	return Coord{ X: vector.X / magnitude, Y: vector.Y / magnitude }
 }

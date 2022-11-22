@@ -9,6 +9,11 @@ import (
 	"math"
 
 	"github.com/fzipp/astar"
+
+	beziercp "github.com/brothertoad/bezier"
+	"gonum.org/v1/plot/font"
+	beziercurve "gonum.org/v1/plot/tools/bezier"
+	"gonum.org/v1/plot/vg"
 )
 
 type LevelMap [][]int
@@ -116,4 +121,41 @@ func simplifyPath(path []image.Point) []image.Point {
 		result = append(result, p)
 	}
 	return result
+}
+
+// GetBezierPathFromCoords creates a bezier curve through the given path points
+func GetBezierPathFromCoords(pathPoints []Coord, resolution float64) []Coord {
+	var bps []beziercp.PointF
+	for _, pathCoord := range pathPoints {
+		bps = append(bps, beziercp.PointF{
+			X: pathCoord.X,
+			Y: pathCoord.Y,
+		})
+	}
+
+	return GetBezierPath(bps, resolution)
+}
+
+// GetBezierPath creates a bezier curve through the given path points
+func GetBezierPath(pathPoints []beziercp.PointF, resolution float64) []Coord {
+	var bPath []Coord
+	
+	// Get Bezier control points from the path
+	curveCPs := beziercp.GetControlPointsF(pathPoints)
+	// Get the Bezier curves through the origiunal path points based on the control points
+	for _, c := range curveCPs {
+		curve := beziercurve.New(
+			vg.Point{X: font.Length(int(c.P0.X)), Y: font.Length(c.P0.Y)},
+			vg.Point{X: font.Length(int(c.P1.X)), Y: font.Length(c.P1.Y)},
+			vg.Point{X: font.Length(int(c.P2.X)), Y: font.Length(c.P2.Y)},
+			vg.Point{X: font.Length(int(c.P3.X)), Y: font.Length(c.P3.Y)},
+		)
+
+		// 4 points per curve
+		for i := 0.0; i < 1; i = i + 1.0 / resolution {
+			bp := curve.Point(i)
+			bPath = append(bPath, Coord{X: float64(bp.X), Y: float64(bp.Y)})
+		}
+	}
+	return bPath
 }
