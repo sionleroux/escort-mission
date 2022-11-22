@@ -92,6 +92,7 @@ type Game struct {
 	LevelMap      LevelMap
 	State         GameState
 	Checkpoint    int
+	HUD           *HUD
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -298,6 +299,8 @@ func NewGame(g *Game) {
 		}
 	}
 
+	g.HUD = NewHUD()
+
 	g.State = gameRunning
 }
 
@@ -461,6 +464,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	)
 
 	g.Camera.Blit(screen)
+
+	g.HUD.Draw(g.Player.Ammo, screen)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
 		"FPS: %.2f\n"+
