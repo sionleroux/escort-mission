@@ -95,6 +95,7 @@ type Game struct {
 	State         GameState
 	Checkpoint    int
 	HUD           *HUD
+	DeathRenderer *DeathRenderer
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -302,6 +303,7 @@ func NewGame(g *Game) {
 	}
 
 	g.HUD = NewHUD()
+	g.DeathRenderer = NewDeathRenderer()
 
 	g.State = gameRunning
 }
@@ -430,9 +432,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	if g.State == gameOver {
 		if g.Dog.State == dogDied {
-			ebitenutil.DebugPrint(screen, "Your dog died, press Q to quit")
+			g.DeathRenderer.DrawCenered(screen, "YOUR DOG DIED")
 		} else {
-			ebitenutil.DebugPrint(screen, "You Died, press Q to quit")
+			g.DeathRenderer.DrawCenered(screen, "YOU DIED")
 		}
 		return // game not loaded yet
 	}

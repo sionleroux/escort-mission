@@ -16,6 +16,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/solarlune/ldtkgo"
+	"github.com/tinne26/etxt"
 )
 
 //go:embed assets/*
@@ -211,4 +212,14 @@ func loadSoundFile(name string, sampleRate int) *vorbis.Stream {
 	}
 
 	return music
+}
+
+func loadFont(name string) *etxt.Font {
+	font, fname, err := etxt.ParseEmbedFontFrom(name, assets)
+	if err != nil {
+		log.Fatalf("error parsing font %s: %v", name, err)
+	}
+
+	log.Println("loaded font:", fname)
+	return font
 }
