@@ -22,6 +22,8 @@ import (
 const sampleRate int = 44100 // assuming "normal" sample rate
 var context *audio.Context
 
+const cameraPadding = 1
+
 // For testing it is sometimes useful to start the game at a later checkpoint
 var startingCheckpoint int = 0
 
@@ -62,6 +64,7 @@ type GameScreen struct {
 	Checkpoint    int
 	HUD           *HUD
 	Debuggers     Debuggers
+	Zoom          *Zoom
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -273,6 +276,7 @@ func NewGameScreen(game *Game) {
 	}
 
 	g.HUD = NewHUD()
+	g.Zoom = NewZoom()
 
 	game.Screens[gameRunning] = g
 	if startingCheckpoint != 0 {
@@ -316,6 +320,7 @@ func (g *GameScreen) Reset(game *Game) {
 
 	g.SoundLoops[musicBackground].Play()
 	g.Voices[voiceRespawn].Play()
+	g.Zoom = NewZoom()
 	game.State = gameRunning
 }
 
@@ -335,6 +340,13 @@ func (g *GameScreen) Update() (GameState, error) {
 	if clicked() {
 		Shoot(g)
 	}
+
+	// Zoom handling
+	if clickedRight() {
+		g.Zoom.On = !g.Zoom.On
+	}
+	g.Zoom.Update()
+	g.Camera.SetZoom(g.Zoom.Amount)
 
 	// Update player
 	g.Player.Update(g)
@@ -436,6 +448,11 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 // Clicked is shorthand for when the left mouse button has just been clicked
 func clicked() bool {
 	return inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
+}
+
+// Clicked is shorthand for when the right mouse button has just been clicked
+func clickedRight() bool {
+	return inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight)
 }
 
 // Shoot sets shooting states and also die states for any zombies in range

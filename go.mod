@@ -9,6 +9,7 @@ require (
 	github.com/melonfunction/ebiten-camera v0.0.0-20220812153034-695003d18a6d
 	github.com/solarlune/ldtkgo v0.9.3
 	github.com/solarlune/resolv v0.6.1-0.20221115185258-12370add6bd4
+	github.com/tanema/gween v0.0.0-20220318192052-2db1c2d931bd
 	github.com/tinne26/etxt v0.0.7
 	gonum.org/v1/plot v0.12.0
 	gopkg.in/ini.v1 v1.67.0
