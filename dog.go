@@ -257,8 +257,10 @@ func (d *Dog) move(dx, dy float64) {
 		// WORKAROUND: If the dog is following the path or going back to the path
 		// then collision with walls is not checked
 		if collision := d.Object.Check(dx, dy, tagPlayer); collision != nil {
-			d.State = dogBlocked
-			return
+			if d.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
+				d.State = dogBlocked
+				return
+			}
 		}
 		if collision := d.Object.Check(dx, dy, tagMob); collision != nil {
 			return
@@ -270,7 +272,9 @@ func (d *Dog) move(dx, dy float64) {
 		return
 	} else {
 		if collision := d.Object.Check(dx, dy, tagWall, tagMob, tagPlayer); collision != nil {
-			return
+			if d.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
+				return
+			}
 		}
 	}
 
