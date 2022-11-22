@@ -464,20 +464,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
 		"FPS: %.2f\n"+
-			"TPS: %.2f\n"+
-			"X: %.2f\n"+
-			"Y: %.2f\n"+
-			"Zombies: %d\n"+
-			"Ammo: %d\n"+
-			"Reloading: %t\n"+
 			"Checkpoint: %d\n",
 		ebiten.ActualFPS(),
-		ebiten.ActualTPS(),
-		g.Player.Object.X/32,
-		g.Player.Object.Y/32,
-		len(g.Zombies),
-		g.Player.Ammo,
-		(g.Player.State == playerReload),
 		g.Checkpoint,
 	))
 }
