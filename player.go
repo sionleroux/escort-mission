@@ -109,7 +109,7 @@ func (p *Player) Update(g *Game) {
 	opposite := float64(cy) - p.Object.Y
 	p.Angle = math.Atan2(opposite, adjacent)
 
-	p.animate(g)
+	p.Frame = Animate(p.Frame, g.Tick, p.Sprite.Meta.FrameTags[p.State])
 	p.Object.Shape.SetRotation(-p.Angle)
 	p.Object.Update()
 }
@@ -128,25 +128,6 @@ func (p *Player) animationBasedStateChanges(g *Game) {
 	case playerDryFire: // Back to idle after reload animation
 		p.State = playerIdle
 	}
-}
-
-func (p *Player) animate(g *Game) {
-	ft := p.Sprite.Meta.FrameTags[p.State]
-	from, to := ft.From, ft.To
-
-	// Instantly start animation if state changed
-	if p.Frame < from || p.Frame >= to {
-		p.Frame = from
-		return
-	}
-
-	// Update only in every 5th cycle
-	if g.Tick%5 != 0 {
-		return
-	}
-
-	// Continuously increase the Frame counter between from and to
-	p.Frame++
 }
 
 // MoveLeft moves the player left

@@ -141,25 +141,26 @@ func (z *Zombie) Update(g *Game) error {
 		return errors.New("Zombie died")
 	}
 
-	if z.State == zombieDeath || z.State == zombieHit {
-		z.animate(g)
-		return nil
+	if z.State == zombieIdle || z.State == zombieWalking {
+		playerDistance, _, _ := CalcObjectDistance(z.Object, g.Player.Object)
+		dogDistance, _, _ := CalcObjectDistance(z.Object, g.Dog.Object)
+
+		if playerDistance < zombieRange {
+			z.Target = g.Player.Object
+			z.walk()
+		} else if dogDistance < zombieRange*1.2 {
+			z.Target = g.Dog.Object
+			z.walk()
+		} else {
+			z.State = zombieIdle
+		}
 	}
 
-	playerDistance, _, _ := CalcObjectDistance(z.Object, g.Player.Object)
-	dogDistance, _, _ := CalcObjectDistance(z.Object, g.Dog.Object)
-
-	if playerDistance < zombieRange {
-		z.Target = g.Player.Object
-		z.walk()
-	} else if dogDistance < zombieRange*1.2 {
-		z.Target = g.Dog.Object
-		z.walk()
-	} else {
-		z.State = zombieIdle
+	z.Frame = Animate(z.Frame, g.Tick, z.Sprite.Meta.FrameTags[z.State])
+	if z.Frame == z.Sprite.Meta.FrameTags[z.State].To {
+		z.animationBasedStateChanges(g)
 	}
 
-	z.animate(g)
 	z.Object.Shape.SetRotation(-z.Angle)
 	z.Object.Update()
 	return nil
@@ -187,30 +188,15 @@ func (z *Zombie) walk() {
 	}
 }
 
-func (z *Zombie) animate(g *Game) {
-	// Update only in every 5th cycle
-	if g.Tick%5 != 0 {
-		return
-	}
-
-	// No states at the moment, zombies are always walking
-	ft := z.Sprite.Meta.FrameTags[z.State]
-
-	if ft.From == ft.To {
-		z.Frame = ft.From
-	} else {
-		// Contiuously increase the Frame counter between From and To
-		z.Frame = (z.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
-	}
-
-	// Set as walking after hit animation
-	if z.State == zombieHit && z.Frame == ft.To {
+// Animation-trigged state changes
+func (z *Zombie) animationBasedStateChanges(g *Game) {
+	switch z.State {
+	case zombieHit:
 		z.State = zombieWalking
-	}
-
-	// Set as dead after death animation
-	if z.State == zombieDeath && z.Frame == ft.To {
+	case zombieDeath:
 		z.State = zombieDead
+	default:
+		z.State = zombieWalking
 	}
 }
 

@@ -52,6 +52,9 @@ const (
 	dogDied
 )
 
+// Maps dog states to animation frames
+var dogStateToFrame = [8]int{0, 0, 0, 1, 1, 2, 2, 2}
+
 // Dog is player's companion
 type Dog struct {
 	Object            *resolv.Object
@@ -149,8 +152,10 @@ func (d *Dog) Update(g *Game) {
 		}
 	}
 
+	animationFrame := d.Sprite.Meta.FrameTags[dogStateToFrame[d.State]]
+	d.Frame = Animate(d.Frame, g.Tick, animationFrame)
+
 	d.Object.Shape.SetRotation(-d.Angle)
-	d.animate(g)
 	d.Object.Update()
 
 	sx, sy := g.Camera.GetScreenCoords(d.Object.X, d.Object.Y)
@@ -163,24 +168,6 @@ func (d *Dog) Update(g *Game) {
 		d.OutOfSightCounter = 0
 	}
 
-}
-
-func (d *Dog) animate(g *Game) {
-	// Update only in every 5th cycle
-	if g.Tick%5 != 0 {
-		return
-	}
-
-	dogStateToFrame := [8]int{0, 0, 0, 1, 1, 2, 2, 2}
-
-	ft := d.Sprite.Meta.FrameTags[dogStateToFrame[d.State]]
-
-	if ft.From == ft.To {
-		d.Frame = ft.From
-	} else {
-		// Contiuously increase the Frame counter between From and To
-		d.Frame = (d.Frame-ft.From+1)%(ft.To-ft.From+1) + ft.From
-	}
 }
 
 // TurnTowardsCoordinate turns the dog to the direction of the point
