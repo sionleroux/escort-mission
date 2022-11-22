@@ -7,6 +7,7 @@ package main
 import (
 	"image"
 	"math"
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/solarlune/resolv"
@@ -239,8 +240,9 @@ func (d *Dog) Update(g *Game) {
 	case dogDangerBarking:
 		// Play barking sound
 		if d.PrevState != dogDangerBarking {
-			g.Sounds[soundDogBark1].Rewind()
-			g.Sounds[soundDogBark1].Play()
+			randSound := rand.Intn(len(g.Sounds[soundDogBark]))
+			g.Sounds[soundDogBark][randSound].Rewind()
+			g.Sounds[soundDogBark][randSound].Play()
 		}
 	case dogDangerFleeing:
 		zInRange, _, resultantVector := d.zombiesInRange(zombieFleeRadius, g)

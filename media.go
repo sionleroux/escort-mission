@@ -159,11 +159,13 @@ const (
 	soundMusicBackground SoundType = iota
 	soundGunShot
 	soundGunReload
-	soundDogBark1
+	soundDogBark
 	soundPlayerDies
 	soundHit1
 	soundDryFire
 )
+
+type Sounds [][]*audio.Player
 
 // VoiceType is a unique identifier to reference voices by name
 type VoiceType uint64
