@@ -360,8 +360,11 @@ func (g *Game) Update() error {
 	if collision := g.Player.Object.Check(0, 0, tagCheckpoint); collision != nil {
 		if o := collision.Objects[0]; g.Player.Object.Overlaps(o) {
 			if g.Checkpoint < o.Data.(int) {
-				g.Checkpoint = o.Data.(int)
-				g.Sounds[voiceCheckpoint].PlayVariant(g.Checkpoint-1)
+				if (g.Dog.State == dogNormalSniffing && g.Dog.PrevCheckpoint == o.Data.(int)) {
+					g.Checkpoint = o.Data.(int)
+					g.Sounds[voiceCheckpoint].PlayVariant(g.Checkpoint-1)	
+					g.Dog.StopSniffing()
+				}
 			}
 
 		}

@@ -82,7 +82,6 @@ type Dog struct {
 	LastPathCoord     Coord
 	Sprite            *SpriteSheet
 	PrevCheckpoint    int
-	SniffingCounter   int
 	OutOfSightCounter int
 }
 
@@ -175,17 +174,16 @@ func (d *Dog) updateState(g *Game) {
 			if playerDistance > waitingRadius {
 				d.State = dogNormalWaiting
 			}
-			// The case when dog reaches checkpoint and starts sniffing:
-			// The case when dog reaches destination:
-			// The case when dog is getting blocked by the player:
+			// Next state is set elsewhere
+			// - In case when dog reaches checkpoint and starts sniffing
+			// - In case when dog reaches destination
+			// - In case when dog is getting blocked by the player
 		case dogNormalBlocked:
-			// The case when dog is not blocked anymore by the player:
+			// Next state is set elsewhere
+			// - In case when dog is not blocked anymore by the player
 		case dogNormalSniffing:
-			// Sniffing for 3 seconds
-			if d.SniffingCounter >= 180 {
-				d.SniffingCounter = 0
-				d.State = dogNormalWalking
-			}
+			// Next state is set elsewhere
+			// - In case when player is also at the checkpoint
 		}
 	case dogDanger:
 		zInRange, _, _ := d.zombiesInRange(zombieFleeRadius, g)
@@ -236,7 +234,7 @@ func (d *Dog) Update(g *Game) {
 		// Try to move along the path
 		d.followPath(g)
 	case dogNormalSniffing:
-		d.sniffNextCheckpoint()
+		// Do nothing, just wait for the player to arrive at the same checkpoint
 	case dogDangerBarking:
 		// Play barking sound
 		if d.PrevState != dogDangerBarking {
@@ -259,6 +257,13 @@ func (d *Dog) Update(g *Game) {
 	d.Object.Update()
 }
 
+// StopSniffing stops sniffing when the player is at the same checkpoint
+func (d *Dog) StopSniffing() {
+	if d.State == dogNormalSniffing {
+		d.State = dogNormalWalking
+	}
+}
+
 // TurnTowardsCoordinate turns the dog to the direction of the point
 func (d *Dog) turnTowardsCoordinate(coord Coord) {
 	adjacent := coord.X - d.Object.X
@@ -269,11 +274,6 @@ func (d *Dog) turnTowardsCoordinate(coord Coord) {
 // TurnTowardsPathPoint turns the dog to the direction of the next path point
 func (d *Dog) turnTowardsPathPoint() {
 	d.turnTowardsCoordinate(d.CurrentPath.Points[d.CurrentPath.NextPoint])
-}
-
-// SniffNextCheckpoint makes the dog sniffing for next checkpoint
-func (d *Dog) sniffNextCheckpoint() {
-	d.SniffingCounter++
 }
 
 // followPath moves the dog along its current path
