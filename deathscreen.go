@@ -8,25 +8,39 @@ import (
 	"github.com/tinne26/etxt"
 )
 
+const deathCoolDownTime = 4 * 60
+
 // DeathScreen is the screen you see when you or your dog dies in the game, it
 // shows you a message for a short while and then respawns you into the game
 type DeathScreen struct {
 	textRenderer *DeathRenderer
 	dogDied      bool
+	tick         int
+	respawning   bool
+	game         *Game
 }
 
-func NewDeathScreen(dogDied bool) *DeathScreen {
+func NewDeathScreen(dogDied bool, game *Game) *DeathScreen {
 	return &DeathScreen{
 		dogDied:      dogDied,
 		textRenderer: NewDeathRenderer(),
+		game:         game,
 	}
 }
 
 func (s *DeathScreen) Update() (GameState, error) {
+	s.tick++
+
 	// Pressing Q any time quits immediately
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		return gameOver, errors.New("game quit by player")
 	}
+
+	if s.tick > deathCoolDownTime && !s.respawning {
+		s.respawning = true
+		go NewGameScreen(s.game)
+	}
+
 	return gameOver, nil
 }
 

@@ -19,6 +19,13 @@ import (
 	"github.com/solarlune/resolv"
 )
 
+const sampleRate int = 44100 // assuming "normal" sample rate
+var context *audio.Context
+
+func init() {
+	context = audio.NewContext(sampleRate)
+}
+
 const (
 	tagPlayer     = "player"
 	tagMob        = "mob"
@@ -120,8 +127,6 @@ func NewGameScreen(game *Game) {
 	}
 
 	// Music
-	const sampleRate int = 44100 // assuming "normal" sample rate
-	context := audio.NewContext(sampleRate)
 	g.Sounds = make([][]*audio.Player, 7)
 	g.Sounds[soundMusicBackground] = make([]*audio.Player, 1)
 	g.Sounds[soundMusicBackground][0] = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context)

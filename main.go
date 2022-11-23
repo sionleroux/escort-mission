@@ -23,7 +23,7 @@ func main() {
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
 	game := &Game{Width: gameWidth, Height: gameHeight}
-	game.DeathScreen = NewDeathScreen(false)
+	game.DeathScreen = NewDeathScreen(false, game)
 
 	go NewGameScreen(game)
 
