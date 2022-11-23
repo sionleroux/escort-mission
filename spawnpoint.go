@@ -19,7 +19,7 @@ const spawnMinDistance = gameWidth/2 + 50
 type SpawnPoints []*SpawnPoint
 
 // Update updates all the SpawnPoints
-func (sps *SpawnPoints) Update(g *Game) {
+func (sps *SpawnPoints) Update(g *GameScreen) {
 	for _, s := range *sps {
 		s.Update(g)
 	}
@@ -62,7 +62,7 @@ func (s *SpawnPoint) NextPosition() Coord {
 }
 
 // SpawnZombie spawns one zombie
-func (s *SpawnPoint) SpawnZombie(g *Game) {
+func (s *SpawnPoint) SpawnZombie(g *GameScreen) {
 	var np, nc Coord
 
 	// At least one of the 12 positions should be OK
@@ -105,7 +105,7 @@ func (s *SpawnPoint) SpawnZombie(g *Game) {
 }
 
 // Update updates the state of the spawn point
-func (s *SpawnPoint) Update(g *Game) {
+func (s *SpawnPoint) Update(g *GameScreen) {
 	if s.InitialSpawned && !s.Continuous {
 		return
 	}

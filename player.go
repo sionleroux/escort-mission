@@ -83,14 +83,14 @@ func NewPlayer(position []int, sprites *SpriteSheet) *Player {
 }
 
 // Reload reloads the ammo
-func (p *Player) Reload(g *Game) {
+func (p *Player) Reload(g *GameScreen) {
 	p.State = playerReload
 	g.Sounds[soundGunReload][0].Rewind()
 	g.Sounds[soundGunReload][0].Play()
 }
 
 // Update updates the state of the player
-func (p *Player) Update(g *Game) {
+func (p *Player) Update(g *GameScreen) {
 	p.PrevState = p.State
 	p.Sprinting = false
 
@@ -115,7 +115,7 @@ func (p *Player) Update(g *Game) {
 }
 
 // Animation-trigged state changes
-func (p *Player) animationBasedStateChanges(g *Game) {
+func (p *Player) animationBasedStateChanges(g *GameScreen) {
 	switch p.State {
 	case playerShooting: // Back to idle after shooting animation
 		p.State = playerIdle
@@ -182,7 +182,7 @@ func (p *Player) move(dx, dy float64) {
 }
 
 // Draw draws the Player to the screen
-func (p *Player) Draw(g *Game) {
+func (p *Player) Draw(g *GameScreen) {
 	// the centre of the player's head is 2px down from the middle
 	const centerOffset float64 = -2
 

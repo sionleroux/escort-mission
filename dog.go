@@ -98,8 +98,8 @@ func (d *Dog) Init() {
 //  - if there are zombies in range
 //  - the distance of the closest zombie
 //  - the resultant vector of the fleeing path based on all the zombies in range
-func (d *Dog) zombiesInRange(zRange float64, g *Game) (bool, float64, Coord) {
-	resultantVectorCoord := Coord{ X: 0, Y: 0}
+func (d *Dog) zombiesInRange(zRange float64, g *GameScreen) (bool, float64, Coord) {
+	resultantVectorCoord := Coord{X: 0, Y: 0}
 	closestZombie := 1000.0
 	for _, zombie := range g.Zombies {
 		zombieDistance, xDistance, yDistance := CalcObjectDistance(d.Object, zombie.Object)
@@ -116,29 +116,29 @@ func (d *Dog) zombiesInRange(zRange float64, g *Game) (bool, float64, Coord) {
 }
 
 // planFleeingRoute plans a fleeing route for the dog
-func (d *Dog) planFleeingRoute(vector Coord, g *Game) *Path {
+func (d *Dog) planFleeingRoute(vector Coord, g *GameScreen) *Path {
 	fleeingPath := &Path{}
 	nv := NormalizeVector(vector)
 	fleeingPath.Points = []Coord{
-		{X: d.Object.X + nv.X * fleeingPathLength, Y: d.Object.Y + nv.Y * fleeingPathLength},
+		{X: d.Object.X + nv.X*fleeingPathLength, Y: d.Object.Y + nv.Y*fleeingPathLength},
 	}
 	return fleeingPath
 }
 
 // planRouteBackToMainPath plans a route back to the main path
-func (d *Dog) planRouteBackToMainPath(g *Game) *Path {
+func (d *Dog) planRouteBackToMainPath(g *GameScreen) *Path {
 	returnPath := &Path{}
 	returnPath.Points = g.LevelMap.FindPath(
 		Coord{X: d.Object.X, Y: d.Object.Y},
 		d.LastPathCoord,
 	)
-	returnPath.Points[len(returnPath.Points) - 1] = d.LastPathCoord
+	returnPath.Points[len(returnPath.Points)-1] = d.LastPathCoord
 	returnPath.Points = GetBezierPathFromCoords(returnPath.Points, 2)
 	return returnPath
 }
 
 // updateState updates the state machine of the dog
-func (d *Dog) updateState(g *Game) {
+func (d *Dog) updateState(g *GameScreen) {
 	d.PrevState = d.State
 
 	// Does the dog need to change mode? Danger <-> Normal
@@ -169,16 +169,16 @@ func (d *Dog) updateState(g *Game) {
 				d.turnTowardsPathPoint()
 				d.OnMainPath = false
 			}
-			if (playerDistance <= waitingRadius) {
+			if playerDistance <= waitingRadius {
 				d.State = dogNormalWalking
 			}
 		case dogNormalWalking:
-			if (playerDistance > waitingRadius) {
+			if playerDistance > waitingRadius {
 				d.State = dogNormalWaiting
 			}
-			// The case when dog reaches checkpoint and starts sniffing: 
+			// The case when dog reaches checkpoint and starts sniffing:
 			// The case when dog reaches destination:
-			// The case when dog is getting blocked by the player: 
+			// The case when dog is getting blocked by the player:
 		case dogNormalBlocked:
 			// The case when dog is not blocked anymore by the player:
 		case dogNormalSniffing:
@@ -206,12 +206,12 @@ func (d *Dog) updateState(g *Game) {
 }
 
 // Update updates the state of the dog
-func (d *Dog) Update(g *Game) {
+func (d *Dog) Update(g *GameScreen) {
 	// If the dog is dead, no need to update
 	if d.Mode == dogDead {
 		return
 	}
-	
+
 	d.updateState(g)
 
 	// If the dog is out of the screen for too long then it dies
@@ -236,7 +236,7 @@ func (d *Dog) Update(g *Game) {
 	case dogNormalBlocked:
 		// Try to move along the path
 		d.followPath(g)
-	case dogNormalSniffing:		
+	case dogNormalSniffing:
 		d.sniffNextCheckpoint()
 	case dogDangerBarking:
 		// Play barking sound
@@ -280,11 +280,11 @@ func (d *Dog) sniffNextCheckpoint() {
 }
 
 // followPath moves the dog along its current path
-func (d *Dog) followPath(g *Game) {
+func (d *Dog) followPath(g *GameScreen) {
 	if d.CurrentPath.NextPoint == len(d.CurrentPath.Points) {
 		return
 	}
-	
+
 	nextPoint := d.CurrentPath.Points[d.CurrentPath.NextPoint]
 	nextPathCoordDistance := CalcDistance(nextPoint.X, nextPoint.Y, d.Object.X, d.Object.Y)
 	if nextPathCoordDistance < 2 {
@@ -300,7 +300,7 @@ func (d *Dog) followPath(g *Game) {
 					// If the dog reaches the main path again then it will continue on that
 					d.CurrentPath = d.MainPath
 					d.OnMainPath = true
-				}	
+				}
 			} else {
 				// If the dog is fleeing
 				zInRange, _, resultantVector := d.zombiesInRange(zombieFleeRadius, g)
@@ -323,8 +323,8 @@ func (d *Dog) followPath(g *Game) {
 	}
 
 	d.move(
-		math.Cos(d.Angle) * speed,
-		math.Sin(d.Angle) * speed,
+		math.Cos(d.Angle)*speed,
+		math.Sin(d.Angle)*speed,
 	)
 }
 
@@ -367,7 +367,7 @@ func (d *Dog) move(dx, dy float64) {
 }
 
 // Draw draws the Dog to the screen
-func (d *Dog) Draw(g *Game) {
+func (d *Dog) Draw(g *GameScreen) {
 	// the centre of the dog's shoulders is 5px down from the middle
 	const centerOffset float64 = 5
 
