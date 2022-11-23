@@ -95,6 +95,8 @@ type Game struct {
 	HUD           *HUD
 	StartScreen   Screen
 	DeathScreen   Screen
+	LoadingScreen Screen
+	WinScreen     Screen
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -334,6 +336,30 @@ func (g *Game) Update() error {
 		}
 	}
 
+	if g.State == gameStart {
+		state, err := g.StartScreen.Update()
+		g.State = state
+		return err
+	}
+
+	if g.State == gameLoading {
+		state, err := g.LoadingScreen.Update()
+		g.State = state
+		return err
+	}
+
+	if g.State == gameOver {
+		state, err := g.DeathScreen.Update()
+		g.State = state
+		return err
+	}
+
+	if g.State == gameWon {
+		state, err := g.WinScreen.Update()
+		g.State = state
+		return err
+	}
+
 	// Pressing R reloads the ammo
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		switch g.Player.State {
@@ -345,18 +371,6 @@ func (g *Game) Update() error {
 
 	if g.State == gameOver || g.State == gameWon {
 		return nil // TODO: provide a possibility to restart the game
-	}
-
-	if g.State == gameStart {
-		state, err := g.StartScreen.Update()
-		g.State = state
-		return err
-	}
-
-	if g.State == gameOver {
-		state, err := g.DeathScreen.Update()
-		g.State = state
-		return err
 	}
 
 	// Gun shooting handler
@@ -439,8 +453,8 @@ func (g *Game) Update() error {
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
 	if g.State == gameLoading {
-		ebitenutil.DebugPrint(screen, "Loading...")
-		return // game not loaded yet
+		g.LoadingScreen.Draw(screen)
+		return
 	}
 
 	if g.State == gameOver {
@@ -449,8 +463,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	if g.State == gameWon {
-		ebitenutil.DebugPrint(screen, "You Won, press Q to quit")
-		return // game not loaded yet
+		g.WinScreen.Draw(screen)
+		return
 	}
 
 	if g.State == gameStart {
