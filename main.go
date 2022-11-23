@@ -164,24 +164,14 @@ func NewGame(g *Game) {
 	for i := 0; i < 8; i++ {
 		g.Sounds[i] = &Sound{ Volume: 1 }
 	} 
-	g.Sounds[soundMusicBackground].AddAudio( NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context) )
-	g.Sounds[soundGunShot].AddAudio( NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context) )
-	g.Sounds[soundGunReload].AddAudio( NewSoundPlayer(loadSoundFile("assets/sfx/Reload.ogg", sampleRate), context) )
-	for index := 0; index < 5; index++ {
-		g.Sounds[soundDogBark].AddAudio( NewSoundPlayer(
-			loadSoundFile("assets/sfx/Dog-sound-"+strconv.Itoa(index+1)+".ogg", sampleRate),
-			context,
-		))
-	}
-	g.Sounds[soundPlayerDies].AddAudio( NewSoundPlayer(loadSoundFile("assets/sfx/PlayerDies.ogg", sampleRate), context) )
-	g.Sounds[soundHit1].AddAudio( NewSoundPlayer(loadSoundFile("assets/sfx/Hit-1.ogg", sampleRate), context) )
-	g.Sounds[soundDryFire].AddAudio( NewSoundPlayer(loadSoundFile("assets/sfx/Gun-dry-fire.ogg", sampleRate), context) )
-	for index := 0; index < 7; index++ {
-		g.Sounds[voiceCheckpoint].AddAudio( NewSoundPlayer(
-			loadSoundFile("assets/voice/Checkpoint-"+strconv.Itoa(index+1)+".ogg", sampleRate),
-			context,
-		))
-	}
+	g.Sounds[soundMusicBackground].AddMusic( "assets/music/BackgroundMusic", sampleRate, context )
+	g.Sounds[soundGunShot].AddSound( "assets/sfx/Gunshot", sampleRate, context )
+	g.Sounds[soundGunReload].AddSound( "assets/sfx/Reload", sampleRate, context )
+	g.Sounds[soundDogBark].AddSound( "assets/sfx/Dog-sound", sampleRate, context, 5 )
+	g.Sounds[soundPlayerDies].AddSound( "assets/sfx/PlayerDies", sampleRate, context )
+	g.Sounds[soundHit].AddSound( "assets/sfx/Hit", sampleRate, context, 5 )
+	g.Sounds[soundDryFire].AddSound( "assets/sfx/Gun-dry-fire", sampleRate, context )
+	g.Sounds[voiceCheckpoint].AddSound( "assets/voice/Checkpoint", sampleRate, context, 7)
 
 	g.Sounds[soundMusicBackground].SetVolume(0.5)
 	g.Sounds[soundMusicBackground].Play()
@@ -521,7 +511,7 @@ func Shoot(g *Game) {
 			for _, o := range c.Objects {
 				if o.HasTags(tagMob) {
 					log.Println("HIT!")
-					g.Sounds[soundHit1].Play()
+					g.Sounds[soundHit].Play()
 					o.Data.(*Zombie).Hit()
 					return // stop at the first zombie
 				}

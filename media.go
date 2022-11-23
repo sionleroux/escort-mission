@@ -12,6 +12,7 @@ import (
 	"log"
 	"path"
 	"math/rand"
+	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -163,22 +164,42 @@ const (
 	soundGunReload
 	soundDogBark
 	soundPlayerDies
-	soundHit1
+	soundHit
 	soundDryFire
 
 	voiceCheckpoint
 )
 
-// Sound stores and plays all the audios for one single soundType
+// Sound stores and plays all the sound variants for one single soundType
 type Sound struct {
 	Audio      []*audio.Player
 	LastPlayed int
 	Volume     float64
 }
 
-// AddAudio adds one new audio to the sound to the soundType
-func (s *Sound) AddAudio(audio *audio.Player) {
-	s.Audio = append(s.Audio, audio)
+// AddMusic adds one new music to the soundType
+func (s *Sound) AddMusic(f string, sampleRate int, context *audio.Context) {	
+	s.Audio = append(s.Audio, NewMusicPlayer(loadSoundFile(f + ".ogg", sampleRate), context))
+}
+
+// AddSound adds one new sound to the soundType
+func (s *Sound) AddSound(f string, sampleRate int, context *audio.Context, v... int) {
+	var filename string
+
+	variants := 1	
+	if len(v) > 0 {
+		variants = v[0]
+	}
+
+	for i := 0; i < variants; i++ {
+		if variants == 1 {
+			filename = f + ".ogg"
+		} else {
+			filename = f + "-" + strconv.Itoa(i + 1) + ".ogg"
+		}
+	
+		s.Audio = append(s.Audio, NewSoundPlayer( loadSoundFile(filename, sampleRate), context ))
+	}
 }
 
 // SetVolume sets the volume of the audio
