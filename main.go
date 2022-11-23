@@ -218,10 +218,13 @@ func NewGame(g *Game) {
 	g.Player = NewPlayer(playerPosition, g.Sprites[spritePlayer])
 	g.Space.Add(g.Player.Object)
 
-	eid := 0
 	for _, e := range entities.Entities {
 		if strings.HasPrefix(e.Identifier, "Checkpoint") {
-			eid++
+			eid, err := strconv.Atoi(e.Identifier[11:])
+			if (err != nil) {
+				log.Printf("Cannot load checkpoint: %s", e.Identifier)
+				continue
+			}
 			log.Println(e.Identifier, e.Position)
 			img := loadEntityImage(e.Identifier)
 			w, h := img.Size()

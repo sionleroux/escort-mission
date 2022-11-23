@@ -184,6 +184,7 @@ func (d *Dog) updateState(g *Game) {
 		case dogNormalSniffing:
 			// Sniffing for 3 seconds
 			if d.SniffingCounter >= 180 {
+				d.SniffingCounter = 0
 				d.State = dogNormalWalking
 			}
 		}
