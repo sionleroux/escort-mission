@@ -259,7 +259,7 @@ func (d *Dog) Update(g *Game) {
 	// Animate dog
 	animationFrame := d.Sprite.Meta.FrameTags[dogStateToFrame[d.State]]
 	d.Frame = Animate(d.Frame, g.Tick, animationFrame)
-
+	d.Object.Update()
 }
 
 // TurnTowardsCoordinate turns the dog to the direction of the point
