@@ -93,8 +93,8 @@ type Game struct {
 	State         GameState
 	Checkpoint    int
 	HUD           *HUD
-	DeathRenderer *DeathRenderer
 	StartScreen   Screen
+	DeathScreen   Screen
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -302,7 +302,6 @@ func NewGame(g *Game) {
 	}
 
 	g.HUD = NewHUD()
-	g.DeathRenderer = NewDeathRenderer()
 	g.StartScreen = &StartScreen{}
 
 	g.State = gameStart
@@ -354,6 +353,12 @@ func (g *Game) Update() error {
 		return err
 	}
 
+	if g.State == gameOver {
+		state, err := g.DeathScreen.Update()
+		g.State = state
+		return err
+	}
+
 	// Gun shooting handler
 	if clicked() {
 		Shoot(g)
@@ -379,6 +384,7 @@ func (g *Game) Update() error {
 				g.Sounds[soundMusicBackground][0].Rewind()
 				g.Sounds[soundPlayerDies][0].Rewind()
 				g.Sounds[soundPlayerDies][0].Play()
+				g.DeathScreen = NewDeathScreen(false)
 				g.State = gameOver
 				return nil // return early, no point in continuing, you are dead
 			}
@@ -416,6 +422,7 @@ func (g *Game) Update() error {
 	if g.Dog.Mode == dogDead {
 		g.Sounds[soundMusicBackground][0].Pause()
 		g.Sounds[soundMusicBackground][0].Rewind()
+		g.DeathScreen = NewDeathScreen(true)
 		g.State = gameOver
 		return nil
 	}
@@ -437,12 +444,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	if g.State == gameOver {
-		if g.Dog.Mode == dogDead {
-			g.DeathRenderer.DrawCenered(screen, "YOUR DOG DIED")
-		} else {
-			g.DeathRenderer.DrawCenered(screen, "YOU DIED")
-		}
-		return // game not loaded yet
+		g.DeathScreen.Draw(screen)
+		return
 	}
 
 	if g.State == gameWon {
