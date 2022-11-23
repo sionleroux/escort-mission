@@ -139,7 +139,7 @@ func GetBezierPathFromCoords(pathPoints []Coord, resolution float64) []Coord {
 // GetBezierPath creates a bezier curve through the given path points
 func GetBezierPath(pathPoints []beziercp.PointF, resolution float64) []Coord {
 	var bPath []Coord
-	
+
 	// Get Bezier control points from the path
 	curveCPs := beziercp.GetControlPointsF(pathPoints)
 	// Get the Bezier curves through the origiunal path points based on the control points
@@ -152,7 +152,7 @@ func GetBezierPath(pathPoints []beziercp.PointF, resolution float64) []Coord {
 		)
 
 		// 4 points per curve
-		for i := 0.0; i < 1; i = i + 1.0 / resolution {
+		for i := 0.0; i < 1; i = i + 1.0/resolution {
 			bp := curve.Point(i)
 			bPath = append(bPath, Coord{X: float64(bp.X), Y: float64(bp.Y)})
 		}

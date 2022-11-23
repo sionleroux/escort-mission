@@ -225,7 +225,7 @@ func NewGame(g *Game) {
 	for _, e := range entities.Entities {
 		if strings.HasPrefix(e.Identifier, "Checkpoint") {
 			eid, err := strconv.Atoi(e.Identifier[11:])
-			if (err != nil) {
+			if err != nil {
 				log.Printf("Cannot load checkpoint: %s", e.Identifier)
 				continue
 			}
@@ -271,10 +271,10 @@ func NewGame(g *Game) {
 	))
 	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
 	g.Dog = &Dog{
-		Object:     object,
-		Angle:      0,
-		Sprite:     g.Sprites[spriteDog],
-		MainPath:   &Path{ Points: dogPath, NextPoint: 0 },
+		Object:   object,
+		Angle:    0,
+		Sprite:   g.Sprites[spriteDog],
+		MainPath: &Path{Points: dogPath, NextPoint: 0},
 	}
 	g.Dog.Init()
 	g.Space.Add(g.Dog.Object)
@@ -558,5 +558,5 @@ func CalcDistance(x1, y1, x2, y2 float64) float64 {
 // NormalizeVector normalizes the vector
 func NormalizeVector(vector Coord) Coord {
 	magnitude := CalcDistance(vector.X, vector.Y, 0, 0)
-	return Coord{ X: vector.X / magnitude, Y: vector.Y / magnitude }
+	return Coord{X: vector.X / magnitude, Y: vector.Y / magnitude}
 }
