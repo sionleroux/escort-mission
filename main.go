@@ -179,7 +179,7 @@ func NewGame(g *Game) {
 	g.Sounds[soundHit1] = make([]*audio.Player, 1)
 	g.Sounds[soundHit1][0] = NewSoundPlayer(loadSoundFile("assets/sfx/Hit-1.ogg", sampleRate), context)
 	g.Sounds[soundDryFire] = make([]*audio.Player, 1)
-	g.Sounds[soundDryFire][0] = NewSoundPlayer(loadSoundFile("assets/sfx/DryFire.ogg", sampleRate), context)
+	g.Sounds[soundDryFire][0] = NewSoundPlayer(loadSoundFile("assets/sfx/Gun-dry-fire.ogg", sampleRate), context)
 
 	g.Sounds[soundMusicBackground][0].SetVolume(0.5)
 	g.Sounds[soundMusicBackground][0].Play()
