@@ -23,9 +23,6 @@ import (
 	"github.com/solarlune/resolv"
 
 	beziercp "github.com/brothertoad/bezier"
-	"gonum.org/v1/plot/font"
-	beziercurve "gonum.org/v1/plot/tools/bezier"
-	"gonum.org/v1/plot/vg"
 )
 
 const (
@@ -78,7 +75,7 @@ type Game struct {
 	Tick          int
 	TileRenderer  *TileRenderer
 	LDTKProject   *ldtkgo.Project
-	Sounds        []*audio.Player
+	Sounds        Sounds
 	Voices        Voices
 	Level         int
 	Background    *ebiten.Image
@@ -163,23 +160,36 @@ func NewGame(g *Game) {
 	// Music
 	const sampleRate int = 44100 // assuming "normal" sample rate
 	context := audio.NewContext(sampleRate)
-	g.Sounds = make([]*audio.Player, 7)
-	g.Sounds[soundMusicBackground] = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context)
-	g.Sounds[soundGunShot] = NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context)
-	g.Sounds[soundGunReload] = NewSoundPlayer(loadSoundFile("assets/sfx/Reload.ogg", sampleRate), context)
-	g.Sounds[soundDogBark1] = NewSoundPlayer(loadSoundFile("assets/sfx/Dog-bark-1.ogg", sampleRate), context)
-	g.Sounds[soundPlayerDies] = NewSoundPlayer(loadSoundFile("assets/sfx/PlayerDies.ogg", sampleRate), context)
-	g.Sounds[soundHit1] = NewSoundPlayer(loadSoundFile("assets/sfx/Hit-1.ogg", sampleRate), context)
-	g.Sounds[soundDryFire] = NewSoundPlayer(loadSoundFile("assets/sfx/DryFire.ogg", sampleRate), context)
-	g.Sounds[soundMusicBackground].SetVolume(0.5)
-	g.Sounds[soundMusicBackground].Play()
+	g.Sounds = make([][]*audio.Player, 7)
+	g.Sounds[soundMusicBackground] = make([]*audio.Player, 1)
+	g.Sounds[soundMusicBackground][0] = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context)
+	g.Sounds[soundGunShot] = make([]*audio.Player, 1)
+	g.Sounds[soundGunShot][0] = NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context)
+	g.Sounds[soundGunReload] = make([]*audio.Player, 1)
+	g.Sounds[soundGunReload][0] = NewSoundPlayer(loadSoundFile("assets/sfx/Reload.ogg", sampleRate), context)
+	g.Sounds[soundDogBark] = make([]*audio.Player, 5)
+	for index := 0; index < 5; index++ {
+		g.Sounds[soundDogBark][index] = NewSoundPlayer(
+			loadSoundFile("assets/sfx/Dog-sound-"+strconv.Itoa(index+1)+".ogg", sampleRate),
+			context,
+		)
+	}
+	g.Sounds[soundPlayerDies] = make([]*audio.Player, 1)
+	g.Sounds[soundPlayerDies][0] = NewSoundPlayer(loadSoundFile("assets/sfx/PlayerDies.ogg", sampleRate), context)
+	g.Sounds[soundHit1] = make([]*audio.Player, 1)
+	g.Sounds[soundHit1][0] = NewSoundPlayer(loadSoundFile("assets/sfx/Hit-1.ogg", sampleRate), context)
+	g.Sounds[soundDryFire] = make([]*audio.Player, 1)
+	g.Sounds[soundDryFire][0] = NewSoundPlayer(loadSoundFile("assets/sfx/DryFire.ogg", sampleRate), context)
+
+	g.Sounds[soundMusicBackground][0].SetVolume(0.5)
+	g.Sounds[soundMusicBackground][0].Play()
 
 	// Voice
 	g.Voices = make([][]*audio.Player, 1)
 	g.Voices[voiceCheckpoint] = make([]*audio.Player, 7)
 	for index := 0; index < 7; index++ {
 		g.Voices[voiceCheckpoint][index] = NewSoundPlayer(
-			loadSoundFile("assets/voice/checkpoint_"+strconv.Itoa(index+1)+".ogg", sampleRate),
+			loadSoundFile("assets/voice/Checkpoint-"+strconv.Itoa(index+1)+".ogg", sampleRate),
 			context,
 		)
 	}
@@ -212,10 +222,13 @@ func NewGame(g *Game) {
 	g.Player = NewPlayer(playerPosition, g.Sprites[spritePlayer])
 	g.Space.Add(g.Player.Object)
 
-	eid := 0
 	for _, e := range entities.Entities {
 		if strings.HasPrefix(e.Identifier, "Checkpoint") {
-			eid++
+			eid, err := strconv.Atoi(e.Identifier[11:])
+			if (err != nil) {
+				log.Printf("Cannot load checkpoint: %s", e.Identifier)
+				continue
+			}
 			log.Println(e.Identifier, e.Position)
 			img := loadEntityImage(e.Identifier)
 			w, h := img.Size()
@@ -243,24 +256,8 @@ func NewGame(g *Game) {
 			Y: (pathCoord.(map[string]any)["cy"].(float64) + 0.5) * float64(entities.GridSize),
 		})
 	}
-	// Get Bezier control points from the path
-	curveCPs := beziercp.GetControlPointsF(pathPoints)
-	// Get the Bezier curves through the origiunal path points based on the control points
-	var dogpath []Coord
-	for _, c := range curveCPs {
-		curve := beziercurve.New(
-			vg.Point{X: font.Length(int(c.P0.X)), Y: font.Length(c.P0.Y)},
-			vg.Point{X: font.Length(int(c.P1.X)), Y: font.Length(c.P1.Y)},
-			vg.Point{X: font.Length(int(c.P2.X)), Y: font.Length(c.P2.Y)},
-			vg.Point{X: font.Length(int(c.P3.X)), Y: font.Length(c.P3.Y)},
-		)
 
-		// 4 points per curve
-		for i := 0.0; i < 1; i = i + 0.25 {
-			bp := curve.Point(i)
-			dogpath = append(dogpath, Coord{X: float64(bp.X), Y: float64(bp.Y)})
-		}
-	}
+	dogPath := GetBezierPath(pathPoints, 4)
 
 	// Add dog to the game
 	object := resolv.NewObject(
@@ -274,12 +271,12 @@ func NewGame(g *Game) {
 	))
 	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
 	g.Dog = &Dog{
-		Object:   object,
-		Angle:    0,
-		Sprite:   g.Sprites[spriteDog],
-		Path:     dogpath,
-		NextPath: -1,
+		Object:     object,
+		Angle:      0,
+		Sprite:     g.Sprites[spriteDog],
+		MainPath:   &Path{ Points: dogPath, NextPoint: 0 },
 	}
+	g.Dog.Init()
 	g.Space.Add(g.Dog.Object)
 
 	// Add spawnpoints to the game
@@ -369,10 +366,10 @@ func (g *Game) Update() error {
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
 			if g.Player.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
-				g.Sounds[soundMusicBackground].Pause()
-				g.Sounds[soundMusicBackground].Rewind()
-				g.Sounds[soundPlayerDies].Rewind()
-				g.Sounds[soundPlayerDies].Play()
+				g.Sounds[soundMusicBackground][0].Pause()
+				g.Sounds[soundMusicBackground][0].Rewind()
+				g.Sounds[soundPlayerDies][0].Rewind()
+				g.Sounds[soundPlayerDies][0].Play()
 				g.State = gameOver
 				return nil // return early, no point in continuing, you are dead
 			}
@@ -399,17 +396,17 @@ func (g *Game) Update() error {
 		}
 	}
 
-	// Collision detection and response between zombie and player
+	// Collision detection and response between zombie and dog
 	if collision := g.Dog.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Dog.Object.Overlaps(collision.Objects[0]) {
-			g.Dog.State = dogDied
+			g.Dog.Mode = dogDead
 		}
 	}
 
 	// Game over if the dog dies
-	if g.Dog.State == dogDied {
-		g.Sounds[soundMusicBackground].Pause()
-		g.Sounds[soundMusicBackground].Rewind()
+	if g.Dog.Mode == dogDead {
+		g.Sounds[soundMusicBackground][0].Pause()
+		g.Sounds[soundMusicBackground][0].Rewind()
 		g.State = gameOver
 		return nil
 	}
@@ -431,7 +428,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	if g.State == gameOver {
-		if g.Dog.State == dogDied {
+		if g.Dog.Mode == dogDead {
 			g.DeathRenderer.DrawCenered(screen, "YOUR DOG DIED")
 		} else {
 			g.DeathRenderer.DrawCenered(screen, "YOU DIED")
@@ -501,9 +498,9 @@ func clicked() bool {
 // Shoot sets shooting states and also die states for any zombies in range
 func Shoot(g *Game) {
 	interruptReload := func() {
-		g.Sounds[soundGunReload].Pause()
-		g.Sounds[soundDryFire].Rewind()
-		g.Sounds[soundDryFire].Play()
+		g.Sounds[soundGunReload][0].Pause()
+		g.Sounds[soundDryFire][0].Rewind()
+		g.Sounds[soundDryFire][0].Play()
 		g.Player.State = playerDryFire
 	}
 
@@ -519,8 +516,8 @@ func Shoot(g *Game) {
 			return
 		}
 
-		g.Sounds[soundGunShot].Rewind()
-		g.Sounds[soundGunShot].Play()
+		g.Sounds[soundGunShot][0].Rewind()
+		g.Sounds[soundGunShot][0].Play()
 
 		g.Player.Ammo--
 		g.Player.State = playerShooting
@@ -538,8 +535,8 @@ func Shoot(g *Game) {
 			for _, o := range c.Objects {
 				if o.HasTags(tagMob) {
 					log.Println("HIT!")
-					g.Sounds[soundHit1].Rewind()
-					g.Sounds[soundHit1].Play()
+					g.Sounds[soundHit1][0].Rewind()
+					g.Sounds[soundHit1][0].Play()
 					o.Data.(*Zombie).Hit()
 					return // stop at the first zombie
 				}
@@ -556,4 +553,10 @@ func CalcObjectDistance(obj1, obj2 *resolv.Object) (float64, float64, float64) {
 // CalcDistance calculates the distance between two coordinates
 func CalcDistance(x1, y1, x2, y2 float64) float64 {
 	return math.Sqrt(math.Pow(x1-x2, 2) + math.Pow(y1-y2, 2))
+}
+
+// NormalizeVector normalizes the vector
+func NormalizeVector(vector Coord) Coord {
+	magnitude := CalcDistance(vector.X, vector.Y, 0, 0)
+	return Coord{ X: vector.X / magnitude, Y: vector.Y / magnitude }
 }
