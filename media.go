@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path"
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -164,18 +165,58 @@ const (
 	soundPlayerDies
 	soundHit1
 	soundDryFire
+
+	voiceCheckpoint
 )
 
-type Sounds [][]*audio.Player
+// Sound stores and plays all the audios for one single soundType
+type Sound struct {
+	Audio      []*audio.Player
+	LastPlayed int
+	Volume     float64
+}
 
-// VoiceType is a unique identifier to reference voices by name
-type VoiceType uint64
+// AddAudio adds one new audio to the sound to the soundType
+func (s *Sound) AddAudio(audio *audio.Player) {
+	s.Audio = append(s.Audio, audio)
+}
 
-const (
-	voiceCheckpoint VoiceType = iota
-)
+// SetVolume sets the volume of the audio
+func (s *Sound) SetVolume(v float64) {
+	if (v >= 0 && v <= 1) {
+		s.Volume = v
+	}
+}
 
-type Voices [][]*audio.Player
+// Play plays the audio or a random one if there are more
+func (s *Sound) Play() {
+	length := len(s.Audio)
+	index := 0
+
+	if length == 0 {
+		return
+	} else if length > 1 {
+		index = rand.Intn(length)
+	}
+
+	s.PlayVariant(index)
+}
+
+// PlayVariant plays the selected audio
+func (s *Sound) PlayVariant(i int) {
+	s.LastPlayed = i
+	s.Audio[i].SetVolume(s.Volume)
+	s.Audio[i].Rewind()
+	s.Audio[i].Play()
+}
+
+// Pause pauses the audio being played
+func (s *Sound) Pause() {
+	s.Audio[s.LastPlayed].Pause()
+}
+
+// Sounds is a slice of sounds
+type Sounds []*Sound
 
 // NewMusicPlayer loads a sound into an audio player that can be used to play it
 // as an infinite loop of music without any additional setup required

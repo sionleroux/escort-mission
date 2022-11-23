@@ -85,8 +85,7 @@ func NewPlayer(position []int, sprites *SpriteSheet) *Player {
 // Reload reloads the ammo
 func (p *Player) Reload(g *Game) {
 	p.State = playerReload
-	g.Sounds[soundGunReload][0].Rewind()
-	g.Sounds[soundGunReload][0].Play()
+	g.Sounds[soundGunReload].Play()
 }
 
 // Update updates the state of the player

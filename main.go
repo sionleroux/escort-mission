@@ -76,7 +76,6 @@ type Game struct {
 	TileRenderer  *TileRenderer
 	LDTKProject   *ldtkgo.Project
 	Sounds        Sounds
-	Voices        Voices
 	Level         int
 	Background    *ebiten.Image
 	Foreground    *ebiten.Image
@@ -157,42 +156,35 @@ func NewGame(g *Game) {
 		}
 	}
 
-	// Music
+	// Sound
 	const sampleRate int = 44100 // assuming "normal" sample rate
 	context := audio.NewContext(sampleRate)
-	g.Sounds = make([][]*audio.Player, 7)
-	g.Sounds[soundMusicBackground] = make([]*audio.Player, 1)
-	g.Sounds[soundMusicBackground][0] = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context)
-	g.Sounds[soundGunShot] = make([]*audio.Player, 1)
-	g.Sounds[soundGunShot][0] = NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context)
-	g.Sounds[soundGunReload] = make([]*audio.Player, 1)
-	g.Sounds[soundGunReload][0] = NewSoundPlayer(loadSoundFile("assets/sfx/Reload.ogg", sampleRate), context)
-	g.Sounds[soundDogBark] = make([]*audio.Player, 5)
+
+	g.Sounds = make([]*Sound, 8)
+	for i := 0; i < 8; i++ {
+		g.Sounds[i] = &Sound{ Volume: 1 }
+	} 
+	g.Sounds[soundMusicBackground].AddAudio( NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate), context) )
+	g.Sounds[soundGunShot].AddAudio( NewSoundPlayer(loadSoundFile("assets/sfx/Gunshot.ogg", sampleRate), context) )
+	g.Sounds[soundGunReload].AddAudio( NewSoundPlayer(loadSoundFile("assets/sfx/Reload.ogg", sampleRate), context) )
 	for index := 0; index < 5; index++ {
-		g.Sounds[soundDogBark][index] = NewSoundPlayer(
+		g.Sounds[soundDogBark].AddAudio( NewSoundPlayer(
 			loadSoundFile("assets/sfx/Dog-sound-"+strconv.Itoa(index+1)+".ogg", sampleRate),
 			context,
-		)
+		))
 	}
-	g.Sounds[soundPlayerDies] = make([]*audio.Player, 1)
-	g.Sounds[soundPlayerDies][0] = NewSoundPlayer(loadSoundFile("assets/sfx/PlayerDies.ogg", sampleRate), context)
-	g.Sounds[soundHit1] = make([]*audio.Player, 1)
-	g.Sounds[soundHit1][0] = NewSoundPlayer(loadSoundFile("assets/sfx/Hit-1.ogg", sampleRate), context)
-	g.Sounds[soundDryFire] = make([]*audio.Player, 1)
-	g.Sounds[soundDryFire][0] = NewSoundPlayer(loadSoundFile("assets/sfx/Gun-dry-fire.ogg", sampleRate), context)
-
-	g.Sounds[soundMusicBackground][0].SetVolume(0.5)
-	g.Sounds[soundMusicBackground][0].Play()
-
-	// Voice
-	g.Voices = make([][]*audio.Player, 1)
-	g.Voices[voiceCheckpoint] = make([]*audio.Player, 7)
+	g.Sounds[soundPlayerDies].AddAudio( NewSoundPlayer(loadSoundFile("assets/sfx/PlayerDies.ogg", sampleRate), context) )
+	g.Sounds[soundHit1].AddAudio( NewSoundPlayer(loadSoundFile("assets/sfx/Hit-1.ogg", sampleRate), context) )
+	g.Sounds[soundDryFire].AddAudio( NewSoundPlayer(loadSoundFile("assets/sfx/Gun-dry-fire.ogg", sampleRate), context) )
 	for index := 0; index < 7; index++ {
-		g.Voices[voiceCheckpoint][index] = NewSoundPlayer(
+		g.Sounds[voiceCheckpoint].AddAudio( NewSoundPlayer(
 			loadSoundFile("assets/voice/Checkpoint-"+strconv.Itoa(index+1)+".ogg", sampleRate),
 			context,
-		)
+		))
 	}
+
+	g.Sounds[soundMusicBackground].SetVolume(0.5)
+	g.Sounds[soundMusicBackground].Play()
 
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 5)
@@ -366,10 +358,8 @@ func (g *Game) Update() error {
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
 			if g.Player.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
-				g.Sounds[soundMusicBackground][0].Pause()
-				g.Sounds[soundMusicBackground][0].Rewind()
-				g.Sounds[soundPlayerDies][0].Rewind()
-				g.Sounds[soundPlayerDies][0].Play()
+				g.Sounds[soundMusicBackground].Pause()
+				g.Sounds[soundPlayerDies].Play()
 				g.State = gameOver
 				return nil // return early, no point in continuing, you are dead
 			}
@@ -381,8 +371,7 @@ func (g *Game) Update() error {
 		if o := collision.Objects[0]; g.Player.Object.Overlaps(o) {
 			if g.Checkpoint < o.Data.(int) {
 				g.Checkpoint = o.Data.(int)
-				g.Voices[voiceCheckpoint][g.Checkpoint-1].Rewind()
-				g.Voices[voiceCheckpoint][g.Checkpoint-1].Play()
+				g.Sounds[voiceCheckpoint].PlayVariant(g.Checkpoint-1)
 			}
 
 		}
@@ -405,8 +394,7 @@ func (g *Game) Update() error {
 
 	// Game over if the dog dies
 	if g.Dog.Mode == dogDead {
-		g.Sounds[soundMusicBackground][0].Pause()
-		g.Sounds[soundMusicBackground][0].Rewind()
+		g.Sounds[soundMusicBackground].Pause()
 		g.State = gameOver
 		return nil
 	}
@@ -498,9 +486,8 @@ func clicked() bool {
 // Shoot sets shooting states and also die states for any zombies in range
 func Shoot(g *Game) {
 	interruptReload := func() {
-		g.Sounds[soundGunReload][0].Pause()
-		g.Sounds[soundDryFire][0].Rewind()
-		g.Sounds[soundDryFire][0].Play()
+		g.Sounds[soundGunReload].Pause()
+		g.Sounds[soundDryFire].Play()
 		g.Player.State = playerDryFire
 	}
 
@@ -516,8 +503,7 @@ func Shoot(g *Game) {
 			return
 		}
 
-		g.Sounds[soundGunShot][0].Rewind()
-		g.Sounds[soundGunShot][0].Play()
+		g.Sounds[soundGunShot].Play()
 
 		g.Player.Ammo--
 		g.Player.State = playerShooting
@@ -535,8 +521,7 @@ func Shoot(g *Game) {
 			for _, o := range c.Objects {
 				if o.HasTags(tagMob) {
 					log.Println("HIT!")
-					g.Sounds[soundHit1][0].Rewind()
-					g.Sounds[soundHit1][0].Play()
+					g.Sounds[soundHit1].Play()
 					o.Data.(*Zombie).Hit()
 					return // stop at the first zombie
 				}
