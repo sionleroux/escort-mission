@@ -33,6 +33,9 @@ const dogRunningSpeed float64 = 1.3
 // waitingRadius is the maximum distance the dog walks away from the player
 const waitingRadius float64 = 96
 
+// followingRadius is the distance within which the dog follows the player after the last checkpoint
+const followingRadius float64 = 96
+
 // zombieBarkRadius: if a zombie is this close to the dog, it barks
 const zombieBarkRadius float64 = 150
 
@@ -58,31 +61,31 @@ const (
 	dogNormalWalking
 	dogNormalBlocked
 	dogNormalSniffing
-	dogNormalFinished
 
 	dogDangerBarking
 	dogDangerFleeing
 )
 
 // Maps dog states to animation frames
-var dogStateToFrame = [7]int{2, 0, 2, 1, 2, 1, 0}
+var dogStateToFrame = [7]int{2, 0, 2, 1, 1, 0}
 
 // Dog is player's companion
 type Dog struct {
-	Object            *resolv.Object
-	Angle             float64
-	Speed             float64
-	Frame             int
-	Mode              int
-	State             int
-	PrevState         int
-	CurrentPath       *Path
-	MainPath          *Path
-	OnMainPath        bool
-	LastPathCoord     Coord
-	Sprite            *SpriteSheet
-	PrevCheckpoint    int
-	OutOfSightCounter int
+	Object               *resolv.Object
+	Angle                float64
+	Speed                float64
+	Frame                int
+	Mode                 int
+	State                int
+	PrevState            int
+	CurrentPath          *Path
+	MainPath             *Path
+	OnMainPath           bool
+	LastPathCoord        Coord
+	Sprite               *SpriteSheet
+	PrevCheckpoint       int
+	LastPathpointReached bool
+	OutOfSightCounter    int
 }
 
 func (d *Dog) Init() {
@@ -229,10 +232,10 @@ func (d *Dog) Update(g *GameScreen) {
 	case dogNormalWalking:
 		// If dog is walking back to the main path and reaches it then change its path to main path
 		// Try to move along the path
-		d.followPath(g)
+		d.walk(g)
 	case dogNormalBlocked:
 		// Try to move along the path
-		d.followPath(g)
+		d.walk(g)
 	case dogNormalSniffing:
 		// Do nothing, just wait for the player to arrive at the same checkpoint
 	case dogDangerBarking:
@@ -258,9 +261,19 @@ func (d *Dog) Update(g *GameScreen) {
 }
 
 // StopSniffing stops sniffing when the player is at the same checkpoint
+// If the last checkpoint is reached then the dog starts following the player
 func (d *Dog) StopSniffing() {
 	if d.State == dogNormalSniffing {
 		d.State = dogNormalWalking
+	}
+}
+
+// walk moves the dog either on a path or by following the player
+func (d *Dog) walk(g *GameScreen) {
+	if (d.LastPathpointReached) {
+		d.followPlayer(g)
+	} else {
+		d.followPath(g)
 	}
 }
 
@@ -274,6 +287,15 @@ func (d *Dog) turnTowardsCoordinate(coord Coord) {
 // TurnTowardsPathPoint turns the dog to the direction of the next path point
 func (d *Dog) turnTowardsPathPoint() {
 	d.turnTowardsCoordinate(d.CurrentPath.Points[d.CurrentPath.NextPoint])
+}
+
+func (d *Dog) followPlayer(g *GameScreen) {
+	d.turnTowardsCoordinate(Coord{ X: g.Player.Object.X, Y: g.Player.Object.Y})
+
+	d.move(
+		math.Cos(d.Angle) * dogWalkingSpeed,
+		math.Sin(d.Angle) * dogWalkingSpeed,
+	)
 }
 
 // followPath moves the dog along its current path
@@ -291,7 +313,7 @@ func (d *Dog) followPath(g *GameScreen) {
 				// If the dog is normally walking, not fleeing
 				if d.OnMainPath {
 					// If the dog reaches the end of the main path then it finishes
-					d.State = dogNormalFinished
+					d.LastPathpointReached = true
 					return
 				} else {
 					// If the dog reaches the main path again then it will continue on that
