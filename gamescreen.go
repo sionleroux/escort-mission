@@ -268,7 +268,7 @@ func NewGameScreen(game *Game) {
 
 	g.HUD = NewHUD()
 
-	game.GameScreen = g
+	game.Screens[gameRunning] = g
 	game.State = gameRunning
 }
 

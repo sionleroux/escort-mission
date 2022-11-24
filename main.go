@@ -23,7 +23,13 @@ func main() {
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
 	game := &Game{Width: gameWidth, Height: gameHeight}
-	game.DeathScreen = NewDeathScreen(false, game)
+	game.Screens = []Screen{
+		&LoadingScreen{},
+		&StartScreen{},
+		&GameScreen{},
+		NewDeathScreen(false, game),
+		&WinScreen{},
+	}
 
 	go NewGameScreen(game)
 
@@ -45,14 +51,10 @@ const (
 
 // Game represents the main game state
 type Game struct {
-	Width         int
-	Height        int
-	StartScreen   Screen
-	DeathScreen   Screen
-	LoadingScreen Screen
-	WinScreen     Screen
-	GameScreen    Screen
-	State         GameState
+	Width   int
+	Height  int
+	Screens []Screen
+	State   GameState
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -76,66 +78,14 @@ func (g *Game) Update() error {
 		}
 	}
 
-	if g.State == gameStart {
-		state, err := g.StartScreen.Update()
-		g.State = state
-		return err
-	}
-
-	if g.State == gameLoading {
-		state, err := g.LoadingScreen.Update()
-		g.State = state
-		return err
-	}
-
-	if g.State == gameOver {
-		state, err := g.DeathScreen.Update()
-		g.State = state
-		return err
-	}
-
-	if g.State == gameWon {
-		state, err := g.WinScreen.Update()
-		g.State = state
-		return err
-	}
-
-	if g.State == gameRunning {
-		state, err := g.GameScreen.Update()
-		g.State = state
-		return err
-	}
-
-	return nil
+	state, err := g.Screens[g.State].Update()
+	g.State = state
+	return err
 }
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
-	if g.State == gameLoading {
-		g.LoadingScreen.Draw(screen)
-		return
-	}
-
-	if g.State == gameOver {
-		g.DeathScreen.Draw(screen)
-		return
-	}
-
-	if g.State == gameWon {
-		g.WinScreen.Draw(screen)
-		return
-	}
-
-	if g.State == gameStart {
-		g.StartScreen.Draw(screen)
-		return
-	}
-
-	if g.State == gameRunning {
-		g.GameScreen.Draw(screen)
-		return
-	}
-
+	g.Screens[g.State].Draw(screen)
 }
 
 // Screen is a full-screen UI Screen for some part of the game like a menu or a
