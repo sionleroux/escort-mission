@@ -63,8 +63,9 @@ type GameScreen struct {
 // before starting if we did it before the first Update loop
 func NewGameScreen(game *Game) {
 	g := &GameScreen{
-		Width:  game.Width,
-		Height: game.Height,
+		Width:      game.Width,
+		Height:     game.Height,
+		Checkpoint: game.Checkpoint,
 	}
 
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
@@ -220,7 +221,6 @@ func NewGameScreen(game *Game) {
 	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
 	g.Dog = &Dog{
 		Object:   object,
-		Angle:    0,
 		Sprite:   g.Sprites[spriteDog],
 		MainPath: &Path{Points: dogPath, NextPoint: 0},
 	}
@@ -250,6 +250,30 @@ func NewGameScreen(game *Game) {
 	g.HUD = NewHUD()
 
 	game.Screens[gameRunning] = g
+	game.State = gameRunning
+}
+
+// Reset is similar to NewGameScreen but only resets the things that should be
+// changed when you reset/restart the game, without reloading all the media
+func (g *GameScreen) Reset(game *Game) {
+	// How far to spawn dog from player
+	dogOffset := 20
+
+	// Load entities from map
+	entities := g.LDTKProject.Levels[g.Level].LayerByIdentifier("Entities")
+
+	// Reset some player and dog values
+	g.Player.Ammo = playerAmmoClipMax
+	startPos := entities.EntityByIdentifier("Player").Position
+	if g.Checkpoint > 0 {
+		startPos = entities.EntityByIdentifier(
+			"Checkpoint_" + strconv.Itoa(g.Checkpoint),
+		).Position
+	}
+	g.Player.Object.X, g.Player.Object.Y = float64(startPos[0]), float64(startPos[1])
+	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
+
+	g.Sounds[soundMusicBackground].Play()
 	game.State = gameRunning
 }
 

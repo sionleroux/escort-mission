@@ -96,6 +96,31 @@ func (d *Dog) Init() {
 	d.turnTowardsPathPoint()
 }
 
+// Resets the dog to a coordinate after death
+func (d *Dog) Reset(cp int, x, y float64) {
+	d.Mode = dogNormal
+	d.State = dogNormalWaiting
+	d.CurrentPath = d.MainPath
+	d.CurrentPath.NextPoint = d.findClosestPathPoint(x, y)
+	d.OnMainPath = true
+	d.Object.X, d.Object.Y = x, y
+	d.turnTowardsPathPoint()
+}
+
+// Finds the closest pathpoint on the dog's path
+func (d *Dog) findClosestPathPoint(x, y float64) int {
+	minDest := 1000.0
+	index := 0
+	for i, p := range d.MainPath.Points {
+		d := CalcDistance(x, y, p.X, p.Y)
+		if d < minDest {
+			minDest = d
+			index = i
+		}
+	}
+	return index
+}
+
 // zombiesInRange checks if there zombies close to the Dog
 // Returns
 //  - if there are zombies in range
