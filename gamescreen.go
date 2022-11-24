@@ -279,6 +279,7 @@ func (g *GameScreen) Reset(game *Game) {
 	// XXX what else is missing, why does the dog respawn and walk through walls
 	g.Dog.Object.X, g.Dog.Object.Y = float64(startPos[0]+dogOffset), float64(startPos[1])
 
+	g.Sounds[soundMusicBackground].Play()
 	game.State = gameRunning
 }
 
