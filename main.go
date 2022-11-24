@@ -14,6 +14,7 @@ import (
 )
 
 const gameWidth, gameHeight = 320, 240
+const deathCoolDownTime = 4 * 60
 
 func main() {
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
@@ -51,10 +52,13 @@ const (
 
 // Game represents the main game state
 type Game struct {
-	Width   int
-	Height  int
-	Screens []Screen
-	State   GameState
+	Width      int
+	Height     int
+	Screens    []Screen
+	State      GameState
+	DeathTime  int
+	Tick       int
+	Checkpoint int
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -64,6 +68,8 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 
 // Update calculates game logic
 func (g *Game) Update() error {
+	g.Tick++
+
 	// Pressing Q any time quits immediately
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		return errors.New("game quit by player")
@@ -83,7 +89,16 @@ func (g *Game) Update() error {
 
 	switch g.State {
 	case gameOver:
-		g.Screens[gameOver].(*DeathScreen).DogDied = (g.Screens[gameRunning].(*GameScreen).Dog.Mode == dogDead)
+		if g.DeathTime == 0 {
+			g.DeathTime = g.Tick
+			g.Screens[gameOver].(*DeathScreen).DogDied = (g.Screens[gameRunning].(*GameScreen).Dog.Mode == dogDead)
+		}
+		if g.Tick-g.DeathTime > deathCoolDownTime {
+			g.Checkpoint = g.Screens[gameRunning].(*GameScreen).Checkpoint
+			g.State = gameLoading
+			g.DeathTime = 0
+			go g.Screens[gameRunning].(*GameScreen).Reset(g)
+		}
 	}
 
 	return err
