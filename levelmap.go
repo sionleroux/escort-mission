@@ -125,6 +125,9 @@ func simplifyPath(path []image.Point) []image.Point {
 
 // GetBezierPathFromCoords creates a bezier curve through the given path points
 func GetBezierPathFromCoords(pathPoints []Coord, resolution float64) []Coord {
+	if len(pathPoints) < 3 {
+		return pathPoints
+	}
 	var bps []beziercp.PointF
 	for _, pathCoord := range pathPoints {
 		bps = append(bps, beziercp.PointF{
