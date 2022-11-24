@@ -27,7 +27,7 @@ func main() {
 		&LoadingScreen{},
 		&StartScreen{},
 		&GameScreen{},
-		NewDeathScreen(false, game),
+		NewDeathScreen(game),
 		&WinScreen{},
 	}
 
@@ -80,6 +80,12 @@ func (g *Game) Update() error {
 
 	state, err := g.Screens[g.State].Update()
 	g.State = state
+
+	switch g.State {
+	case gameOver:
+		g.Screens[gameOver].(*DeathScreen).DogDied = (g.Screens[gameRunning].(*GameScreen).Dog.Mode == dogDead)
+	}
+
 	return err
 }
 

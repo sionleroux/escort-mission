@@ -14,15 +14,14 @@ const deathCoolDownTime = 4 * 60
 // shows you a message for a short while and then respawns you into the game
 type DeathScreen struct {
 	textRenderer *DeathRenderer
-	dogDied      bool
+	DogDied      bool
 	tick         int
 	respawning   bool
 	game         *Game
 }
 
-func NewDeathScreen(dogDied bool, game *Game) *DeathScreen {
+func NewDeathScreen(game *Game) *DeathScreen {
 	return &DeathScreen{
-		dogDied:      dogDied,
 		textRenderer: NewDeathRenderer(),
 		game:         game,
 	}
@@ -45,7 +44,7 @@ func (s *DeathScreen) Update() (GameState, error) {
 }
 
 func (s *DeathScreen) Draw(screen *ebiten.Image) {
-	if s.dogDied {
+	if s.DogDied {
 		s.textRenderer.DrawCenered(screen, "YOUR DOG DIED")
 	} else {
 		s.textRenderer.DrawCenered(screen, "YOU DIED")
