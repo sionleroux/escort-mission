@@ -61,13 +61,14 @@ const (
 	dogNormalWalking
 	dogNormalBlocked
 	dogNormalSniffing
+	dogNormalWaitingAtCheckpoint
 
 	dogDangerBarking
 	dogDangerFleeing
 )
 
 // Maps dog states to animation frames
-var dogStateToFrame = [7]int{2, 0, 2, 1, 1, 0}
+var dogStateToFrame = [7]int{2, 0, 2, 1, 2, 1, 0}
 
 // Dog is player's companion
 type Dog struct {
@@ -85,6 +86,7 @@ type Dog struct {
 	Sprite               *SpriteSheet
 	PrevCheckpoint       int
 	LastPathpointReached bool
+	AtCheckpointCounter  int
 	OutOfSightCounter    int
 }
 
@@ -185,6 +187,17 @@ func (d *Dog) updateState(g *GameScreen) {
 			// Next state is set elsewhere
 			// - In case when dog is not blocked anymore by the player
 		case dogNormalSniffing:
+			// If the player has already touched the checkpoint previously
+			if (d.PrevCheckpoint == g.Checkpoint) {
+				d.State = dogNormalWalking
+			}
+			// Sniffing for 3 seconds
+			if d.AtCheckpointCounter >= 180 {
+				d.State = dogNormalWaitingAtCheckpoint
+			}
+			// Next state is set elsewhere
+			// - In case when player is also at the checkpoint
+		case dogNormalWaitingAtCheckpoint:
 			// Next state is set elsewhere
 			// - In case when player is also at the checkpoint
 		}
@@ -237,7 +250,15 @@ func (d *Dog) Update(g *GameScreen) {
 		// Try to move along the path
 		d.walk(g)
 	case dogNormalSniffing:
-		// Do nothing, just wait for the player to arrive at the same checkpoint
+		d.AtCheckpointCounter++
+		// Wait for the player to arrive at the same checkpoint
+	case dogNormalWaitingAtCheckpoint:
+		d.AtCheckpointCounter++
+		// Dog barks at every 5 seconds
+		if (d.AtCheckpointCounter % 300 == 0) {
+			g.Sounds[soundDogBark].Play()
+		}
+		// Wait for the player to arrive at the same checkpoint
 	case dogDangerBarking:
 		// Play barking sound
 		if d.PrevState != dogDangerBarking {
@@ -260,12 +281,10 @@ func (d *Dog) Update(g *GameScreen) {
 	d.Object.Update()
 }
 
-// StopSniffing stops sniffing when the player is at the same checkpoint
+// ContinueFromCheckpoint continues walking on the path when the player is at the same checkpoint
 // If the last checkpoint is reached then the dog starts following the player
-func (d *Dog) StopSniffing() {
-	if d.State == dogNormalSniffing {
-		d.State = dogNormalWalking
-	}
+func (d *Dog) ContinueFromCheckpoint() {
+	d.State = dogNormalWalking
 }
 
 // walk moves the dog either on a path or by following the player
@@ -361,10 +380,12 @@ func (d *Dog) move(dx, dy float64) {
 		// If the dog reaches a checkpoint
 		if collision := d.Object.Check(dx, dy, tagCheckpoint); collision != nil {
 			o := collision.Objects[0]
+			// If the dog or the player has not been at the checkpoint before
 			if o.Data.(int) > d.PrevCheckpoint {
 				d.PrevCheckpoint = o.Data.(int)
-				d.State = dogNormalSniffing
 			}
+			d.AtCheckpointCounter = 0
+			d.State = dogNormalSniffing
 		}
 	case dogNormalBlocked:
 		// If the dog would not collide with the player anymore

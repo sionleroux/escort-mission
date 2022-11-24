@@ -297,10 +297,10 @@ func (g *GameScreen) Update() (GameState, error) {
 	if collision := g.Player.Object.Check(0, 0, tagCheckpoint); collision != nil {
 		if o := collision.Objects[0]; g.Player.Object.Overlaps(o) {
 			if g.Checkpoint < o.Data.(int) {
-				if g.Dog.State == dogNormalSniffing && g.Dog.PrevCheckpoint == o.Data.(int) {
+				if g.Dog.State == dogNormalSniffing || g.Dog.State == dogNormalWaitingAtCheckpoint {
 					g.Checkpoint = o.Data.(int)
 					g.Sounds[voiceCheckpoint].PlayVariant(g.Checkpoint - 1)
-					g.Dog.StopSniffing()
+					g.Dog.ContinueFromCheckpoint()
 				}
 			}
 
@@ -366,7 +366,7 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
 		"FPS: %.2f\n"+
-			"Checkpoint: %d\n",
+		"Checkpoint: %d\n",
 		ebiten.ActualFPS(),
 		g.Checkpoint,
 	))
