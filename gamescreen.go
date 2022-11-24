@@ -92,13 +92,26 @@ func NewGameScreen(game *Game) {
 		case "Desert":
 			fg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
 			op := &ebiten.DrawImageOptions{}
-			op.ColorM.Scale(0.5, 0.5, 0.5, 0.25)
-			// op.GeoM.Translate(0, -16)
+			op.ColorM.Scale(0, 0, 0, 0.05)
 			op.GeoM.Scale(1, 1.1)
 			shade.DrawImage(layer.Image, op)
-			op.GeoM.Scale(1, 1.1)
+			op.GeoM.Translate(0, -2)
 			shade.DrawImage(layer.Image, op)
-			op.GeoM.Scale(1, 1.1)
+			op.GeoM.Translate(0, -2)
+			shade.DrawImage(layer.Image, op)
+			op.GeoM.Translate(0, -2)
+			shade.DrawImage(layer.Image, op)
+			op.GeoM.Translate(0, -2)
+			shade.DrawImage(layer.Image, op)
+			op.GeoM.Translate(0, -2)
+			shade.DrawImage(layer.Image, op)
+			op.GeoM.Translate(0, -2)
+			shade.DrawImage(layer.Image, op)
+			op.GeoM.Translate(0, -2)
+			shade.DrawImage(layer.Image, op)
+			op.GeoM.Translate(0, -2)
+			shade.DrawImage(layer.Image, op)
+			op.GeoM.Translate(0, -2)
 			shade.DrawImage(layer.Image, op)
 		case "Treetops":
 			fg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
@@ -289,10 +302,10 @@ func (g *GameScreen) Update() (GameState, error) {
 	g.Player.Update(g)
 
 	// Update dog
-	g.Dog.Update(g)
+	// g.Dog.Update(g)
 
 	// Update zombies
-	g.Zombies.Update(g)
+	// g.Zombies.Update(g)
 
 	// Update spawn points
 	g.SpawnPoints.Update(g)
