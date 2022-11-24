@@ -45,6 +45,7 @@ type GameScreen struct {
 	Level         int
 	Background    *ebiten.Image
 	Foreground    *ebiten.Image
+	Shade         *ebiten.Image
 	Camera        *camera.Camera
 	Sprites       map[SpriteType]*SpriteSheet
 	ZombieSprites []*SpriteSheet
@@ -79,21 +80,35 @@ func NewGameScreen(game *Game) {
 	level := g.LDTKProject.Levels[g.Level]
 
 	bg := ebiten.NewImage(level.Width, level.Height)
-	bg.Fill(level.BGColor)
+	// bg.Fill(level.BGColor)
 	fg := ebiten.NewImage(level.Width, level.Height)
+	shade := ebiten.NewImage(level.Width, level.Height)
 
 	// Render map
 	g.TileRenderer.Render(level)
 	for _, layer := range g.TileRenderer.RenderedLayers {
 		log.Println("Pre-drawing layer:", layer.Layer.Identifier)
-		if layer.Layer.Identifier == "Treetops" {
+		switch layer.Layer.Identifier {
+		case "Desert":
 			fg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
-		} else {
+			op := &ebiten.DrawImageOptions{}
+			op.ColorM.Scale(0.5, 0.5, 0.5, 0.25)
+			// op.GeoM.Translate(0, -16)
+			op.GeoM.Scale(1, 1.1)
+			shade.DrawImage(layer.Image, op)
+			op.GeoM.Scale(1, 1.1)
+			shade.DrawImage(layer.Image, op)
+			op.GeoM.Scale(1, 1.1)
+			shade.DrawImage(layer.Image, op)
+		case "Treetops":
+			fg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
+		default:
 			bg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
 		}
 	}
 	g.Background = bg
 	g.Foreground = fg
+	g.Shade = shade
 
 	// Create space for collision detection
 	g.Space = resolv.NewSpace(level.Width, level.Height, 16, 16)
@@ -353,6 +368,12 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 
 	// Zombies
 	g.Zombies.Draw(g)
+
+	// Shadows cast by the walls onto the ground and entities
+	g.Camera.Surface.DrawImage(
+		g.Shade,
+		g.Camera.GetTranslation(&ebiten.DrawImageOptions{}, 0, 0),
+	)
 
 	// Tree tops etc. high-up stuff need to be drawn above the entities
 	g.Camera.Surface.DrawImage(
