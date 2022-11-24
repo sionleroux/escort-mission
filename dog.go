@@ -96,7 +96,7 @@ func (d *Dog) Init() {
 //  - if there are zombies in range
 //  - the distance of the closest zombie
 //  - the resultant vector of the fleeing path based on all the zombies in range
-func (d *Dog) zombiesInRange(zRange float64, g *Game) (bool, float64, Coord) {
+func (d *Dog) zombiesInRange(zRange float64, g *GameScreen) (bool, float64, Coord) {
 	resultantVectorCoord := Coord{X: 0, Y: 0}
 	closestZombie := 1000.0
 	for _, zombie := range g.Zombies {
@@ -114,7 +114,7 @@ func (d *Dog) zombiesInRange(zRange float64, g *Game) (bool, float64, Coord) {
 }
 
 // planFleeingRoute plans a fleeing route for the dog
-func (d *Dog) planFleeingRoute(vector Coord, g *Game) *Path {
+func (d *Dog) planFleeingRoute(vector Coord, g *GameScreen) *Path {
 	fleeingPath := &Path{}
 	nv := NormalizeVector(vector)
 	fleeingPath.Points = []Coord{
@@ -124,7 +124,7 @@ func (d *Dog) planFleeingRoute(vector Coord, g *Game) *Path {
 }
 
 // planRouteBackToMainPath plans a route back to the main path
-func (d *Dog) planRouteBackToMainPath(g *Game) *Path {
+func (d *Dog) planRouteBackToMainPath(g *GameScreen) *Path {
 	returnPath := &Path{}
 	returnPath.Points = g.LevelMap.FindPath(
 		Coord{X: d.Object.X, Y: d.Object.Y},
@@ -136,7 +136,7 @@ func (d *Dog) planRouteBackToMainPath(g *Game) *Path {
 }
 
 // updateState updates the state machine of the dog
-func (d *Dog) updateState(g *Game) {
+func (d *Dog) updateState(g *GameScreen) {
 	d.PrevState = d.State
 
 	// Does the dog need to change mode? Danger <-> Normal
@@ -203,7 +203,7 @@ func (d *Dog) updateState(g *Game) {
 }
 
 // Update updates the state of the dog
-func (d *Dog) Update(g *Game) {
+func (d *Dog) Update(g *GameScreen) {
 	// If the dog is dead, no need to update
 	if d.Mode == dogDead {
 		return
@@ -277,7 +277,7 @@ func (d *Dog) turnTowardsPathPoint() {
 }
 
 // followPath moves the dog along its current path
-func (d *Dog) followPath(g *Game) {
+func (d *Dog) followPath(g *GameScreen) {
 	if d.CurrentPath.NextPoint == len(d.CurrentPath.Points) {
 		return
 	}
@@ -364,7 +364,7 @@ func (d *Dog) move(dx, dy float64) {
 }
 
 // Draw draws the Dog to the screen
-func (d *Dog) Draw(g *Game) {
+func (d *Dog) Draw(g *GameScreen) {
 	// the centre of the dog's shoulders is 5px down from the middle
 	const centerOffset float64 = 5
 

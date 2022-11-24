@@ -46,7 +46,7 @@ const (
 type Zombies []*Zombie
 
 // Update updates all the zombies
-func (zs *Zombies) Update(g *Game) {
+func (zs *Zombies) Update(g *GameScreen) {
 	for i, z := range *zs {
 		err := z.Update(g)
 		if err != nil {
@@ -107,7 +107,7 @@ func NewZombie(spawnpoint *SpawnPoint, position Coord, zombieType ZombieType, sp
 }
 
 // Draw draws all the zombies
-func (zs Zombies) Draw(g *Game) {
+func (zs Zombies) Draw(g *GameScreen) {
 	for _, z := range zs {
 		z.Draw(g)
 	}
@@ -136,7 +136,7 @@ type Zombie struct {
 }
 
 // Update updates the state of the zombie
-func (z *Zombie) Update(g *Game) error {
+func (z *Zombie) Update(g *GameScreen) error {
 	if z.State == zombieDead {
 		return errors.New("Zombie died")
 	}
@@ -189,7 +189,7 @@ func (z *Zombie) walk() {
 }
 
 // Animation-trigged state changes
-func (z *Zombie) animationBasedStateChanges(g *Game) {
+func (z *Zombie) animationBasedStateChanges(g *GameScreen) {
 	switch z.State {
 	case zombieHit:
 		z.State = zombieWalking
@@ -230,7 +230,7 @@ func (z *Zombie) move(dx, dy float64) {
 }
 
 // Draw draws the Zombie to the screen
-func (z *Zombie) Draw(g *Game) {
+func (z *Zombie) Draw(g *GameScreen) {
 	// -2, // the centre of the zombie's head is 2px up from the middle
 	const centerOffset float64 = 2
 
