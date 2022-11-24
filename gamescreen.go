@@ -221,7 +221,6 @@ func NewGameScreen(game *Game) {
 	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
 	g.Dog = &Dog{
 		Object:   object,
-		Angle:    0,
 		Sprite:   g.Sprites[spriteDog],
 		MainPath: &Path{Points: dogPath, NextPoint: 0},
 	}
@@ -272,12 +271,7 @@ func (g *GameScreen) Reset(game *Game) {
 		).Position
 	}
 	g.Player.Object.X, g.Player.Object.Y = float64(startPos[0]), float64(startPos[1])
-	g.Dog.Mode = dogNormal
-	g.Dog.State = 0     // XXX what should this be
-	g.Dog.PrevState = 0 // XXX what should this be
-	g.Dog.OnMainPath = false
-	// XXX what else is missing, why does the dog respawn and walk through walls
-	g.Dog.Object.X, g.Dog.Object.Y = float64(startPos[0]+dogOffset), float64(startPos[1])
+	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
 
 	g.Sounds[soundMusicBackground].Play()
 	game.State = gameRunning
