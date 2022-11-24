@@ -213,7 +213,7 @@ func (d *Dog) updateState(g *GameScreen) {
 			// - In case when dog is not blocked anymore by the player
 		case dogNormalSniffing:
 			// If the player has already touched the checkpoint previously
-			if (d.PrevCheckpoint == g.Checkpoint) {
+			if d.PrevCheckpoint == g.Checkpoint {
 				d.State = dogNormalWalking
 			}
 			// Sniffing for 3 seconds
@@ -280,7 +280,7 @@ func (d *Dog) Update(g *GameScreen) {
 	case dogNormalWaitingAtCheckpoint:
 		d.AtCheckpointCounter++
 		// Dog barks at every 5 seconds
-		if (d.AtCheckpointCounter % 300 == 0) {
+		if d.AtCheckpointCounter%300 == 0 {
 			g.Sounds[soundDogBark].Play()
 		}
 		// Wait for the player to arrive at the same checkpoint
@@ -314,7 +314,7 @@ func (d *Dog) ContinueFromCheckpoint() {
 
 // walk moves the dog either on a path or by following the player
 func (d *Dog) walk(g *GameScreen) {
-	if (d.LastPathpointReached) {
+	if d.LastPathpointReached {
 		d.followPlayer(g)
 	} else {
 		d.followPath(g)
@@ -334,11 +334,11 @@ func (d *Dog) turnTowardsPathPoint() {
 }
 
 func (d *Dog) followPlayer(g *GameScreen) {
-	d.turnTowardsCoordinate(Coord{ X: g.Player.Object.X, Y: g.Player.Object.Y})
+	d.turnTowardsCoordinate(Coord{X: g.Player.Object.X, Y: g.Player.Object.Y})
 
 	d.move(
-		math.Cos(d.Angle) * dogWalkingSpeed,
-		math.Sin(d.Angle) * dogWalkingSpeed,
+		math.Cos(d.Angle)*dogWalkingSpeed,
+		math.Sin(d.Angle)*dogWalkingSpeed,
 	)
 }
 

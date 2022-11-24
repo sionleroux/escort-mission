@@ -10,8 +10,8 @@ import (
 	"image/png"
 	"io/ioutil"
 	"log"
-	"path"
 	"math/rand"
+	"path"
 	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -178,15 +178,15 @@ type Sound struct {
 }
 
 // AddMusic adds one new music to the soundType
-func (s *Sound) AddMusic(f string, sampleRate int, context *audio.Context) {	
-	s.Audio = append(s.Audio, NewMusicPlayer(loadSoundFile(f + ".ogg", sampleRate), context))
+func (s *Sound) AddMusic(f string, sampleRate int, context *audio.Context) {
+	s.Audio = append(s.Audio, NewMusicPlayer(loadSoundFile(f+".ogg", sampleRate), context))
 }
 
 // AddSound adds one new sound to the soundType
-func (s *Sound) AddSound(f string, sampleRate int, context *audio.Context, v... int) {
+func (s *Sound) AddSound(f string, sampleRate int, context *audio.Context, v ...int) {
 	var filename string
 
-	variants := 1	
+	variants := 1
 	if len(v) > 0 {
 		variants = v[0]
 	}
@@ -195,16 +195,16 @@ func (s *Sound) AddSound(f string, sampleRate int, context *audio.Context, v... 
 		if variants == 1 {
 			filename = f + ".ogg"
 		} else {
-			filename = f + "-" + strconv.Itoa(i + 1) + ".ogg"
+			filename = f + "-" + strconv.Itoa(i+1) + ".ogg"
 		}
-	
-		s.Audio = append(s.Audio, NewSoundPlayer( loadSoundFile(filename, sampleRate), context ))
+
+		s.Audio = append(s.Audio, NewSoundPlayer(loadSoundFile(filename, sampleRate), context))
 	}
 }
 
 // SetVolume sets the volume of the audio
 func (s *Sound) SetVolume(v float64) {
-	if (v >= 0 && v <= 1) {
+	if v >= 0 && v <= 1 {
 		s.Volume = v
 	}
 }

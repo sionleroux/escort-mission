@@ -390,7 +390,7 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(
 		"FPS: %.2f\n"+
-		"Checkpoint: %d\n",
+			"Checkpoint: %d\n",
 		ebiten.ActualFPS(),
 		g.Checkpoint,
 	))
