@@ -10,7 +10,7 @@
 	},
 	"jsonVersion": "1.1.3",
 	"appBuildId": 458364,
-	"nextUid": 98,
+	"nextUid": 99,
 	"identifierStyle": "Capitalize",
 	"worldLayout": "Free",
 	"worldGridWidth": 256,
@@ -2030,7 +2030,7 @@
 					"max": null,
 					"regex": null,
 					"acceptFileTypes": null,
-					"defaultOverride": { "id": "V_Int", "params": [2] },
+					"defaultOverride": { "id": "V_Int", "params": [1] },
 					"textLanguageMode": null,
 					"symmetricalRef": false,
 					"autoChainRef": true,
@@ -2117,7 +2117,7 @@
 					"max": null,
 					"regex": null,
 					"acceptFileTypes": null,
-					"defaultOverride": { "id": "V_Int", "params": [2] },
+					"defaultOverride": { "id": "V_Int", "params": [1] },
 					"textLanguageMode": null,
 					"symmetricalRef": false,
 					"autoChainRef": true,
@@ -2199,8 +2199,8 @@
 			"spacing": 0,
 			"padding": 0,
 			"tags": [],
-			"tagsSourceEnumUid": null,
-			"enumTags": [],
+			"tagsSourceEnumUid": 98,
+			"enumTags": [ { "enumValueId": "Corner", "tileIds": [64,65,66,67,68,69,70,71] }, { "enumValueId": "Edge", "tileIds": [72,73,74,75] }, { "enumValueId": "Inner", "tileIds": [83,84,85,86,87,88,89,90,91] }, { "enumValueId": "Rock", "tileIds": [52,53,54,55,56,57,58,59,60,61,62,63] } ],
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": {
@@ -2271,7 +2271,12 @@
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "0000000000000000", "averageColors": "5452545254525452445244524452445214311431143114310000000000009653" }
 		}
-	], "enums": [], "externalEnums": [], "levelFields": [] },
+	], "enums": [{ "identifier": "Walls", "uid": 98, "values": [
+		{ "id": "Corner", "tileId": 71, "color": 11171635, "__tileSrcRect": [224,256,32,32] },
+		{ "id": "Edge", "tileId": 73, "color": 10053171, "__tileSrcRect": [32,288,32,32] },
+		{ "id": "Inner", "tileId": 83, "color": 4469538, "__tileSrcRect": [96,320,32,32] },
+		{ "id": "Rock", "tileId": 54, "color": 8939042, "__tileSrcRect": [192,192,32,32] }
+	], "iconTilesetUid": 1, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [] },
 	"levels": [
 		{
 			"identifier": "Level_0",
@@ -4843,7 +4848,7 @@
 							"defUid": 88,
 							"px": [1120,192],
 							"fieldInstances": [
-								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
+								{ "__identifier": "Initial", "__value": 1, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 90, "realEditorValues": [] }
 							]
 						},
@@ -4860,7 +4865,7 @@
 							"defUid": 88,
 							"px": [512,1152],
 							"fieldInstances": [
-								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
+								{ "__identifier": "Initial", "__value": 1, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 90, "realEditorValues": [] }
 							]
 						},
@@ -4877,7 +4882,7 @@
 							"defUid": 88,
 							"px": [352,2720],
 							"fieldInstances": [
-								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
+								{ "__identifier": "Initial", "__value": 1, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 90, "realEditorValues": [] }
 							]
 						},
@@ -4894,7 +4899,7 @@
 							"defUid": 88,
 							"px": [1760,1824],
 							"fieldInstances": [
-								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
+								{ "__identifier": "Initial", "__value": 1, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 90, "realEditorValues": [] }
 							]
 						},
@@ -4911,7 +4916,7 @@
 							"defUid": 88,
 							"px": [2144,2720],
 							"fieldInstances": [
-								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
+								{ "__identifier": "Initial", "__value": 1, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 90, "realEditorValues": [] }
 							]
 						},
@@ -4928,7 +4933,7 @@
 							"defUid": 88,
 							"px": [2432,2592],
 							"fieldInstances": [
-								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
+								{ "__identifier": "Initial", "__value": 1, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 90, "realEditorValues": [] }
 							]
 						},
@@ -4945,7 +4950,7 @@
 							"defUid": 88,
 							"px": [2560,2944],
 							"fieldInstances": [
-								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
+								{ "__identifier": "Initial", "__value": 1, "__type": "Int", "__tile": null, "defUid": 89, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 90, "realEditorValues": [] }
 							]
 						},
@@ -4962,7 +4967,7 @@
 							"defUid": 91,
 							"px": [3040,2944],
 							"fieldInstances": [
-								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 92, "realEditorValues": [] },
+								{ "__identifier": "Initial", "__value": 1, "__type": "Int", "__tile": null, "defUid": 92, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 93, "realEditorValues": [] }
 							]
 						},
@@ -4993,6 +4998,312 @@
 							"defUid": 75,
 							"px": [1696,896],
 							"fieldInstances": []
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [69,74],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "64619100-5110-11ed-86e4-61031629bc76",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [2208,2368],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [34,77],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "658354b0-5110-11ed-86e4-29e0326c6c8c",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [1088,2464],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [25,71],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "6632ce90-5110-11ed-86e4-6d9886199c6a",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [800,2272],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [35,55],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "671a2150-5110-11ed-86e4-c39e1794d119",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [1120,1760],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [7,40],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "67ed4fd0-5110-11ed-86e4-975bc4326b3a",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [224,1280],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [30,33],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "68740c00-5110-11ed-86e4-336dc57facf0",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [960,1056],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [9,15],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "6a5eec10-5110-11ed-86e4-47b73983e2fb",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [288,480],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [38,33],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "6d576b90-5110-11ed-86e4-01e1afdd22a8",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [1216,1056],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [66,48],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "6e371d30-5110-11ed-86e4-f997c72bd8b8",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [2112,1536],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [84,59],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "6ea45df0-5110-11ed-86e4-5b722f958287",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [2688,1888],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [50,92],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "729b3aa0-5110-11ed-86e4-89b1c1be71bd",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [1600,2944],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [58,84],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "7321f6d0-5110-11ed-86e4-537d816f562a",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [1856,2688],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [8,23],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "7e384060-5110-11ed-86e4-0dd30e03905d",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [256,736],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [6,75],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "7ffa3bb0-5110-11ed-86e4-bffc049280e4",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [192,2400],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [6,84],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "8069ed70-5110-11ed-86e4-6bb86d3f169b",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [192,2688],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [10,94],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "80cfdb30-5110-11ed-86e4-9906c48940bb",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [320,3008],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [27,95],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "813fb400-5110-11ed-86e4-bd8a09aec0a1",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [864,3040],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
+						},
+						{
+							"__identifier": "Zombie",
+							"__grid": [33,61],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D994A3",
+							"iid": "86b8eaf0-5110-11ed-86e4-85c2548e1a09",
+							"width": 16,
+							"height": 16,
+							"defUid": 83,
+							"px": [1056,1952],
+							"fieldInstances": [
+								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
+								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
+							]
 						}
 					]
 				},
