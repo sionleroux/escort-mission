@@ -94,11 +94,12 @@ func NewZombie(spawnpoint *SpawnPoint, position Coord, zombieType ZombieType, sp
 	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
 
 	z := &Zombie{
-		Object:   object,
-		Angle:    0,
-		Sprite:   sprites,
-		Speed:    speed * (1 + rand.Float64()),
-		HitToDie: hitToDie,
+		Object:     object,
+		Angle:      0,
+		Sprite:     sprites,
+		Speed:      speed * (1 + rand.Float64()),
+		HitToDie:   hitToDie,
+		ZombieType: zombieType,
 	}
 	z.Object.Data = z
 	z.SpawnPoint = spawnpoint
@@ -132,6 +133,7 @@ type Zombie struct {
 	Speed      float64        // The speed this zombie walks at
 	Target     *resolv.Object // Target object (player or dog)
 	HitToDie   int            // Number of hits needed to die
+	ZombieType ZombieType     // Type of the zombie
 	SpawnPoint *SpawnPoint    // Reference for the SpawnPoint where the zombie was spawned
 }
 
@@ -145,11 +147,27 @@ func (z *Zombie) Update(g *GameScreen) error {
 		playerDistance, _, _ := CalcObjectDistance(z.Object, g.Player.Object)
 		dogDistance, _, _ := CalcObjectDistance(z.Object, g.Dog.Object)
 
+		zShouldWalk := false
+
 		if playerDistance < zombieRange {
 			z.Target = g.Player.Object
-			z.walk()
+			zShouldWalk = true
 		} else if dogDistance < zombieRange*1.2 {
 			z.Target = g.Dog.Object
+			zShouldWalk = true
+		}
+
+		if (zShouldWalk) {
+			if z.State == zombieIdle {
+				// Zombie detects target
+				if z.ZombieType == zombieNormal || z.ZombieType == zombieCrawler {
+					g.Sounds[soundZombieGrowl].Play()
+				} else if z.ZombieType == zombieSprinter {
+					g.Sounds[soundZombieScream].Play()
+				} else {
+					g.Sounds[soundBigZombieSound].Play()
+				}
+			}
 			z.walk()
 		} else {
 			z.State = zombieIdle
@@ -195,8 +213,6 @@ func (z *Zombie) animationBasedStateChanges(g *GameScreen) {
 		z.State = zombieWalking
 	case zombieDeath:
 		z.State = zombieDead
-	default:
-		z.State = zombieWalking
 	}
 }
 

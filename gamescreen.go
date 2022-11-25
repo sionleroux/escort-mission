@@ -126,8 +126,8 @@ func NewGameScreen(game *Game) {
 	}
 
 	// Sound
-	g.Sounds = make([]*Sound, 11)
-	for i := 0; i < 11; i++ {
+	g.Sounds = make([]*Sound, 12)
+	for i := 0; i < 12; i++ {
 		g.Sounds[i] = &Sound{Volume: 1}
 	}
 	g.Sounds[soundMusicBackground].AddMusic("assets/music/BackgroundMusic", sampleRate, context)
@@ -140,6 +140,7 @@ func NewGameScreen(game *Game) {
 	g.Sounds[soundZombieScream].AddSound("assets/sfx/Zombie-scream", sampleRate, context)
 	g.Sounds[soundZombieGrowl].AddSound("assets/sfx/Zombie-growl", sampleRate, context, 4)
 	g.Sounds[soundZombieDeath].AddSound("assets/sfx/Zombie-Death", sampleRate, context, 3)
+	g.Sounds[soundBigZombieSound].AddSound("assets/sfx/Big-zombie-sound", sampleRate, context, 4)
 
 
 	g.Sounds[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)

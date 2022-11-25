@@ -169,6 +169,7 @@ const (
 	soundZombieScream
 	soundZombieGrowl
 	soundZombieDeath
+	soundBigZombieSound
 
 	voiceCheckpoint
 )
