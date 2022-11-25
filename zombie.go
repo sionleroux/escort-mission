@@ -26,7 +26,7 @@ const zombieSpeed float64 = 0.4
 const zombieCrawlerSpeed float64 = 0.2
 
 // zombieSprinterSpeed is the distance the sprinter zombie moves per update cycle
-const zombieSprinterSpeed float64 = 0.6
+const zombieSprinterSpeed float64 = 2.0
 
 // zombieRange is how far away the zombie sees something to attack
 const zombieRange float64 = 200
