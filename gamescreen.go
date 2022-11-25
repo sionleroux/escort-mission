@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 	"math"
@@ -56,6 +55,7 @@ type GameScreen struct {
 	LevelMap      LevelMap
 	Checkpoint    int
 	HUD           *HUD
+	Debuggers     Debuggers
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -66,6 +66,7 @@ func NewGameScreen(game *Game) {
 		Width:      game.Width,
 		Height:     game.Height,
 		Checkpoint: game.Checkpoint,
+		Debuggers:  debuggers,
 	}
 
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
@@ -388,12 +389,7 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 
 	g.HUD.Draw(g.Player.Ammo, screen)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf(
-		"FPS: %.2f\n"+
-			"Checkpoint: %d\n",
-		ebiten.ActualFPS(),
-		g.Checkpoint,
-	))
+	g.Debuggers.Debug(g, screen)
 }
 
 func debugPosition(g *GameScreen, screen *ebiten.Image, o *resolv.Object) {
