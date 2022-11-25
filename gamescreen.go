@@ -1,7 +1,6 @@
 package main
 
 import (
-	"image/color"
 	"log"
 	"math"
 	"strconv"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
 	beziercp "github.com/brothertoad/bezier"
@@ -390,20 +388,6 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 	g.HUD.Draw(g.Player.Ammo, screen)
 
 	g.Debuggers.Debug(g, screen)
-}
-
-func debugPosition(g *GameScreen, screen *ebiten.Image, o *resolv.Object) {
-	verts := o.Shape.(*resolv.ConvexPolygon).Transformed()
-	for i := 0; i < len(verts); i++ {
-		vert := verts[i]
-		next := verts[0]
-		if i < len(verts)-1 {
-			next = verts[i+1]
-		}
-		vX, vY := g.Camera.GetScreenCoords(vert.X(), vert.Y())
-		nX, nY := g.Camera.GetScreenCoords(next.X(), next.Y())
-		ebitenutil.DrawLine(screen, vX, vY, nX, nY, color.White)
-	}
 }
 
 // Clicked is shorthand for when the left mouse button has just been clicked
