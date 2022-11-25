@@ -155,11 +155,14 @@ func loadMaps(name string) *ldtkgo.Project {
 }
 
 // SoundType is a unique identifier to reference sound by name
-type SoundType uint64
+type SoundType uint8
 
 const (
-	soundMusicBackground SoundType = iota
-	soundGunShot
+	musicBackground SoundType = iota
+)
+
+const (
+	soundGunShot SoundType = iota
 	soundGunReload
 	soundDogBark
 	soundPlayerDies
@@ -169,8 +172,10 @@ const (
 	soundZombieGrowl
 	soundZombieDeath
 	soundBigZombieSound
+)
 
-	voiceCheckpoint
+const (
+	voiceCheckpoint SoundType = iota
 )
 
 // Sound stores and plays all the sound variants for one single soundType

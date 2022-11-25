@@ -41,7 +41,9 @@ type GameScreen struct {
 	Tick          int
 	TileRenderer  *TileRenderer
 	LDTKProject   *ldtkgo.Project
+	Musics        Sounds
 	Sounds        Sounds
+	Voices        Sounds
 	Level         int
 	Background    *ebiten.Image
 	Foreground    *ebiten.Image
@@ -128,12 +130,17 @@ func NewGameScreen(game *Game) {
 		}
 	}
 
+	// Music
+	g.Musics = make([]*Sound, 1)
+	g.Musics[0] = &Sound{Volume: 0.5}
+	g.Musics[musicBackground].AddMusic("assets/music/BackgroundMusic", sampleRate, context)
+	g.Musics[musicBackground].Play()
+
 	// Sound
-	g.Sounds = make([]*Sound, 12)
-	for i := 0; i < 12; i++ {
-		g.Sounds[i] = &Sound{Volume: 1}
+	g.Sounds = make([]*Sound, 10)
+	for i := 0; i < 10; i++ {
+		g.Sounds[i] = &Sound{Volume: 0.7}
 	}
-	g.Sounds[soundMusicBackground].AddMusic("assets/music/BackgroundMusic", sampleRate, context)
 	g.Sounds[soundGunShot].AddSound("assets/sfx/Gunshot", sampleRate, context)
 	g.Sounds[soundGunReload].AddSound("assets/sfx/Reload", sampleRate, context)
 	g.Sounds[soundDogBark].AddSound("assets/sfx/Dog-sound", sampleRate, context, 5)
@@ -145,11 +152,11 @@ func NewGameScreen(game *Game) {
 	g.Sounds[soundZombieDeath].AddSound("assets/sfx/Zombie-Death", sampleRate, context, 3)
 	g.Sounds[soundBigZombieSound].AddSound("assets/sfx/Big-zombie-sound", sampleRate, context, 4)
 
+	// Voices
+	g.Voices = make([]*Sound, 1)
+	g.Voices[0] = &Sound{Volume: 1}
+	g.Voices[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)
 
-	g.Sounds[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)
-
-	g.Sounds[soundMusicBackground].SetVolume(0.5)
-	g.Sounds[soundMusicBackground].Play()
 
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 5)
@@ -281,7 +288,7 @@ func (g *GameScreen) Reset(game *Game) {
 	g.Player.Object.X, g.Player.Object.Y = float64(startPos[0]), float64(startPos[1])
 	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
 
-	g.Sounds[soundMusicBackground].Play()
+	g.Musics[musicBackground].Play()
 	game.State = gameRunning
 }
 
@@ -318,7 +325,7 @@ func (g *GameScreen) Update() (GameState, error) {
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
 			if g.Player.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
-				g.Sounds[soundMusicBackground].Pause()
+				g.Musics[musicBackground].Pause()
 				g.Sounds[soundPlayerDies].Play()
 				return gameOver, nil // return early, no point in continuing, you are dead
 			}
@@ -331,7 +338,7 @@ func (g *GameScreen) Update() (GameState, error) {
 			if g.Checkpoint < o.Data.(int) {
 				if g.Dog.State == dogNormalSniffing || g.Dog.State == dogNormalWaitingAtCheckpoint {
 					g.Checkpoint = o.Data.(int)
-					g.Sounds[voiceCheckpoint].PlayVariant(g.Checkpoint - 1)
+					g.Voices[voiceCheckpoint].PlayVariant(g.Checkpoint - 1)
 					g.Dog.ContinueFromCheckpoint()
 				}
 			}
@@ -355,7 +362,7 @@ func (g *GameScreen) Update() (GameState, error) {
 
 	// Game over if the dog dies
 	if g.Dog.Mode == dogDead {
-		g.Sounds[soundMusicBackground].Pause()
+		g.Musics[musicBackground].Pause()
 		return gameOver, nil
 	}
 

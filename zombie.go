@@ -32,7 +32,7 @@ const zombieSprinterSpeed float64 = 2.0
 const zombieRange float64 = 200
 
 // Types of zombies
-type ZombieType uint64
+type ZombieType uint8
 
 const (
 	zombieNormal ZombieType = iota
