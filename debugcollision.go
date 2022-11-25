@@ -23,9 +23,9 @@ func init() {
 func DebugCollision(g *GameScreen, screen *ebiten.Image) {
 	debugPosition(g, screen, g.Player.Object)
 	debugPosition(g, screen, g.Dog.Object)
-	for _, z := range g.Zombies {
-		debugPosition(g, screen, z.Object)
-	}
+	// for _, z := range g.Zombies {
+	// 	debugPosition(g, screen, z.Object)
+	// }
 	for _, o := range g.Space.Objects() {
 		if o.HasTags(tagWall) {
 			debugPosition(g, screen, o)
@@ -34,7 +34,16 @@ func DebugCollision(g *GameScreen, screen *ebiten.Image) {
 }
 
 func debugPosition(g *GameScreen, screen *ebiten.Image, o *resolv.Object) {
+	if o.Shape == nil {
+		return
+	}
 	verts := o.Shape.(*resolv.ConvexPolygon).Transformed()
+	var lineColor color.RGBA
+	if o.Data == nil {
+		lineColor = color.RGBA{255, 255, 255, 255} // white by default
+	} else {
+		lineColor = o.Data.(color.RGBA)
+	}
 	for i := 0; i < len(verts); i++ {
 		vert := verts[i]
 		next := verts[0]
@@ -43,6 +52,6 @@ func debugPosition(g *GameScreen, screen *ebiten.Image, o *resolv.Object) {
 		}
 		vX, vY := g.Camera.GetScreenCoords(vert.X(), vert.Y())
 		nX, nY := g.Camera.GetScreenCoords(next.X(), next.Y())
-		ebitenutil.DrawLine(screen, vX, vY, nX, nY, color.White)
+		ebitenutil.DrawLine(screen, vX, vY, nX, nY, lineColor)
 	}
 }

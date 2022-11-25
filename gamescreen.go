@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image/color"
 	"log"
 	"math"
 	"strconv"
@@ -109,51 +110,69 @@ func NewGameScreen(game *Game) {
 	g.LevelMap = CreateMap(level.Width, level.Height)
 
 	// Add wall tiles to space for collision detection
-	for _, layer := range level.Layers {
-		if layer.Type == ldtkgo.LayerTypeIntGrid && layer.Identifier == "Desert" {
-
-			tiles := layer.AllTiles()
-
-			for i := 0; i < len(layer.IntGrid); i++ {
-				tile := tiles[i]
-				intData := layer.IntGrid[i]
-				origin := struct{ X, Y float64 }{
-					float64(intData.Position[0] + layer.OffsetX),
-					float64(intData.Position[1] + layer.OffsetY),
-				}
-				size := struct{ W, H float64 }{
-					float64(layer.GridSize),
-					float64(layer.GridSize),
-				}
-
-				object := resolv.NewObject(
-					origin.X, origin.Y,
-					size.W, size.H,
-					tagWall,
-				)
-
-				log.Println(tile)
-				enums := layer.Tileset.EnumsForTile(tile.ID)
-
-				if enums.Contains(wallCorner) {
-					object.SetShape(resolv.NewConvexPolygon( // triangle
-						0, 0, // start at origin
-						0, 0,
-						size.W, size.H,
-						0, size.H,
-					))
-				} else {
-					object.SetShape(resolv.NewRectangle( // square
-						0, 0,
-						size.W, size.H,
-					))
-				}
-
-				g.Space.Add(object)
-
-				g.LevelMap.SetObstacle(intData.Position[0]/layer.GridSize, intData.Position[1]/layer.GridSize)
-			}
+	layer := level.LayerByIdentifier("Desert")
+	tiles := layer.AllTiles()
+	for i := 0; i < len(layer.IntGrid); i++ {
+		tile := tiles[i]
+		intData := layer.IntGrid[i]
+		origin := struct{ X, Y float64 }{
+			float64(intData.Position[0] + layer.OffsetX),
+			float64(intData.Position[1] + layer.OffsetY),
 		}
+		size := struct{ W, H float64 }{
+			float64(layer.GridSize),
+			float64(layer.GridSize),
+		}
+
+		object := resolv.NewObject(
+			origin.X, origin.Y,
+			size.W, size.H,
+			tagWall,
+		)
+
+		enum := layer.Tileset.EnumsForTile(tile.ID)[0]
+		log.Printf("(%v): %#v", tile.ID, enum)
+
+		switch enum {
+		case "Corner":
+			object.SetShape(resolv.NewConvexPolygon( // triangle
+				0, 0, // start at origin
+				0, 0,
+				size.W, size.H,
+				0, size.H,
+			))
+			object.Data = color.RGBA{255, 0, 0, 255} // red
+		case "Edge":
+			// there is about this much sand on the tile from the edge to the rock
+			const wallEdgeMargin = 12
+			object.SetShape(resolv.NewRectangle( // square with the top chopped off
+				0, wallEdgeMargin,
+				size.W, size.H-wallEdgeMargin,
+			))
+			object.Data = color.RGBA{0, 255, 0, 255} // green
+		case "Rock":
+			object.SetShape(resolv.NewRectangle( // square
+				0, 0,
+				size.W, size.H,
+			))
+			object.Data = color.RGBA{255, 0, 255, 255}
+		case "Inner":
+			object.SetShape(resolv.NewRectangle( // square
+				0, 0,
+				size.W, size.H,
+			))
+			object.Data = color.RGBA{0, 255, 255, 255}
+		default:
+			object.SetShape(resolv.NewRectangle( // square
+				0, 0,
+				size.W, size.H,
+			))
+			object.Data = color.RGBA{0, 0, 255, 255} // blue
+		}
+
+		g.Space.Add(object)
+
+		g.LevelMap.SetObstacle(intData.Position[0]/layer.GridSize, intData.Position[1]/layer.GridSize)
 	}
 
 	// Sound
@@ -171,7 +190,7 @@ func NewGameScreen(game *Game) {
 	g.Sounds[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)
 
 	g.Sounds[soundMusicBackground].SetVolume(0.5)
-	g.Sounds[soundMusicBackground].Play()
+	// g.Sounds[soundMusicBackground].Play()
 
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 5)
