@@ -166,6 +166,9 @@ const (
 	soundPlayerDies
 	soundHit
 	soundDryFire
+	soundZombieScream
+	soundZombieGrowl
+	soundZombieDeath
 
 	voiceCheckpoint
 )

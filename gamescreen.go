@@ -126,8 +126,8 @@ func NewGameScreen(game *Game) {
 	}
 
 	// Sound
-	g.Sounds = make([]*Sound, 8)
-	for i := 0; i < 8; i++ {
+	g.Sounds = make([]*Sound, 11)
+	for i := 0; i < 11; i++ {
 		g.Sounds[i] = &Sound{Volume: 1}
 	}
 	g.Sounds[soundMusicBackground].AddMusic("assets/music/BackgroundMusic", sampleRate, context)
@@ -137,6 +137,11 @@ func NewGameScreen(game *Game) {
 	g.Sounds[soundPlayerDies].AddSound("assets/sfx/PlayerDies", sampleRate, context)
 	g.Sounds[soundHit].AddSound("assets/sfx/Hit", sampleRate, context, 5)
 	g.Sounds[soundDryFire].AddSound("assets/sfx/Gun-dry-fire", sampleRate, context)
+	g.Sounds[soundZombieScream].AddSound("assets/sfx/Zombie-scream", sampleRate, context)
+	g.Sounds[soundZombieGrowl].AddSound("assets/sfx/Zombie-growl", sampleRate, context, 4)
+	g.Sounds[soundZombieDeath].AddSound("assets/sfx/Zombie-Death", sampleRate, context, 3)
+
+
 	g.Sounds[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)
 
 	g.Sounds[soundMusicBackground].SetVolume(0.5)
@@ -433,8 +438,7 @@ func Shoot(g *GameScreen) {
 			for _, o := range c.Objects {
 				if o.HasTags(tagMob) {
 					log.Println("HIT!")
-					g.Sounds[soundHit].Play()
-					o.Data.(*Zombie).Hit()
+					o.Data.(*Zombie).Hit(g)
 					return // stop at the first zombie
 				}
 			}
