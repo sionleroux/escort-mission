@@ -97,6 +97,7 @@ func (d *Dog) Init() {
 
 // Resets the dog to a coordinate after death
 func (d *Dog) Reset(cp int, x, y float64) {
+	d.OutOfSightCounter = 0
 	d.Mode = dogNormal
 	d.State = dogNormalWaiting
 	d.CurrentPath = d.MainPath
