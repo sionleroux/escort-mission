@@ -177,6 +177,7 @@ const (
 
 const (
 	voiceCheckpoint SoundType = iota
+	voiceRespawn
 )
 
 // Sound stores and plays all the sound variants for one single soundType

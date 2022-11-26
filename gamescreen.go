@@ -157,9 +157,12 @@ func NewGameScreen(game *Game) {
 	g.Sounds[soundBigZombieSound].AddSound("assets/sfx/Big-zombie-sound", sampleRate, context, 4)
 
 	// Voices
-	g.Voices = make([]*Sound, 1)
-	g.Voices[0] = &Sound{Volume: 1}
+	g.Voices = make([]*Sound, 2)
+	for i := 0; i < 2; i++ {
+		g.Voices[i] = &Sound{Volume: 1}
+	}
 	g.Voices[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)
+	g.Voices[voiceRespawn].AddSound("assets/voice/Respawn", sampleRate, context, 5)
 
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 5)
@@ -304,6 +307,7 @@ func (g *GameScreen) Reset(game *Game) {
 	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
 
 	g.SoundLoops[musicBackground].Play()
+	g.Voices[voiceRespawn].Play()
 	game.State = gameRunning
 }
 
