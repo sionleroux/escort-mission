@@ -109,28 +109,24 @@ func (s *SpawnPoint) Update(g *GameScreen) {
 		return
 	}
 
-	// If the player is close to the spawn point then it is activated
 	playerDistance := CalcDistance(s.Position.X, s.Position.Y, g.Player.Object.X, g.Player.Object.Y)
+	
+	// Spawn point is activated if the player is close enougn, but not too close
+	if playerDistance < spawnMaxDistance && playerDistance > spawnMinDistance {
+		if !s.InitialSpawned || ( g.Tick%s.NextSpawn == 0 && len(s.Zombies) < s.InitialCount ) {
+			s.CanSpawn = true
+		}
+	}
 
-	if playerDistance < spawnMaxDistance {
-		// Intial spawning
+	if s.CanSpawn {
 		if !s.InitialSpawned {
 			for i := 0; i < s.InitialCount; i++ {
 				s.SpawnZombie(g)
 			}
 			s.InitialSpawned = true
 		} else {
-			// Continuous spawning one zombie if needed after a while
-			if g.Tick%s.NextSpawn == 0 {
-				if len(s.Zombies) < s.InitialCount {
-					s.CanSpawn = true
-				}
-			}
+			s.SpawnZombie(g)	
 		}
-	}
-	// Zombie is spawned only if the player is not too close
-	if playerDistance > spawnMinDistance && s.CanSpawn {
-		s.SpawnZombie(g)
 		s.CanSpawn = false
 	}
 }
@@ -143,4 +139,14 @@ func (s *SpawnPoint) RemoveZombie(z *Zombie) {
 			s.Zombies = append((s.Zombies)[:i], (s.Zombies)[i+1:]...)
 		}
 	}
+}
+
+// Reset removes all the zombies and sets the initial state of the SpawnPoint
+func (s *SpawnPoint) Reset() {
+	for i, _ := range s.Zombies {
+		s.Zombies[i] = nil
+	}
+	s.Zombies = Zombies{}
+	s.InitialSpawned = false
+	s.PrevPosition = SpawnPosition{ 0, 0 }
 }

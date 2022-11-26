@@ -277,6 +277,19 @@ func (g *GameScreen) Reset(game *Game) {
 	// Load entities from map
 	entities := g.LDTKProject.Levels[g.Level].LayerByIdentifier("Entities")
 
+	// Remove zombies
+	for i, z := range g.Zombies {
+		g.Space.Remove(z.Object)
+		g.Zombies[i] = nil
+	}
+	g.Zombies = Zombies{}
+
+	// Reset spawnpoints
+	for _, s := range g.SpawnPoints {
+		s.Reset()
+	}
+
+
 	// Reset some player and dog values
 	g.Player.Ammo = playerAmmoClipMax
 	startPos := entities.EntityByIdentifier("Player").Position
