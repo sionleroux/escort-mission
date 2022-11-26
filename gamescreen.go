@@ -41,7 +41,7 @@ type GameScreen struct {
 	Tick          int
 	TileRenderer  *TileRenderer
 	LDTKProject   *ldtkgo.Project
-	Musics        Sounds
+	SoundLoops    Sounds
 	Sounds        Sounds
 	Voices        Sounds
 	Level         int
@@ -130,11 +130,15 @@ func NewGameScreen(game *Game) {
 		}
 	}
 
-	// Music
-	g.Musics = make([]*Sound, 1)
-	g.Musics[0] = &Sound{Volume: 0.5}
-	g.Musics[musicBackground].AddMusic("assets/music/BackgroundMusic", sampleRate, context)
-	g.Musics[musicBackground].Play()
+	// SoundLoops
+	g.SoundLoops = make([]*Sound, 2)
+	for i := 0; i < 2; i++ {
+		g.SoundLoops[i] = &Sound{Volume: 0.5}
+	}
+	g.SoundLoops[musicBackground].AddSoundLoop("assets/music/BackgroundMusic", sampleRate, context)
+	g.SoundLoops[soundFootStep].AddSoundLoop("assets/sfx/Footstep-loop", sampleRate, context)
+	g.SoundLoops[soundFootStep].SetVolume(0.7)
+	g.SoundLoops[musicBackground].Play()
 
 	// Sound
 	g.Sounds = make([]*Sound, 10)
@@ -156,7 +160,6 @@ func NewGameScreen(game *Game) {
 	g.Voices = make([]*Sound, 1)
 	g.Voices[0] = &Sound{Volume: 1}
 	g.Voices[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)
-
 
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 5)
@@ -289,7 +292,6 @@ func (g *GameScreen) Reset(game *Game) {
 		s.Reset()
 	}
 
-
 	// Reset some player and dog values
 	g.Player.Ammo = playerAmmoClipMax
 	startPos := entities.EntityByIdentifier("Player").Position
@@ -301,7 +303,7 @@ func (g *GameScreen) Reset(game *Game) {
 	g.Player.Object.X, g.Player.Object.Y = float64(startPos[0]), float64(startPos[1])
 	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
 
-	g.Musics[musicBackground].Play()
+	g.SoundLoops[musicBackground].Play()
 	game.State = gameRunning
 }
 
@@ -338,7 +340,7 @@ func (g *GameScreen) Update() (GameState, error) {
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
 			if g.Player.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
-				g.Musics[musicBackground].Pause()
+				g.SoundLoops[musicBackground].Pause()
 				g.Sounds[soundPlayerDies].Play()
 				return gameOver, nil // return early, no point in continuing, you are dead
 			}
@@ -375,7 +377,7 @@ func (g *GameScreen) Update() (GameState, error) {
 
 	// Game over if the dog dies
 	if g.Dog.Mode == dogDead {
-		g.Musics[musicBackground].Pause()
+		g.SoundLoops[musicBackground].Pause()
 		return gameOver, nil
 	}
 

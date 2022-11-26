@@ -159,6 +159,7 @@ type SoundType uint8
 
 const (
 	musicBackground SoundType = iota
+	soundFootStep
 )
 
 const (
@@ -185,8 +186,8 @@ type Sound struct {
 	Volume     float64
 }
 
-// AddMusic adds one new music to the soundType
-func (s *Sound) AddMusic(f string, sampleRate int, context *audio.Context) {
+// AddSoundLoop adds one new looped sound to the soundType
+func (s *Sound) AddSoundLoop(f string, sampleRate int, context *audio.Context) {
 	s.Audio = append(s.Audio, NewMusicPlayer(loadSoundFile(f+".ogg", sampleRate), context))
 }
 
