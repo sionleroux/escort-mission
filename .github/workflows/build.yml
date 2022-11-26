@@ -134,6 +134,7 @@ jobs:
           README.md
           LICENSE
           escort-mission.exe
+          escort-mission.ini.example
 
   deploy-win:
     name: Deploy Windows build to itch.io
