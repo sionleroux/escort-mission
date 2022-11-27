@@ -1,22 +1,6 @@
 package main
 
-type bossAnimationTags uint8
-
-const (
-	bossIdle1 bossAnimationTags = iota
-	bossWalking1
-	bossHit1
-	bossIdle2
-	bossWalking2
-	bossHit2
-	bossWalking3
-	bossIdle3
-	bossDeath1
-	bossPhase2
-	bossIdle4
-	bossRunning
-	bossDeath2
-)
+//go:generate ./tools/gen_sprite_tags.sh assets/sprites/Zombie_big.json boss_anim.go boss
 
 // Boss zombie, it is bigger than the rest and you need to kill it twice
 type Boss struct {
