@@ -64,7 +64,6 @@ type GameScreen struct {
 	HUD           *HUD
 	Debuggers     Debuggers
 	Zoom          *Zoom
-	Loaded        bool
 	FadeTween     *gween.Tween
 	Alpha         uint8
 }
@@ -285,7 +284,8 @@ func NewGameScreen(game *Game) {
 		g.Checkpoint = startingCheckpoint
 		g.Reset(game)
 	}
-	g.Loaded = true
+
+	game.State = gameStart
 }
 
 func (g *GameScreen) Start() {
@@ -330,10 +330,6 @@ func (g *GameScreen) Reset(game *Game) {
 }
 
 func (g *GameScreen) Update() (GameState, error) {
-	if !g.Loaded {
-		return gameRunning, nil
-	}
-
 	g.Tick++
 
 	// Fade out the black cover
@@ -430,10 +426,6 @@ func (g *GameScreen) Update() (GameState, error) {
 }
 
 func (g *GameScreen) Draw(screen *ebiten.Image) {
-	if !g.Loaded {
-		return
-	}
-
 	g.Camera.Surface.Clear()
 
 	// Ground, walls and other lowest-level stuff needs to be drawn first

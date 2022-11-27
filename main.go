@@ -34,6 +34,7 @@ func main() {
 
 	game := &Game{Width: gameWidth, Height: gameHeight}
 	game.Screens = []Screen{
+		&LoadingScreen{},
 		&StartScreen{},
 		NewIntroScreen(game),
 		&GameScreen{},
@@ -52,7 +53,8 @@ func main() {
 type GameState int
 
 const (
-	gameStart   GameState = iota // Game start screen is shown
+	gameLoading GameState = iota // Assets are being loaded
+	gameStart                    // Game start screen is shown
 	gameIntro                    // Intro is played before game is started
 	gameRunning                  // The game is running the main game code
 	gameOver                     // The game has ended because you died

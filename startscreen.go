@@ -14,7 +14,7 @@ type StartScreen struct{}
 
 // Update handles player input to update the start screen
 func (s *StartScreen) Update() (GameState, error) {
-	// Pressing Q any time quits immediately
+	// Pressing space starts the game
 	if ebiten.IsKeyPressed(ebiten.KeySpace) {
 		return gameIntro, nil
 	}
