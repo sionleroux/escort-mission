@@ -377,6 +377,7 @@ func (g *GameScreen) Update() (GameState, error) {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
 			if g.Player.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
 				g.SoundLoops[musicBackground].Pause()
+				g.SoundLoops[soundFootStep].Pause()
 				g.Sounds[soundPlayerDies].Play()
 				return gameOver, nil // return early, no point in continuing, you are dead
 			}
@@ -414,6 +415,7 @@ func (g *GameScreen) Update() (GameState, error) {
 	// Game over if the dog dies
 	if g.Dog.Mode == dogDead {
 		g.SoundLoops[musicBackground].Pause()
+		g.SoundLoops[soundFootStep].Pause()
 		return gameOver, nil
 	}
 

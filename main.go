@@ -112,9 +112,8 @@ func (g *Game) Update() error {
 		}
 		if g.Tick-g.DeathTime > deathCoolDownTime {
 			g.Checkpoint = g.Screens[gameRunning].(*GameScreen).Checkpoint
-			g.State = gameRunning
 			g.DeathTime = 0
-			go g.Screens[gameRunning].(*GameScreen).Reset(g)
+			g.Screens[gameRunning].(*GameScreen).Reset(g)
 		}
 	}
 
