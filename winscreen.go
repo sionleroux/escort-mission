@@ -13,7 +13,7 @@ type WinScreen struct{}
 
 func (s *WinScreen) Update() (GameState, error) {
 	// TODO: maybe calculate some cool stats?
-	return gameStart, nil
+	return gameWon, nil
 }
 
 func (s *WinScreen) Draw(screen *ebiten.Image) {
