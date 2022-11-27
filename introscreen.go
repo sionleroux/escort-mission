@@ -28,7 +28,7 @@ type IntroScreen struct {
 func NewIntroScreen(game *Game) *IntroScreen {
 	return &IntroScreen{
 		textRenderer: NewIntroRenderer(),
-		FadeTween:    gween.New(255, 0, fadeOutTime, ease.OutExpo),
+		FadeTween:    gween.New(255, 0, fadeOutTime, ease.OutQuad),
 		Alpha:        255,
 		IntroVoice:   NewSoundPlayer(loadSoundFile("assets/voice/Intro.ogg", sampleRate), context),
 	}

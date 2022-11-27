@@ -35,7 +35,7 @@ const (
 )
 
 // Length of the fading animation
-const fadeOutTime = 300
+const fadeOutTime = 180
 
 type GameScreen struct {
 	Width         int
@@ -75,7 +75,7 @@ func NewGameScreen(game *Game) {
 		Height:     game.Height,
 		Checkpoint: game.Checkpoint,
 		Debuggers:  debuggers,
-		FadeTween:  gween.New(255, 0, fadeOutTime, ease.OutExpo),
+		FadeTween:  gween.New(255, 0, fadeOutTime, ease.OutQuad),
 	}
 
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
