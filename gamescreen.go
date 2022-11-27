@@ -62,6 +62,7 @@ type GameScreen struct {
 	Checkpoint    int
 	HUD           *HUD
 	Debuggers     Debuggers
+	Loaded        bool
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -141,7 +142,6 @@ func NewGameScreen(game *Game) {
 	g.SoundLoops[musicBackground].AddSoundLoop("assets/music/BackgroundMusic", sampleRate, context)
 	g.SoundLoops[soundFootStep].AddSoundLoop("assets/sfx/Footstep-loop", sampleRate, context)
 	g.SoundLoops[soundFootStep].SetVolume(0.7)
-	g.SoundLoops[musicBackground].Play()
 
 	// Sound
 	g.Sounds = make([]*Sound, 10)
@@ -279,7 +279,11 @@ func NewGameScreen(game *Game) {
 		g.Checkpoint = startingCheckpoint
 		g.Reset(game)
 	}
-	game.State = gameRunning
+	g.Loaded = true
+}
+
+func (g *GameScreen) Start() {
+	g.SoundLoops[musicBackground].Play()
 }
 
 // Reset is similar to NewGameScreen but only resets the things that should be
@@ -314,12 +318,15 @@ func (g *GameScreen) Reset(game *Game) {
 	g.Player.Object.X, g.Player.Object.Y = float64(startPos[0]), float64(startPos[1])
 	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
 
-	g.SoundLoops[musicBackground].Play()
 	g.Voices[voiceRespawn].Play()
 	game.State = gameRunning
 }
 
 func (g *GameScreen) Update() (GameState, error) {
+	if !g.Loaded {
+		return gameRunning, nil
+	}
+
 	g.Tick++
 
 	// Pressing R reloads the ammo
@@ -403,6 +410,10 @@ func (g *GameScreen) Update() (GameState, error) {
 }
 
 func (g *GameScreen) Draw(screen *ebiten.Image) {
+	if !g.Loaded {
+		return
+	}
+
 	g.Camera.Surface.Clear()
 
 	// Ground, walls and other lowest-level stuff needs to be drawn first

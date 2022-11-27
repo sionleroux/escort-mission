@@ -28,8 +28,8 @@ func main() {
 
 	game := &Game{Width: gameWidth, Height: gameHeight}
 	game.Screens = []Screen{
-		&LoadingScreen{},
 		&StartScreen{},
+		&IntroScreen{},
 		&GameScreen{},
 		NewDeathScreen(game),
 		&WinScreen{},
@@ -46,11 +46,11 @@ func main() {
 type GameState int
 
 const (
-	gameLoading GameState = iota // Loading files and setting up the game
-	gameStart                    // Game start screen is shown
-	gameRunning                  // The game is running the main game code
-	gameOver                     // The game has ended because you died
-	gameWon                      // The game has ended because you won
+	gameStart GameState = iota  // Game start screen is shown
+	gameIntro                   // Intro is played before game is started
+	gameRunning                 // The game is running the main game code
+	gameOver                    // The game has ended because you died
+	gameWon                     // The game has ended because you won
 )
 
 // Game represents the main game state
@@ -59,6 +59,7 @@ type Game struct {
 	Height     int
 	Screens    []Screen
 	State      GameState
+	Loaded     bool
 	DeathTime  int
 	Tick       int
 	Checkpoint int
@@ -87,8 +88,13 @@ func (g *Game) Update() error {
 		}
 	}
 
+	prevState := g.State
 	state, err := g.Screens[g.State].Update()
 	g.State = state
+
+	if prevState != gameRunning && g.State == gameRunning {
+		g.Screens[gameRunning].(*GameScreen).Start()
+	}
 
 	switch g.State {
 	case gameOver:
@@ -98,7 +104,7 @@ func (g *Game) Update() error {
 		}
 		if g.Tick-g.DeathTime > deathCoolDownTime {
 			g.Checkpoint = g.Screens[gameRunning].(*GameScreen).Checkpoint
-			g.State = gameLoading
+			g.State = gameRunning
 			g.DeathTime = 0
 			go g.Screens[gameRunning].(*GameScreen).Reset(g)
 		}

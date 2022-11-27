@@ -16,7 +16,7 @@ type StartScreen struct{}
 func (s *StartScreen) Update() (GameState, error) {
 	// Pressing Q any time quits immediately
 	if ebiten.IsKeyPressed(ebiten.KeySpace) {
-		return gameRunning, nil
+		return gameIntro, nil
 	}
 
 	return gameStart, nil
