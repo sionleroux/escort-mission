@@ -9,6 +9,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"gopkg.in/ini.v1"
 )
@@ -17,6 +18,9 @@ const gameWidth, gameHeight = 320, 240
 
 var deathCoolDownTime = 4 * 60
 
+const sampleRate int = 44100 // assuming "normal" sample rate
+var context *audio.Context
+
 func main() {
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
 	ebiten.SetWindowTitle("eZcort mission")
@@ -24,12 +28,14 @@ func main() {
 	ebiten.SetWindowIcon([]image.Image{loadImage("assets/icon.png")})
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
+	context = audio.NewContext(sampleRate)
+
 	ApplyConfigs()
 
 	game := &Game{Width: gameWidth, Height: gameHeight}
 	game.Screens = []Screen{
 		&StartScreen{},
-		&IntroScreen{},
+		NewIntroScreen(game),
 		&GameScreen{},
 		NewDeathScreen(game),
 		&WinScreen{},
@@ -46,11 +52,11 @@ func main() {
 type GameState int
 
 const (
-	gameStart GameState = iota  // Game start screen is shown
-	gameIntro                   // Intro is played before game is started
-	gameRunning                 // The game is running the main game code
-	gameOver                    // The game has ended because you died
-	gameWon                     // The game has ended because you won
+	gameStart   GameState = iota // Game start screen is shown
+	gameIntro                    // Intro is played before game is started
+	gameRunning                  // The game is running the main game code
+	gameOver                     // The game has ended because you died
+	gameWon                      // The game has ended because you won
 )
 
 // Game represents the main game state

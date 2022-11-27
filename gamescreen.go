@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
 	beziercp "github.com/brothertoad/bezier"
@@ -19,15 +18,8 @@ import (
 	"github.com/solarlune/resolv"
 )
 
-const sampleRate int = 44100 // assuming "normal" sample rate
-var context *audio.Context
-
 // For testing it is sometimes useful to start the game at a later checkpoint
 var startingCheckpoint int = 0
-
-func init() {
-	context = audio.NewContext(sampleRate)
-}
 
 const (
 	tagPlayer     = "player"
