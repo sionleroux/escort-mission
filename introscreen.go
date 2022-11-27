@@ -14,11 +14,13 @@ import (
 	"github.com/tinne26/etxt"
 )
 
+const introVoiceLength = 900
+
 // IntroScreen is displayed before the actual game starts
 type IntroScreen struct {
 	textRenderer *IntroRenderer
-	fadeTween    *gween.Tween
-	Alpha        float64
+	FadeTween    *gween.Tween
+	Alpha        uint8
 	Tick         int
 	IntroVoice   *audio.Player
 }
@@ -26,7 +28,7 @@ type IntroScreen struct {
 func NewIntroScreen(game *Game) *IntroScreen {
 	return &IntroScreen{
 		textRenderer: NewIntroRenderer(),
-		fadeTween:    gween.New(255, 0, 180, ease.OutExpo),
+		FadeTween:    gween.New(255, 0, fadeOutTime, ease.OutExpo),
 		Alpha:        255,
 		IntroVoice:   NewSoundPlayer(loadSoundFile("assets/voice/Intro.ogg", sampleRate), context),
 	}
@@ -45,11 +47,11 @@ func (s *IntroScreen) Update() (GameState, error) {
 
 	s.Tick++
 
-	if s.Tick > 1080 {
-		alpha, _ := s.fadeTween.Update(1)
-		s.Alpha = float64(alpha)
+	if s.Tick > introVoiceLength {
+		alpha, _ := s.FadeTween.Update(1)
+		s.Alpha = uint8(alpha)
 	}
-	if s.Tick == 1260 {
+	if s.Tick == introVoiceLength+fadeOutTime {
 		return gameRunning, nil
 	}
 	return gameIntro, nil
@@ -58,7 +60,7 @@ func (s *IntroScreen) Update() (GameState, error) {
 func (s *IntroScreen) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, "Press S to skip intro")
 
-	s.textRenderer.SetColor(color.RGBA{0xff, 0xff, 0xff, uint8(s.Alpha)})
+	s.textRenderer.SetColor(color.RGBA{0xff, 0xff, 0xff, s.Alpha})
 	s.textRenderer.DrawCentered(screen, "In the middle of nowhere")
 }
 

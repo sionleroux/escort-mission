@@ -4,18 +4,22 @@
 package main
 
 import (
+	"image/color"
 	"log"
 	"math"
 	"strconv"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
 	beziercp "github.com/brothertoad/bezier"
 	camera "github.com/melonfunction/ebiten-camera"
 	"github.com/solarlune/ldtkgo"
 	"github.com/solarlune/resolv"
+	"github.com/tanema/gween"
+	"github.com/tanema/gween/ease"
 )
 
 // For testing it is sometimes useful to start the game at a later checkpoint
@@ -29,6 +33,9 @@ const (
 	tagEnd        = "end"
 	tagCheckpoint = "check"
 )
+
+// Length of the fading animation
+const fadeOutTime = 300
 
 type GameScreen struct {
 	Width         int
@@ -55,6 +62,8 @@ type GameScreen struct {
 	HUD           *HUD
 	Debuggers     Debuggers
 	Loaded        bool
+	FadeTween     *gween.Tween
+	Alpha         uint8
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -66,6 +75,7 @@ func NewGameScreen(game *Game) {
 		Height:     game.Height,
 		Checkpoint: game.Checkpoint,
 		Debuggers:  debuggers,
+		FadeTween:  gween.New(255, 0, fadeOutTime, ease.OutExpo),
 	}
 
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
@@ -321,6 +331,12 @@ func (g *GameScreen) Update() (GameState, error) {
 
 	g.Tick++
 
+	// Fade out the black cover
+	if g.Tick < fadeOutTime {
+		alpha, _ := g.FadeTween.Update(1)
+		g.Alpha = uint8(alpha)
+	}
+
 	// Pressing R reloads the ammo
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		switch g.Player.State {
@@ -432,6 +448,11 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 	g.Camera.Blit(screen)
 
 	g.HUD.Draw(g.Player.Ammo, screen)
+
+	// Fading out black cover
+	if g.Tick < fadeOutTime {
+		ebitenutil.DrawRect(screen, 0, 0, float64(g.Width), float64(g.Height), color.RGBA{0, 0, 0, g.Alpha})
+	}
 
 	g.Debuggers.Debug(g, screen)
 }
