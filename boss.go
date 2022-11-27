@@ -4,6 +4,6 @@ package main
 
 // Boss zombie, it is bigger than the rest and you need to kill it twice
 type Boss struct {
-	Zombie      // inner zombie behaviour
-	Daemon bool // whether it has respawned into daemon mode aka Phase 2
+	*Zombie      // Inner zombie behaviour
+	Daemon  bool // Whether it has respawned into daemon mode aka Phase 2
 }

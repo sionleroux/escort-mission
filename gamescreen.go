@@ -293,7 +293,7 @@ func (g *GameScreen) Reset(game *Game) {
 
 	// Remove zombies
 	for i, z := range g.Zombies {
-		g.Space.Remove(z.Object)
+		z.Remove()
 		g.Zombies[i] = nil
 	}
 	g.Zombies = Zombies{}
@@ -485,7 +485,7 @@ func Shoot(g *GameScreen) {
 }
 
 // CalcObjectDistance calculates the distance between two Objects
-func CalcObjectDistance(obj1, obj2 *resolv.Object) (float64, float64, float64) {
+func CalcObjectDistance(obj1, obj2 *Coord) (float64, float64, float64) {
 	return CalcDistance(obj1.X, obj1.Y, obj2.X, obj2.Y), obj1.X - obj2.X, obj1.Y - obj2.Y
 }
 

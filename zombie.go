@@ -41,8 +41,19 @@ const (
 	zombieBig
 )
 
+// Zombielike is anything that behaves like a zombie (e.g. attacks things and dies)
+type Zombielike interface {
+	Update(*GameScreen) error
+	Draw(*GameScreen)
+	Hit(*GameScreen)
+	Die(*GameScreen)
+	Type() ZombieType
+	Remove()
+	Position() *Coord
+}
+
 // Zombies is an array of Zombie
-type Zombies []*Zombie
+type Zombies []Zombielike
 
 // Update updates all the zombies
 func (zs *Zombies) Update(g *GameScreen) {
@@ -53,7 +64,7 @@ func (zs *Zombies) Update(g *GameScreen) {
 			log.Println(err)
 			g.Zombies[i] = nil
 			g.Zombies = append((*zs)[:i], (*zs)[i+1:]...)
-			z.SpawnPoint.RemoveZombie(z)
+			z.Remove()
 			if len(g.Zombies) == 0 && rand.Float64() < 0.3 {
 				g.Voices[voiceKill].Play()
 			}
@@ -139,6 +150,28 @@ type Zombie struct {
 	SpawnPoint *SpawnPoint    // Reference for the SpawnPoint where the zombie was spawned
 }
 
+// Remove the zombie from the game's list of zombies and from the spawn point's
+// list of live zombies
+func (z *Zombie) Remove() {
+	if z.Object.Space != nil {
+		z.Object.Space.Remove(z.Object)
+	}
+	z.SpawnPoint.RemoveZombie(z)
+}
+
+// Position returns the current coordinates of the zombie
+func (z *Zombie) Position() *Coord {
+	return &Coord{
+		X: z.Object.X,
+		Y: z.Object.Y,
+	}
+}
+
+// Type returns what type of zombie this is
+func (z *Zombie) Type() ZombieType {
+	return z.ZombieType
+}
+
 // Update updates the state of the zombie
 func (z *Zombie) Update(g *GameScreen) error {
 	if z.State == zombieDead {
@@ -146,8 +179,8 @@ func (z *Zombie) Update(g *GameScreen) error {
 	}
 
 	if z.State == zombieIdle || z.State == zombieWalking {
-		playerDistance, _, _ := CalcObjectDistance(z.Object, g.Player.Object)
-		dogDistance, _, _ := CalcObjectDistance(z.Object, g.Dog.Object)
+		playerDistance, _, _ := CalcObjectDistance(z.Position(), g.Player.Position())
+		dogDistance, _, _ := CalcObjectDistance(z.Position(), g.Dog.Position())
 
 		zShouldWalk := false
 

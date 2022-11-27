@@ -98,8 +98,15 @@ func (s *SpawnPoint) SpawnZombie(g *GameScreen) {
 
 	z.Target = g.Player.Object
 	g.Space.Add(z.Object)
-	g.Zombies = append(g.Zombies, z)
-	s.Zombies = append(s.Zombies, z)
+
+	if s.ZombieType == zombieBig {
+		boss := &Boss{Zombie: z}
+		g.Zombies = append(g.Zombies, boss)
+		s.Zombies = append(s.Zombies, boss)
+	} else {
+		g.Zombies = append(g.Zombies, z)
+		s.Zombies = append(s.Zombies, z)
+	}
 	s.NextSpawn = 180 + rand.Intn(180)
 }
 
@@ -110,10 +117,10 @@ func (s *SpawnPoint) Update(g *GameScreen) {
 	}
 
 	playerDistance := CalcDistance(s.Position.X, s.Position.Y, g.Player.Object.X, g.Player.Object.Y)
-	
+
 	// Spawn point is activated if the player is close enougn, but not too close
 	if playerDistance < spawnMaxDistance && playerDistance > spawnMinDistance {
-		if !s.InitialSpawned || ( g.Tick%s.NextSpawn == 0 && len(s.Zombies) < s.InitialCount ) {
+		if !s.InitialSpawned || (g.Tick%s.NextSpawn == 0 && len(s.Zombies) < s.InitialCount) {
 			s.CanSpawn = true
 		}
 	}
@@ -125,7 +132,7 @@ func (s *SpawnPoint) Update(g *GameScreen) {
 			}
 			s.InitialSpawned = true
 		} else {
-			s.SpawnZombie(g)	
+			s.SpawnZombie(g)
 		}
 		s.CanSpawn = false
 	}
@@ -148,5 +155,5 @@ func (s *SpawnPoint) Reset() {
 	}
 	s.Zombies = Zombies{}
 	s.InitialSpawned = false
-	s.PrevPosition = SpawnPosition{ 0, 0 }
+	s.PrevPosition = SpawnPosition{0, 0}
 }

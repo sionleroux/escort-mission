@@ -130,7 +130,7 @@ func (d *Dog) zombiesInRange(zRange float64, g *GameScreen) (bool, float64, Coor
 	resultantVectorCoord := Coord{X: 0, Y: 0}
 	closestZombie := 1000.0
 	for _, zombie := range g.Zombies {
-		zombieDistance, xDistance, yDistance := CalcObjectDistance(d.Object, zombie.Object)
+		zombieDistance, xDistance, yDistance := CalcObjectDistance(d.Position(), zombie.Position())
 		if zombieDistance < closestZombie {
 			closestZombie = zombieDistance
 		}
@@ -188,7 +188,7 @@ func (d *Dog) updateState(g *GameScreen) {
 	// Does the dog need to change state in its current mode?
 	switch d.Mode {
 	case dogNormal:
-		playerDistance, _, _ := CalcObjectDistance(d.Object, g.Player.Object)
+		playerDistance, _, _ := CalcObjectDistance(d.Position(), g.Player.Position())
 
 		switch d.State {
 		case dogNormalWaiting:
@@ -460,4 +460,12 @@ func (d *Dog) Draw(g *GameScreen) {
 			float64(d.Object.Y),
 		),
 	)
+}
+
+// Position returns the Dog's current coordinates
+func (d *Dog) Position() *Coord {
+	return &Coord{
+		X: d.Object.X,
+		Y: d.Object.Y,
+	}
 }

@@ -234,3 +234,11 @@ func (p *Player) handleControls() {
 		p.MoveRight()
 	}
 }
+
+// Position returns the Player's current coordinates
+func (p *Player) Position() *Coord {
+	return &Coord{
+		X: p.Object.X,
+		Y: p.Object.Y,
+	}
+}
