@@ -25,6 +25,7 @@ require (
 	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/kvartborg/vector v0.1.2 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
+	github.com/tanema/gween v0.0.0-20220318192052-2db1c2d931bd // indirect
 	github.com/tidwall/gjson v1.6.4 // indirect
 	github.com/tidwall/match v1.0.1 // indirect
 	github.com/tidwall/pretty v1.0.2 // indirect

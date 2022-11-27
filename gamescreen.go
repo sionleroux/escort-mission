@@ -4,32 +4,28 @@
 package main
 
 import (
+	"image/color"
 	"log"
 	"math"
 	"strconv"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
 	beziercp "github.com/brothertoad/bezier"
 	camera "github.com/melonfunction/ebiten-camera"
 	"github.com/solarlune/ldtkgo"
 	"github.com/solarlune/resolv"
+	"github.com/tanema/gween"
+	"github.com/tanema/gween/ease"
 )
-
-const sampleRate int = 44100 // assuming "normal" sample rate
-var context *audio.Context
 
 const cameraPadding = 1
 
 // For testing it is sometimes useful to start the game at a later checkpoint
 var startingCheckpoint int = 0
-
-func init() {
-	context = audio.NewContext(sampleRate)
-}
 
 const (
 	tagPlayer     = "player"
@@ -39,6 +35,9 @@ const (
 	tagEnd        = "end"
 	tagCheckpoint = "check"
 )
+
+// Length of the fading animation
+const fadeOutTime = 180
 
 type GameScreen struct {
 	Width         int
@@ -65,6 +64,9 @@ type GameScreen struct {
 	HUD           *HUD
 	Debuggers     Debuggers
 	Zoom          *Zoom
+	Loaded        bool
+	FadeTween     *gween.Tween
+	Alpha         uint8
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -76,6 +78,7 @@ func NewGameScreen(game *Game) {
 		Height:     game.Height,
 		Checkpoint: game.Checkpoint,
 		Debuggers:  debuggers,
+		FadeTween:  gween.New(255, 0, fadeOutTime, ease.OutQuad),
 	}
 
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
@@ -144,7 +147,6 @@ func NewGameScreen(game *Game) {
 	g.SoundLoops[musicBackground].AddSoundLoop("assets/music/BackgroundMusic", sampleRate, context)
 	g.SoundLoops[soundFootStep].AddSoundLoop("assets/sfx/Footstep-loop", sampleRate, context)
 	g.SoundLoops[soundFootStep].SetVolume(0.7)
-	g.SoundLoops[musicBackground].Play()
 
 	// Sound
 	g.Sounds = make([]*Sound, 10)
@@ -283,7 +285,11 @@ func NewGameScreen(game *Game) {
 		g.Checkpoint = startingCheckpoint
 		g.Reset(game)
 	}
-	game.State = gameRunning
+	g.Loaded = true
+}
+
+func (g *GameScreen) Start() {
+	g.SoundLoops[musicBackground].Play()
 }
 
 // Reset is similar to NewGameScreen but only resets the things that should be
@@ -318,14 +324,23 @@ func (g *GameScreen) Reset(game *Game) {
 	g.Player.Object.X, g.Player.Object.Y = float64(startPos[0]), float64(startPos[1])
 	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
 
-	g.SoundLoops[musicBackground].Play()
 	g.Voices[voiceRespawn].Play()
 	g.Zoom = NewZoom()
 	game.State = gameRunning
 }
 
 func (g *GameScreen) Update() (GameState, error) {
+	if !g.Loaded {
+		return gameRunning, nil
+	}
+
 	g.Tick++
+
+	// Fade out the black cover
+	if g.Tick < fadeOutTime {
+		alpha, _ := g.FadeTween.Update(1)
+		g.Alpha = uint8(alpha)
+	}
 
 	// Pressing R reloads the ammo
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
@@ -415,6 +430,10 @@ func (g *GameScreen) Update() (GameState, error) {
 }
 
 func (g *GameScreen) Draw(screen *ebiten.Image) {
+	if !g.Loaded {
+		return
+	}
+
 	g.Camera.Surface.Clear()
 
 	// Ground, walls and other lowest-level stuff needs to be drawn first
@@ -441,6 +460,11 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 	g.Camera.Blit(screen)
 
 	g.HUD.Draw(g.Player.Ammo, screen)
+
+	// Fading out black cover
+	if g.Tick < fadeOutTime {
+		ebitenutil.DrawRect(screen, 0, 0, float64(g.Width), float64(g.Height), color.RGBA{0, 0, 0, g.Alpha})
+	}
 
 	g.Debuggers.Debug(g, screen)
 }

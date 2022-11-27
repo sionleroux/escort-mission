@@ -9,6 +9,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"gopkg.in/ini.v1"
 )
@@ -17,6 +18,9 @@ const gameWidth, gameHeight = 320, 240
 
 var deathCoolDownTime = 4 * 60
 
+const sampleRate int = 44100 // assuming "normal" sample rate
+var context *audio.Context
+
 func main() {
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
 	ebiten.SetWindowTitle("eZcort mission")
@@ -24,12 +28,14 @@ func main() {
 	ebiten.SetWindowIcon([]image.Image{loadImage("assets/icon.png")})
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 
+	context = audio.NewContext(sampleRate)
+
 	ApplyConfigs()
 
 	game := &Game{Width: gameWidth, Height: gameHeight}
 	game.Screens = []Screen{
-		&LoadingScreen{},
 		&StartScreen{},
+		NewIntroScreen(game),
 		&GameScreen{},
 		NewDeathScreen(game),
 		&WinScreen{},
@@ -46,8 +52,8 @@ func main() {
 type GameState int
 
 const (
-	gameLoading GameState = iota // Loading files and setting up the game
-	gameStart                    // Game start screen is shown
+	gameStart   GameState = iota // Game start screen is shown
+	gameIntro                    // Intro is played before game is started
 	gameRunning                  // The game is running the main game code
 	gameOver                     // The game has ended because you died
 	gameWon                      // The game has ended because you won
@@ -59,6 +65,7 @@ type Game struct {
 	Height     int
 	Screens    []Screen
 	State      GameState
+	Loaded     bool
 	DeathTime  int
 	Tick       int
 	Checkpoint int
@@ -87,8 +94,13 @@ func (g *Game) Update() error {
 		}
 	}
 
+	prevState := g.State
 	state, err := g.Screens[g.State].Update()
 	g.State = state
+
+	if prevState != gameRunning && g.State == gameRunning {
+		g.Screens[gameRunning].(*GameScreen).Start()
+	}
 
 	switch g.State {
 	case gameOver:
@@ -98,7 +110,7 @@ func (g *Game) Update() error {
 		}
 		if g.Tick-g.DeathTime > deathCoolDownTime {
 			g.Checkpoint = g.Screens[gameRunning].(*GameScreen).Checkpoint
-			g.State = gameLoading
+			g.State = gameRunning
 			g.DeathTime = 0
 			go g.Screens[gameRunning].(*GameScreen).Reset(g)
 		}
