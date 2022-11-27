@@ -47,6 +47,9 @@ var zombieSafeRadius float64 = 192
 // fleeingPathLength: the length of the path planned for fleeing
 var fleeingPathLength float64 = 200
 
+// how much time (ticks) the dog can be out of sight before it dies
+var outOfSightLimit int = 300
+
 // Operating modes of the dog
 const (
 	dogNormal = iota // Dog is alive and no zombies in vicinity
@@ -256,7 +259,7 @@ func (d *Dog) Update(g *GameScreen) {
 	sx, sy := g.Camera.GetScreenCoords(d.Object.X, d.Object.Y)
 	if sx < 0 || sy < 0 || sx > float64(g.Width) || sy > float64(g.Height) {
 		d.OutOfSightCounter++
-		if d.OutOfSightCounter > 300 {
+		if d.OutOfSightCounter > outOfSightLimit {
 			g.Dog.Mode = dogDead
 		}
 	} else {

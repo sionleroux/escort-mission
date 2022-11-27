@@ -220,4 +220,8 @@ func ApplyConfigs() {
 	if err != nil {
 		log.Println("Error parsing INI file:", err)
 	}
+	outOfSightLimit, err = cfg.Section("Dog").Key("OutOfSightLimit").Int()
+	if err != nil {
+		log.Println("Error parsing INI file:", err)
+	}
 }

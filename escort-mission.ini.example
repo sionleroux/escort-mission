@@ -59,3 +59,9 @@ ZombieSafeRadius = 192
 
 # fleeingPathLength: the length of the path planned for fleeing
 FleeingPathLength = 200
+
+# fleeingPathLength: the length of the path planned for fleeing
+FleeingPathLength = 200
+
+# how much time (ticks) the dog can be out of sight before it dies
+OutOfSightLimit = 300
