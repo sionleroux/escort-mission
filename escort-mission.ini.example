@@ -1,4 +1,5 @@
-DeathCoolDownTime = 4 * 60
+# 4 * 60 @ 60 TPS means 4 seconds
+DeathCoolDownTime = 240
 
 HudPadding = 5
 
