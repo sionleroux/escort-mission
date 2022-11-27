@@ -161,7 +161,7 @@ func NewGameScreen(game *Game) {
 	g.Sounds[soundDryFire].AddSound("assets/sfx/Gun-dry-fire", sampleRate, context)
 	g.Sounds[soundZombieScream].AddSound("assets/sfx/Zombie-scream", sampleRate, context)
 	g.Sounds[soundZombieGrowl].AddSound("assets/sfx/Zombie-growl", sampleRate, context, 4)
-	g.Sounds[soundZombieDeath].AddSound("assets/sfx/Zombie-Death", sampleRate, context, 3)
+	g.Sounds[soundZombieDeath].AddSound("assets/sfx/Zombie-Death", sampleRate, context, 2)
 	g.Sounds[soundBigZombieSound].AddSound("assets/sfx/Big-zombie-sound", sampleRate, context, 4)
 
 	// Voices
@@ -461,7 +461,7 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 	if g.Tick < fadeOutTime {
 		ebitenutil.DrawRect(screen, 0, 0, float64(g.Width), float64(g.Height), color.RGBA{0, 0, 0, g.Alpha})
 	}
-	
+
 	g.Debuggers.Debug(g, screen)
 }
 
