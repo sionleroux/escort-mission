@@ -157,12 +157,13 @@ func NewGameScreen(game *Game) {
 	g.Sounds[soundBigZombieSound].AddSound("assets/sfx/Big-zombie-sound", sampleRate, context, 4)
 
 	// Voices
-	g.Voices = make([]*Sound, 2)
-	for i := 0; i < 2; i++ {
+	g.Voices = make([]*Sound, 3)
+	for i := 0; i < 3; i++ {
 		g.Voices[i] = &Sound{Volume: 1}
 	}
 	g.Voices[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)
 	g.Voices[voiceRespawn].AddSound("assets/voice/Respawn", sampleRate, context, 5)
+	g.Voices[voiceKill].AddSound("assets/voice/Kill", sampleRate, context, 6)
 
 	// Load sprites
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 5)

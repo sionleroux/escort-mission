@@ -54,6 +54,9 @@ func (zs *Zombies) Update(g *GameScreen) {
 			g.Zombies[i] = nil
 			g.Zombies = append((*zs)[:i], (*zs)[i+1:]...)
 			z.SpawnPoint.RemoveZombie(z)
+			if len(g.Zombies) == 0 && rand.Float64() < 0.3 {
+				g.Voices[voiceKill].Play()
+			}
 		}
 	}
 }
@@ -156,7 +159,7 @@ func (z *Zombie) Update(g *GameScreen) error {
 			zShouldWalk = true
 		}
 
-		if (zShouldWalk) {
+		if zShouldWalk {
 			if z.State == zombieIdle {
 				// Zombie detects target
 				if z.ZombieType == zombieNormal || z.ZombieType == zombieCrawler {
