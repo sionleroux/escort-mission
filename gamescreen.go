@@ -22,6 +22,9 @@ import (
 const sampleRate int = 44100 // assuming "normal" sample rate
 var context *audio.Context
 
+// For testing it is sometimes useful to start the game at a later checkpoint
+var startingCheckpoint int = 0
+
 func init() {
 	context = audio.NewContext(sampleRate)
 }
@@ -272,6 +275,10 @@ func NewGameScreen(game *Game) {
 	g.HUD = NewHUD()
 
 	game.Screens[gameRunning] = g
+	if startingCheckpoint != 0 {
+		g.Checkpoint = startingCheckpoint
+		g.Reset(game)
+	}
 	game.State = gameRunning
 }
 

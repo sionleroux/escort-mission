@@ -2,6 +2,8 @@ DeathCoolDownTime = 4 * 60
 
 HudPadding = 5
 
+StartingCheckpoint = 0
+
 [Player]
 
 PlayerSpeed = 1.2

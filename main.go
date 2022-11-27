@@ -129,6 +129,7 @@ func ApplyConfigs() {
 	}
 	deathCoolDownTime, _ = cfg.Section("").Key("DeathCoolDownTime").Int()
 	hudPadding, _ = cfg.Section("").Key("HudPadding").Int()
+	startingCheckpoint, _ = cfg.Section("").Key("StartingCheckpoint").Int()
 	playerSpeed, _ = cfg.Section("Player").Key("PlayerSpeed").Float64()
 	playerSpeedFactorReverse, _ = cfg.Section("Player").Key("PlayerSpeedFactorReverse").Float64()
 	playerSpeedFactorSideways, _ = cfg.Section("Player").Key("PlayerSpeedFactorSideways").Float64()
