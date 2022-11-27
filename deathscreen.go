@@ -8,6 +8,7 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/tinne26/etxt"
 )
 
@@ -16,11 +17,14 @@ import (
 type DeathScreen struct {
 	textRenderer *DeathRenderer
 	DogDied      bool
+	BellRang     bool
+	bellSound    *audio.Player
 }
 
 func NewDeathScreen(game *Game) *DeathScreen {
 	return &DeathScreen{
 		textRenderer: NewDeathRenderer(),
+		bellSound:    NewSoundPlayer(loadSoundFile("assets/sfx/Bell.ogg", sampleRate), context),
 	}
 }
 
@@ -28,6 +32,11 @@ func (s *DeathScreen) Update() (GameState, error) {
 	// Pressing Q any time quits immediately
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		return gameOver, errors.New("game quit by player")
+	}
+
+	if !s.BellRang {
+		s.bellSound.Play()
+		s.BellRang = true
 	}
 
 	return gameOver, nil
