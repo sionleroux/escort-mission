@@ -1,16 +1,21 @@
 package main
 
-// List of possible boss states
+type bossAnimationTags uint8
+
 const (
-	bossIdle1 = iota
+	bossIdle1 bossAnimationTags = iota
 	bossWalking1
-	bossInjury1
+	bossHit1
 	bossIdle2
 	bossWalking2
-	bossInjury2
-	bossIdle3
+	bossHit2
 	bossWalking3
-	bossDeath
+	bossIdle3
+	bossDeath1
+	bossPhase2
+	bossIdle4
+	bossRunning
+	bossDeath2
 )
 
 // Boss zombie, it is bigger than the rest and you need to kill it twice
