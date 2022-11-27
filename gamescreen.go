@@ -324,6 +324,7 @@ func (g *GameScreen) Reset(game *Game) {
 	g.Player.Object.X, g.Player.Object.Y = float64(startPos[0]), float64(startPos[1])
 	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
 
+	g.SoundLoops[musicBackground].Play()
 	g.Voices[voiceRespawn].Play()
 	g.Zoom = NewZoom()
 	game.State = gameRunning
