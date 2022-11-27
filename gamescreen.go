@@ -78,6 +78,7 @@ func NewGameScreen(game *Game) {
 		Checkpoint: game.Checkpoint,
 		Debuggers:  debuggers,
 		FadeTween:  gween.New(255, 0, fadeOutTime, ease.OutQuad),
+		Alpha:      255,
 	}
 
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
@@ -460,7 +461,7 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 	if g.Tick < fadeOutTime {
 		ebitenutil.DrawRect(screen, 0, 0, float64(g.Width), float64(g.Height), color.RGBA{0, 0, 0, g.Alpha})
 	}
-
+	
 	g.Debuggers.Debug(g, screen)
 }
 
