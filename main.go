@@ -104,7 +104,7 @@ func (g *Game) Update() error {
 	if prevState != gameRunning && g.State == gameRunning {
 		g.Screens[gameRunning].(*GameScreen).Start()
 	}
-	if prevState != gameOver && g.State == gameOver {
+	if prevState != gameWon && g.State == gameWon {
 		g.Stat.GameWon = time.Now()
 	}
 
