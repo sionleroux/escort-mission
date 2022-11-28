@@ -17,14 +17,16 @@ func (z *Boss) Update(g *GameScreen) error {
 		// TODO: daemon specific stuff here
 	} else {
 		switch z.HitToDie {
-		case 4: // XXX: remove magicno
+		case 6, 5:
 			switch z.Zombie.State {
 			case zombieIdle:
 				z.BossState = bossIdle1
 			case zombieWalking:
 				z.BossState = bossWalking1
+			case zombieHit:
+				z.BossState = bossHit1
 			}
-		case 3: // XXX: remove magicno
+		case 4:
 			switch z.Zombie.State {
 			case zombieHit:
 				z.BossState = bossHit1
@@ -33,7 +35,16 @@ func (z *Boss) Update(g *GameScreen) error {
 			case zombieWalking:
 				z.BossState = bossWalking2
 			}
-		case 2: // XXX: remove magicno
+		case 3:
+			switch z.Zombie.State {
+			case zombieHit:
+				z.BossState = bossHit2
+			case zombieIdle:
+				z.BossState = bossIdle2
+			case zombieWalking:
+				z.BossState = bossWalking2
+			}
+		case 2:
 			switch z.Zombie.State {
 			case zombieHit:
 				z.BossState = bossHit2
@@ -42,7 +53,7 @@ func (z *Boss) Update(g *GameScreen) error {
 			case zombieWalking:
 				z.BossState = bossWalking3
 			}
-		case 1: // XXX: remove magicno
+		case 1:
 			switch z.Zombie.State {
 			case zombieHit:
 				z.BossState = bossDeath1

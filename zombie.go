@@ -92,7 +92,7 @@ func NewZombie(spawnpoint *SpawnPoint, position Coord, zombieType ZombieType, sp
 	case zombieBig:
 		speed = zombieSpeed
 		// hitToDie = 10
-		hitToDie = 4
+		hitToDie = 6
 	}
 
 	dimensions := sprites.Sprite[0].Position
