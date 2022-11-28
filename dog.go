@@ -76,7 +76,7 @@ var dogStateToFrame = [7]int{2, 0, 2, 1, 2, 1, 0}
 type Dog struct {
 	Object               *resolv.Object
 	Angle                float64
-	Speed                float64
+	TempSpeed            float64
 	Frame                int
 	Mode                 int
 	State                int
@@ -93,6 +93,7 @@ type Dog struct {
 }
 
 func (d *Dog) Init() {
+	d.TempSpeed = 1
 	d.CurrentPath = d.MainPath
 	d.OnMainPath = true
 	d.turnTowardsPathPoint()
@@ -126,9 +127,9 @@ func (d *Dog) findClosestPathPoint(x, y float64) int {
 
 // zombiesInRange checks if there zombies close to the Dog
 // Returns
-//  - if there are zombies in range
-//  - the distance of the closest zombie
-//  - the resultant vector of the fleeing path based on all the zombies in range
+//   - if there are zombies in range
+//   - the distance of the closest zombie
+//   - the resultant vector of the fleeing path based on all the zombies in range
 func (d *Dog) zombiesInRange(zRange float64, g *GameScreen) (bool, float64, Coord) {
 	resultantVectorCoord := Coord{X: 0, Y: 0}
 	closestZombie := 1000.0
@@ -340,8 +341,8 @@ func (d *Dog) followPlayer(g *GameScreen) {
 	d.turnTowardsCoordinate(Coord{X: g.Player.Object.X, Y: g.Player.Object.Y})
 
 	d.move(
-		math.Cos(d.Angle)*dogWalkingSpeed,
-		math.Sin(d.Angle)*dogWalkingSpeed,
+		math.Cos(d.Angle)*dogWalkingSpeed*d.TempSpeed,
+		math.Sin(d.Angle)*dogWalkingSpeed*d.TempSpeed,
 	)
 }
 
@@ -389,13 +390,21 @@ func (d *Dog) followPath(g *GameScreen) {
 	}
 
 	d.move(
-		math.Cos(d.Angle)*speed,
-		math.Sin(d.Angle)*speed,
+		math.Cos(d.Angle)*speed*d.TempSpeed,
+		math.Sin(d.Angle)*speed*d.TempSpeed,
 	)
 }
 
 // Move the Dog by the given vector if it is possible to do so
 func (d *Dog) move(dx, dy float64) {
+	// Collision detection and response between sand trap and dog
+	d.TempSpeed = 1
+	if collision := d.Object.Check(0, 0, tagSandTrap); collision != nil {
+		if d.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
+			d.TempSpeed = sandTrapSpeedMultiplier
+		}
+	}
+
 	switch d.State {
 	case dogNormalWalking:
 		// If the dog would collide with the player

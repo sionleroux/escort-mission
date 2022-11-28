@@ -28,6 +28,9 @@ const cameraPadding = 1
 // For testing it is sometimes useful to start the game at a later checkpoint
 var startingCheckpoint int = 0
 
+// Multiplier applied when object is in sand trap
+const sandTrapSpeedMultiplier = 0.5
+
 const (
 	tagPlayer     = "player"
 	tagMob        = "mob"
@@ -35,6 +38,7 @@ const (
 	tagDog        = "dog"
 	tagEnd        = "end"
 	tagCheckpoint = "check"
+	tagSandTrap   = "sandtrap"
 )
 
 // Length of the fading animation
@@ -118,7 +122,7 @@ func NewGameScreen(game *Game) {
 	// Create level map for A* path planning
 	g.LevelMap = CreateMap(level.Width, level.Height)
 
-	// Add wall tiles to space for collision detection
+	// Add wall tiles and sand traps to space for collision detection
 	for _, layer := range level.Layers {
 		if layer.Type == ldtkgo.LayerTypeIntGrid && layer.Identifier == "Desert" {
 			for _, intData := range layer.IntGrid {
@@ -138,6 +142,21 @@ func NewGameScreen(game *Game) {
 				g.Space.Add(object)
 
 				g.LevelMap.SetObstacle(intData.Position[0]/layer.GridSize, intData.Position[1]/layer.GridSize)
+			}
+		} else if layer.Type == ldtkgo.LayerTypeIntGrid && layer.Identifier == "Sand_Traps" {
+			for _, intData := range layer.IntGrid {
+				object := resolv.NewObject(
+					float64(intData.Position[0]+layer.OffsetX),
+					float64(intData.Position[1]+layer.OffsetY),
+					16, 16,
+					tagSandTrap,
+				)
+				object.SetShape(resolv.NewRectangle(
+					float64(intData.Position[0]+layer.OffsetX),
+					float64(intData.Position[1]+layer.OffsetY),
+					16, 16,
+				))
+				g.Space.Add(object)
 			}
 		}
 	}

@@ -50,6 +50,7 @@ type Player struct {
 	Sprite    *SpriteSheet   // Used for player animations
 	Range     float64        // How far you can shoot with the gun
 	Ammo      int            // How many shots you have left in the gun
+	TempSpeed float64        // Temporary speed multiplier
 }
 
 // NewPlayer constructs a new Player object at the provided location and size
@@ -70,12 +71,13 @@ func NewPlayer(position []int, sprites *SpriteSheet) *Player {
 	object.Shape.(*resolv.ConvexPolygon).RecenterPoints()
 
 	player := &Player{
-		State:  playerIdle,
-		Object: object,
-		Angle:  0,
-		Sprite: sprites,
-		Range:  200,
-		Ammo:   playerAmmoClipMax,
+		State:     playerIdle,
+		Object:    object,
+		Angle:     0,
+		Sprite:    sprites,
+		Range:     200,
+		Ammo:      playerAmmoClipMax,
+		TempSpeed: 1,
 	}
 
 	return player
@@ -130,7 +132,7 @@ func (p *Player) animationBasedStateChanges(g *GameScreen) {
 
 // MoveLeft moves the player left
 func (p *Player) MoveLeft() {
-	speed := playerSpeed * playerSpeedFactorSideways
+	speed := playerSpeed * playerSpeedFactorSideways * p.TempSpeed
 	p.move(
 		math.Sin(p.Angle)*speed,
 		-math.Cos(p.Angle)*speed,
@@ -139,7 +141,7 @@ func (p *Player) MoveLeft() {
 
 // MoveRight moves the player right
 func (p *Player) MoveRight() {
-	speed := playerSpeed * playerSpeedFactorSideways
+	speed := playerSpeed * playerSpeedFactorSideways * p.TempSpeed
 	p.move(
 		-math.Sin(p.Angle)*speed,
 		math.Cos(p.Angle)*speed,
@@ -149,8 +151,10 @@ func (p *Player) MoveRight() {
 // MoveForward moves the player forward towards the pointer
 func (p *Player) MoveForward() {
 	speed := playerSpeed
-	if p.Sprinting {
+	if p.Sprinting && p.TempSpeed >= 1 {
 		speed = speed * playerSpeedFactorSprint
+	} else {
+		speed = speed * p.TempSpeed
 	}
 	p.move(
 		math.Cos(p.Angle)*speed,
@@ -160,7 +164,7 @@ func (p *Player) MoveForward() {
 
 // MoveBackward moves the player backward away from the pointer
 func (p *Player) MoveBackward() {
-	speed := playerSpeed * playerSpeedFactorReverse
+	speed := playerSpeed * playerSpeedFactorReverse * p.TempSpeed
 	p.move(
 		-math.Cos(p.Angle)*speed,
 		-math.Sin(p.Angle)*speed,
@@ -170,6 +174,15 @@ func (p *Player) MoveBackward() {
 // Move the Player by the given vector if it is possible to do so
 func (p *Player) move(dx, dy float64) {
 	p.State = playerWalking
+
+	// Collision detection and response between sand trap and player
+	p.TempSpeed = 1
+	if collision := p.Object.Check(0, 0, tagSandTrap); collision != nil {
+		if p.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
+			p.TempSpeed = sandTrapSpeedMultiplier
+		}
+	}
+
 	if collision := p.Object.Check(dx, dy, tagWall, tagDog); collision != nil {
 		if p.Object.Shape.Intersection(dx, dy, collision.Objects[0].Shape) != nil {
 			return

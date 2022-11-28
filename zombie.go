@@ -114,6 +114,7 @@ func NewZombie(spawnpoint *SpawnPoint, position Coord, zombieType ZombieType, sp
 		Speed:      speed * (1 + rand.Float64()),
 		HitToDie:   hitToDie,
 		ZombieType: zombieType,
+		TempSpeed:  1,
 	}
 	z.Object.Data = z
 	z.SpawnPoint = spawnpoint
@@ -145,6 +146,7 @@ type Zombie struct {
 	State      int            // The current animation state
 	Sprite     *SpriteSheet   // Used for zombie animations
 	Speed      float64        // The speed this zombie walks at
+	TempSpeed  float64        // Temporary speed multiplier
 	Target     *resolv.Object // Target object (player or dog)
 	HitToDie   int            // Number of hits needed to die
 	ZombieType ZombieType     // Type of the zombie
@@ -254,22 +256,22 @@ func (z *Zombie) animationBasedStateChanges(g *GameScreen) {
 
 // MoveUp moves the zombie upwards
 func (z *Zombie) MoveUp() {
-	z.move(0, -z.Speed)
+	z.move(0, -z.Speed*z.TempSpeed)
 }
 
 // MoveDown moves the zombie downwards
 func (z *Zombie) MoveDown() {
-	z.move(0, z.Speed)
+	z.move(0, z.Speed*z.TempSpeed)
 }
 
 // MoveLeft moves the zombie left
 func (z *Zombie) MoveLeft() {
-	z.move(-z.Speed, 0)
+	z.move(-z.Speed*z.TempSpeed, 0)
 }
 
 // MoveRight moves the zombie right
 func (z *Zombie) MoveRight() {
-	z.move(z.Speed, 0)
+	z.move(z.Speed*z.TempSpeed, 0)
 }
 
 // Move the Zombie by the given vector if it is possible to do so
@@ -278,6 +280,15 @@ func (z *Zombie) move(dx, dy float64) {
 	if collision := z.Object.Check(dx, dy, tagMob, tagWall); collision == nil {
 		z.Object.X += dx
 		z.Object.Y += dy
+	}
+	// Collision detection and response between sand trap and zombie
+	z.TempSpeed = 1
+	if collision := z.Object.Check(0, 0, tagSandTrap); collision != nil {
+		if z.Object.Overlaps(collision.Objects[0]) {
+			if z.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
+				z.TempSpeed = sandTrapSpeedMultiplier
+			}
+		}
 	}
 }
 
