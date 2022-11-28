@@ -384,7 +384,7 @@ func (g *GameScreen) Update() (GameState, error) {
 				g.SoundLoops[musicBackground].Pause()
 				g.SoundLoops[soundFootStep].Pause()
 				g.Sounds[soundPlayerDies].Play()
-				g.Stat.Counters[counterPlayerDied]++
+				g.Stat.CounterPlayerDied++
 				return gameOver, nil // return early, no point in continuing, you are dead
 			}
 		}
@@ -420,7 +420,7 @@ func (g *GameScreen) Update() (GameState, error) {
 
 	// Game over if the dog dies
 	if g.Dog.Mode == dogDead {
-		g.Stat.Counters[counterDogDied]++
+		g.Stat.CounterDogDied++
 		g.SoundLoops[musicBackground].Pause()
 		g.SoundLoops[soundFootStep].Pause()
 		return gameOver, nil
@@ -487,7 +487,7 @@ func Shoot(g *GameScreen) {
 		g.Sounds[soundGunReload].Pause()
 		g.Sounds[soundDryFire].Play()
 		g.Player.State = playerDryFire
-		g.Stat.Counters[counterDryFires]++
+		g.Stat.CounterDryFires++
 	}
 
 	switch g.Player.State {
@@ -504,7 +504,7 @@ func Shoot(g *GameScreen) {
 
 		g.Sounds[soundGunShot].Play()
 
-		g.Stat.Counters[counterBulletsFired]++
+		g.Stat.CounterBulletsFired++
 		g.Player.Ammo--
 		g.Player.State = playerShooting
 		rangeOfFire := g.Player.Range

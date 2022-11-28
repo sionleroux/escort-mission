@@ -33,7 +33,7 @@ func main() {
 
 	ApplyConfigs()
 
-	game := &Game{Width: gameWidth, Height: gameHeight, Stat: &Stat{Counters: make([]int, 6)}}
+	game := &Game{Width: gameWidth, Height: gameHeight, Stat: &Stat{}}
 	game.Screens = []Screen{
 		&LoadingScreen{},
 		&StartScreen{},
