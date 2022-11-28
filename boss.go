@@ -4,20 +4,40 @@ package main
 
 // Boss zombie, it is bigger than the rest and you need to kill it twice
 type Boss struct {
-	*Zombie                     // Inner zombie behaviour
-	Daemon    bool              // Whether it has respawned into daemon mode aka Phase 2
-	BossState bossAnimationTags // Boss animation state
-	BossFrame int               // Current animation frame
+	*Zombie                      // Inner zombie behaviour
+	Daemon     bool              // Whether it has respawned into daemon mode aka Phase 2
+	ReallyDead bool              // Died for the second time
+	BossState  bossAnimationTags // Boss animation state
+	BossFrame  int               // Current animation frame
 }
 
 // Update boss-specific zombie behaviour
 func (z *Boss) Update(g *GameScreen) error {
+	if z.ReallyDead {
+		z.Zombie.Die(g)
+		return nil
+	}
 
 	if z.Daemon {
-		// TODO: daemon specific stuff here
+		switch z.HitToDie {
+		case 2:
+			switch z.Zombie.State {
+			case zombieHit:
+				z.BossState = bossDeath1
+			case zombieIdle:
+				z.BossState = bossIdle4
+			case zombieWalking:
+				z.BossState = bossRunning
+			}
+		case 1:
+			switch z.Zombie.State {
+			case zombieHit:
+				z.BossState = bossDeath2
+			}
+		}
 	} else {
 		switch z.HitToDie {
-		case 6, 5:
+		case 7, 6:
 			switch z.Zombie.State {
 			case zombieIdle:
 				z.BossState = bossIdle1
@@ -26,10 +46,19 @@ func (z *Boss) Update(g *GameScreen) error {
 			case zombieHit:
 				z.BossState = bossHit1
 			}
-		case 4:
+		case 5:
 			switch z.Zombie.State {
 			case zombieHit:
 				z.BossState = bossHit1
+			case zombieIdle:
+				z.BossState = bossIdle2
+			case zombieWalking:
+				z.BossState = bossWalking2
+			}
+		case 4:
+			switch z.Zombie.State {
+			case zombieHit:
+				z.BossState = bossHit2
 			case zombieIdle:
 				z.BossState = bossIdle2
 			case zombieWalking:
@@ -40,23 +69,23 @@ func (z *Boss) Update(g *GameScreen) error {
 			case zombieHit:
 				z.BossState = bossHit2
 			case zombieIdle:
-				z.BossState = bossIdle2
-			case zombieWalking:
-				z.BossState = bossWalking2
-			}
-		case 2:
-			switch z.Zombie.State {
-			case zombieHit:
-				z.BossState = bossHit2
-			case zombieIdle:
 				z.BossState = bossIdle3
 			case zombieWalking:
 				z.BossState = bossWalking3
 			}
-		case 1:
+		case 2:
 			switch z.Zombie.State {
 			case zombieHit:
 				z.BossState = bossDeath1
+			case zombieIdle:
+				z.BossState = bossIdle4
+			case zombieWalking:
+				z.BossState = bossRunning
+			}
+		case 1:
+			switch z.Zombie.State {
+			case zombieHit:
+				z.BossState = bossDeath2
 			}
 		}
 	}
@@ -66,13 +95,19 @@ func (z *Boss) Update(g *GameScreen) error {
 		z.outterAnimationBasedStateChanges(g)
 	}
 
+	if z.BossState == bossDeath1 || z.BossState == bossDeath2 || z.BossState == bossPhase2 {
+		return nil
+	}
+
 	err := z.Zombie.Update(g)
 	return err // probably dead inside, return early without handling
-	// TODO: might need to handle daemon state here
 }
 
 // Draw draws the Zombie to the screen
 func (z *Boss) Draw(g *GameScreen) {
+	if z.ReallyDead {
+		return // don't draw when dead (why is it still here though?)
+	}
 	z.Frame = z.BossFrame
 	z.Zombie.Draw(g)
 }
@@ -87,6 +122,15 @@ func (z *Boss) outterAnimationBasedStateChanges(g *GameScreen) {
 		z.BossState = bossWalking2
 		z.Zombie.State = zombieWalking
 	case bossDeath1:
+		z.Daemon = true
+		z.Speed = zombieSprinterSpeed * 2
+		z.BossState = bossPhase2
+		z.Zombie.State = zombieWalking
+	case bossPhase2:
+		z.BossState = bossRunning
+		z.Zombie.State = zombieWalking
+	case bossDeath2:
+		z.ReallyDead = true
 		z.Zombie.State = zombieDead
 	}
 }
