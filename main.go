@@ -107,7 +107,6 @@ func (g *Game) Update() error {
 	}
 	if prevState != gameOver && g.State == gameOver {
 		g.Stat.GameWon = time.Now()
-		log.Println(g.Stat)
 	}
 
 	switch g.State {
