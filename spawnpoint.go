@@ -139,7 +139,7 @@ func (s *SpawnPoint) Update(g *GameScreen) {
 }
 
 // RemoveZombie removes a dead zombie from the zombie array of the SpawnPoint
-func (s *SpawnPoint) RemoveZombie(z *Zombie) {
+func (s *SpawnPoint) RemoveZombie(z Zombielike) {
 	for i, sz := range s.Zombies {
 		if sz == z {
 			s.Zombies[i] = nil

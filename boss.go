@@ -1,21 +1,24 @@
 package main
 
+import (
+	"errors"
+)
+
 //go:generate ./tools/gen_sprite_tags.sh assets/sprites/Zombie_big.json boss_anim.go boss
 
 // Boss zombie, it is bigger than the rest and you need to kill it twice
 type Boss struct {
-	*Zombie                      // Inner zombie behaviour
-	Daemon     bool              // Whether it has respawned into daemon mode aka Phase 2
-	ReallyDead bool              // Died for the second time
-	BossState  bossAnimationTags // Boss animation state
-	BossFrame  int               // Current animation frame
+	*Zombie                     // Inner zombie behaviour
+	Daemon    bool              // Whether it has respawned into daemon mode aka Phase 2
+	BossState bossAnimationTags // Boss animation state
+	BossFrame int               // Current animation frame
+	Dead      bool              // Whether the boss has reached its final death
 }
 
 // Update boss-specific zombie behaviour
 func (z *Boss) Update(g *GameScreen) error {
-	if z.ReallyDead {
-		z.Zombie.Die(g)
-		return nil
+	if z.Dead {
+		return errors.New("Zombie Boss died")
 	}
 
 	if z.Daemon {
@@ -105,9 +108,6 @@ func (z *Boss) Update(g *GameScreen) error {
 
 // Draw draws the Zombie to the screen
 func (z *Boss) Draw(g *GameScreen) {
-	if z.ReallyDead {
-		return // don't draw when dead (why is it still here though?)
-	}
 	z.Frame = z.BossFrame
 	z.Zombie.Draw(g)
 }
@@ -130,7 +130,16 @@ func (z *Boss) outterAnimationBasedStateChanges(g *GameScreen) {
 		z.BossState = bossRunning
 		z.Zombie.State = zombieWalking
 	case bossDeath2:
-		z.ReallyDead = true
+		z.Die(g)
 		z.Zombie.State = zombieDead
 	}
+}
+
+func (z *Boss) Remove() {
+	z.SpawnPoint.RemoveZombie(z)
+}
+
+func (z *Boss) Die(g *GameScreen) {
+	z.Zombie.Die(g)
+	z.Dead = true
 }
