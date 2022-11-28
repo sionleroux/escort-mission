@@ -5,6 +5,7 @@ package main
 
 import (
 	"image/color"
+	"fmt"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/tinne26/etxt"
@@ -48,7 +49,7 @@ func NewStatTextRenderer() *WinTextRenderer {
 	r := etxt.NewStdRenderer()
 	r.SetFont(font)
 	r.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
-	r.SetAlign(etxt.YCenter, etxt.Left)
+	r.SetAlign(etxt.YCenter, etxt.XCenter)
 	r.SetSizePx(12)
 	return &WinTextRenderer{r}
 }
@@ -62,6 +63,12 @@ func (s *WinScreen) Draw(screen *ebiten.Image) {
 	s.textRenderer.Renderer.SetTarget(screen)
 	s.textRenderer.Renderer.Draw("You survived... for now", screen.Bounds().Dx()/2, screen.Bounds().Dy()/4)
 
+	timePlayed := s.Stat.GameWon.Sub(s.Stat.GameStarted).Seconds()
+	statText := fmt.Sprintf("You played %d min %d sec\n", int(timePlayed/60), int(timePlayed)%60)
+	statText = statText + fmt.Sprintf("You died %d times\n", s.Stat.CounterPlayerDied)
+	statText = statText + fmt.Sprintf("Rover died %d times\n", s.Stat.CounterDogDied)
+	statText = statText + fmt.Sprintf("You fired %d bullets\n", s.Stat.CounterBulletsFired)
+	statText = statText + fmt.Sprintf("You killed %d zombies\n", s.Stat.CounterZombiesKilled)
 	s.statRenderer.Renderer.SetTarget(screen)
-	s.statRenderer.Renderer.Draw("Zombies killed: 0", 10, screen.Bounds().Dy()/4*3)
+	s.statRenderer.Renderer.Draw(statText, screen.Bounds().Dx()/2, screen.Bounds().Dy()/5*3)
 }
