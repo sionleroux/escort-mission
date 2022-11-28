@@ -34,7 +34,7 @@ func main() {
 	game := &Game{Width: gameWidth, Height: gameHeight}
 	game.Screens = []Screen{
 		&LoadingScreen{},
-		&StartScreen{},
+		NewStartScreen(game),
 		NewIntroScreen(game),
 		&GameScreen{},
 		NewDeathScreen(game),
