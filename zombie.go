@@ -315,6 +315,7 @@ func (z *Zombie) Draw(g *GameScreen) {
 
 // Hit changes zombie state and updates game data in response to it getting shot
 func (z *Zombie) Hit(g *GameScreen) {
+	g.Stat.CounterZombiesHit++
 	z.State = zombieHit
 	z.HitToDie--
 	if z.HitToDie == 0 {
@@ -327,6 +328,7 @@ func (z *Zombie) Hit(g *GameScreen) {
 
 // Die changes zombie state and updates game data in case of a deadly shot
 func (z *Zombie) Die(g *GameScreen) {
+	g.Stat.CounterZombiesKilled++
 	g.Sounds[soundZombieDeath].Play()
 	z.Remove()
 	z.State = zombieDeath

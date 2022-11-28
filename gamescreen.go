@@ -9,6 +9,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -66,6 +67,7 @@ type GameScreen struct {
 	Zoom          *Zoom
 	FadeTween     *gween.Tween
 	Alpha         uint8
+	Stat          *Stat
 }
 
 // NewGame fills up the main Game data with assets, entities, pre-generated
@@ -79,6 +81,7 @@ func NewGameScreen(game *Game) {
 		Debuggers:  debuggers,
 		FadeTween:  gween.New(255, 0, fadeOutTime, ease.OutQuad),
 		Alpha:      255,
+		Stat:       game.Stat,
 	}
 
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
@@ -287,6 +290,7 @@ func NewGameScreen(game *Game) {
 
 func (g *GameScreen) Start() {
 	g.SoundLoops[musicBackground].Play()
+	g.Stat.GameStarted = time.Now()
 }
 
 // Reset is similar to NewGameScreen but only resets the things that should be
@@ -375,6 +379,7 @@ func (g *GameScreen) Update() (GameState, error) {
 			if g.Player.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
 				g.SoundLoops[musicBackground].Pause()
 				g.Sounds[soundPlayerDies].Play()
+				g.Stat.CounterPlayerDied++
 				return gameOver, nil // return early, no point in continuing, you are dead
 			}
 		}
@@ -410,6 +415,7 @@ func (g *GameScreen) Update() (GameState, error) {
 
 	// Game over if the dog dies
 	if g.Dog.Mode == dogDead {
+		g.Stat.CounterDogDied++
 		g.SoundLoops[musicBackground].Pause()
 		return gameOver, nil
 	}
@@ -475,6 +481,7 @@ func Shoot(g *GameScreen) {
 		g.Sounds[soundGunReload].Pause()
 		g.Sounds[soundDryFire].Play()
 		g.Player.State = playerDryFire
+		g.Stat.CounterDryFires++
 	}
 
 	switch g.Player.State {
@@ -491,6 +498,7 @@ func Shoot(g *GameScreen) {
 
 		g.Sounds[soundGunShot].Play()
 
+		g.Stat.CounterBulletsFired++
 		g.Player.Ammo--
 		g.Player.State = playerShooting
 		rangeOfFire := g.Player.Range
