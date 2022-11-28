@@ -45,12 +45,12 @@ func NewWinTextRenderer() *WinTextRenderer {
 
 // NewStatTextRenderer creates a text renderer for stat texts on the win screen
 func NewStatTextRenderer() *WinTextRenderer {
-	font := loadFont("assets/fonts/OptimusPrincepsSemiBold.otf")
+	font := loadFont("assets/fonts/PixelOperator8-Bold.ttf")
 	r := etxt.NewStdRenderer()
 	r.SetFont(font)
 	r.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
 	r.SetAlign(etxt.YCenter, etxt.XCenter)
-	r.SetSizePx(12)
+	r.SetSizePx(8)
 	return &WinTextRenderer{r}
 }
 
