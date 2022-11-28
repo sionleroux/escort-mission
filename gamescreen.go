@@ -140,13 +140,9 @@ func NewGameScreen(game *Game) {
 	}
 
 	// SoundLoops
-	g.SoundLoops = make([]*Sound, 2)
-	for i := 0; i < 2; i++ {
-		g.SoundLoops[i] = &Sound{Volume: 0.5}
-	}
+	g.SoundLoops = make([]*Sound, 1)
+	g.SoundLoops[0] = &Sound{Volume: 0.5}
 	g.SoundLoops[musicBackground].AddSoundLoop("assets/music/BackgroundMusic", sampleRate, context)
-	g.SoundLoops[soundFootStep].AddSoundLoop("assets/sfx/Footstep-loop", sampleRate, context)
-	g.SoundLoops[soundFootStep].SetVolume(0.7)
 
 	// Sound
 	g.Sounds = make([]*Sound, 10)
@@ -378,7 +374,6 @@ func (g *GameScreen) Update() (GameState, error) {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
 			if g.Player.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
 				g.SoundLoops[musicBackground].Pause()
-				g.SoundLoops[soundFootStep].Pause()
 				g.Sounds[soundPlayerDies].Play()
 				return gameOver, nil // return early, no point in continuing, you are dead
 			}
@@ -416,7 +411,6 @@ func (g *GameScreen) Update() (GameState, error) {
 	// Game over if the dog dies
 	if g.Dog.Mode == dogDead {
 		g.SoundLoops[musicBackground].Pause()
-		g.SoundLoops[soundFootStep].Pause()
 		return gameOver, nil
 	}
 

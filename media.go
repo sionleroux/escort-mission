@@ -159,7 +159,6 @@ type SoundType uint8
 
 const (
 	musicBackground SoundType = iota
-	soundFootStep
 )
 
 const (

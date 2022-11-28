@@ -101,13 +101,6 @@ func (p *Player) Update(g *GameScreen) {
 		p.animationBasedStateChanges(g)
 	}
 
-	if p.PrevState == playerIdle && p.State == playerWalking {
-		g.SoundLoops[soundFootStep].Play()
-	}
-	if p.PrevState == playerWalking && p.State != playerWalking {
-		g.SoundLoops[soundFootStep].Pause()
-	}
-
 	// Player gun rotation
 	cx, cy := g.Camera.GetCursorCoords()
 	adjacent := float64(cx) - p.Object.X
