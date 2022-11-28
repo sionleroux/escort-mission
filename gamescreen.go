@@ -453,6 +453,8 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 		g.Camera.GetTranslation(&ebiten.DrawImageOptions{}, 0, 0),
 	)
 
+	g.Camera.SetRotation(math.Pi - g.Player.Angle + math.Pi/2)
+
 	g.Camera.Blit(screen)
 
 	g.HUD.Draw(g.Player.Ammo, screen)

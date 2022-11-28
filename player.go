@@ -50,6 +50,7 @@ type Player struct {
 	Sprite    *SpriteSheet   // Used for player animations
 	Range     float64        // How far you can shoot with the gun
 	Ammo      int            // How many shots you have left in the gun
+	CLast     image.Point    // Last position of the cursor
 }
 
 // NewPlayer constructs a new Player object at the provided location and size
@@ -76,6 +77,7 @@ func NewPlayer(position []int, sprites *SpriteSheet) *Player {
 		Sprite: sprites,
 		Range:  200,
 		Ammo:   playerAmmoClipMax,
+		CLast:  image.Pt(ebiten.CursorPosition()),
 	}
 
 	return player
@@ -109,10 +111,13 @@ func (p *Player) Update(g *GameScreen) {
 	}
 
 	// Player gun rotation
-	cx, cy := g.Camera.GetCursorCoords()
-	adjacent := float64(cx) - p.Object.X
-	opposite := float64(cy) - p.Object.Y
-	p.Angle = math.Atan2(opposite, adjacent)
+	// cx, cy := g.Camera.GetCursorCoords()
+	cx, _ := ebiten.CursorPosition()
+	// p.Angle = math.Atan2(opposite, adjacent) + math.Pi
+	// p.Angle = math.Atan2(opposite, adjacent)
+	const rotationSensitivity = 0.005
+	p.Angle += float64(cx-p.CLast.X) * rotationSensitivity
+	p.CLast = image.Pt(ebiten.CursorPosition())
 
 	p.Frame = Animate(p.Frame, g.Tick, p.Sprite.Meta.FrameTags[p.State])
 	p.Object.Shape.SetRotation(-p.Angle)
@@ -201,6 +206,7 @@ func (p *Player) Draw(g *GameScreen) {
 		float64(-frame.Position.H/2)+centerOffset/2,
 	)
 	op.GeoM.Rotate(p.Angle + math.Pi/2)
+	// op.GeoM.Rotate(-math.Pi / 2)
 
 	g.Camera.Surface.DrawImage(
 		s.Image.SubImage(image.Rect(
