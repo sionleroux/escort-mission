@@ -328,6 +328,6 @@ func (z *Zombie) Hit(g *GameScreen) {
 // Die changes zombie state and updates game data in case of a deadly shot
 func (z *Zombie) Die(g *GameScreen) {
 	g.Sounds[soundZombieDeath].Play()
-	z.Object.Space.Remove(z.Object)
+	z.Remove()
 	z.State = zombieDeath
 }
