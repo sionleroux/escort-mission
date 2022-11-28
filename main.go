@@ -7,6 +7,7 @@ import (
 	"errors"
 	"image"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -32,7 +33,7 @@ func main() {
 
 	ApplyConfigs()
 
-	game := &Game{Width: gameWidth, Height: gameHeight}
+	game := &Game{Width: gameWidth, Height: gameHeight, Stat: &Stat{Counters: make([]int, 6)}}
 	game.Screens = []Screen{
 		&LoadingScreen{},
 		&StartScreen{},
@@ -71,6 +72,7 @@ type Game struct {
 	DeathTime  int
 	Tick       int
 	Checkpoint int
+	Stat       *Stat
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -102,6 +104,10 @@ func (g *Game) Update() error {
 
 	if prevState != gameRunning && g.State == gameRunning {
 		g.Screens[gameRunning].(*GameScreen).Start()
+	}
+	if prevState != gameOver && g.State == gameOver {
+		g.Stat.GameWon = time.Now()
+		log.Println(g.Stat)
 	}
 
 	switch g.State {
