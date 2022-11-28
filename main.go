@@ -40,7 +40,7 @@ func main() {
 		NewIntroScreen(game),
 		&GameScreen{},
 		NewDeathScreen(game),
-		&WinScreen{},
+		NewWinScreen(game),
 	}
 
 	go NewGameScreen(game)
