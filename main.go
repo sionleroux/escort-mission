@@ -39,8 +39,9 @@ func main() {
 		Stat:      &Stat{},
 		StateLock: &sync.RWMutex{},
 	}
+	loadingScreen := NewLoadingScreen()
 	game.Screens = []Screen{
-		&LoadingScreen{},
+		loadingScreen,
 		NewStartScreen(game),
 		NewIntroScreen(game),
 		&GameScreen{},
@@ -48,7 +49,7 @@ func main() {
 		NewWinScreen(game),
 	}
 
-	go NewGameScreen(game)
+	go NewGameScreen(game, loadingScreen.Counter)
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
@@ -105,12 +106,25 @@ func (g *Game) Update() error {
 	}
 
 	g.StateLock.Lock()
+	if g.State == gameLoading && g.Loaded {
+		g.Screens[gameLoading].(*LoadingScreen).Loaded = g.Loaded
+	}
+	g.StateLock.Unlock()
+
 	prevState := g.State
 	state, err := g.Screens[g.State].Update()
 	g.State = state
-	g.StateLock.Unlock()
 
-	g.StateLock.RLock()
+	if errors.Is(err, ErrorDoneLoading) {
+		if startingCheckpoint != 0 {
+			g.Checkpoint = startingCheckpoint
+			g.State = gameOver
+		} else {
+			g.State = gameStart
+		}
+		return nil
+	}
+
 	if prevState != gameRunning && g.State == gameRunning {
 		g.Screens[gameRunning].(*GameScreen).Start()
 	}
@@ -131,16 +145,13 @@ func (g *Game) Update() error {
 			g.Screens[gameRunning].(*GameScreen).Reset(g)
 		}
 	}
-	g.StateLock.RUnlock()
 
 	return err
 }
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.StateLock.RLock()
 	g.Screens[g.State].Draw(screen)
-	g.StateLock.RUnlock()
 }
 
 // Screen is a full-screen UI Screen for some part of the game like a menu or a

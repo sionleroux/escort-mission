@@ -79,7 +79,7 @@ type GameScreen struct {
 // NewGameScreen fills up the main Game data with assets, entities, pre-generated
 // tiles and other things that take longer to load and would make the game pause
 // before starting if we did it before the first Update loop
-func NewGameScreen(game *Game) {
+func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	g := &GameScreen{
 		Width:      game.Width,
 		Height:     game.Height,
@@ -92,6 +92,7 @@ func NewGameScreen(game *Game) {
 
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
 
+	*loadingCount++
 	var renderer *TileRenderer
 	ldtkProject := loadMaps("assets/maps/maps.ldtk")
 	renderer = NewTileRenderer(&EmbedLoader{"assets/maps"})
@@ -164,11 +165,13 @@ func NewGameScreen(game *Game) {
 	}
 
 	// SoundLoops
+	*loadingCount++
 	g.SoundLoops = make([]*Sound, 1)
 	g.SoundLoops[0] = &Sound{Volume: 0.5}
 	g.SoundLoops[musicBackground].AddSoundLoop("assets/music/BackgroundMusic", sampleRate, context)
 
 	// Sound
+	*loadingCount++
 	g.Sounds = make([]*Sound, 10)
 	for i := 0; i < 10; i++ {
 		g.Sounds[i] = &Sound{Volume: 0.7}
@@ -194,6 +197,7 @@ func NewGameScreen(game *Game) {
 	g.Voices[voiceKill].AddSound("assets/voice/Kill", sampleRate, context, 6)
 
 	// Load sprites
+	*loadingCount++
 	g.Sprites = make(map[SpriteType]*SpriteSheet, 5)
 	g.Sprites[spritePlayer] = loadSprite("Player")
 	g.Sprites[spriteDog] = loadSprite("Dog")
@@ -206,6 +210,7 @@ func NewGameScreen(game *Game) {
 	}
 
 	// Load entities from map
+	*loadingCount++
 	entities := level.LayerByIdentifier("Entities")
 
 	// Add endpoint
@@ -300,15 +305,10 @@ func NewGameScreen(game *Game) {
 	g.HUD = NewHUD()
 	g.Zoom = NewZoom()
 
+	*loadingCount++
 	game.StateLock.Lock()
+	game.Loaded = true
 	game.Screens[gameRunning] = g
-	if startingCheckpoint != 0 {
-		g.Checkpoint = startingCheckpoint
-		// trigger reset using the synchronised flow of control
-		game.State = gameOver
-	} else {
-		game.State = gameStart
-	}
 	game.StateLock.Unlock()
 }
 
