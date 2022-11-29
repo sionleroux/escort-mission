@@ -4,11 +4,19 @@
 package main
 
 import (
+	"errors"
 	"image/color"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/tanema/gween"
+	"github.com/tanema/gween/ease"
 	"github.com/tinne26/etxt"
 )
+
+// How long at least to show the loading screen even if everything loads very
+// fast so that it isn't just a black flash
+var loadingScreenMinTime = 2 * 60
 
 // LoadingCounter is for tracking how much of the assets have been loaded
 type LoadingCounter *uint8
@@ -28,17 +36,33 @@ var loadingWhat = []string{
 type LoadingScreen struct {
 	Counter      LoadingCounter // what is being loaded
 	textRenderer *etxt.Renderer
+	textFader    *gween.Tween
+	alpha        uint8
+	ticker       int
+	Loaded       bool
 }
 
 func NewLoadingScreen() *LoadingScreen {
 	return &LoadingScreen{
 		Counter:      new(uint8),
 		textRenderer: NewTextRenderer(),
+		textFader:    gween.New(255, 0, float32(loadingScreenMinTime)*0.3, ease.InQuad),
+		alpha:        255,
 	}
 }
 
+var ErrorDoneLoading = errors.New("Done loading")
+
 // Update handles player input to update the start screen
 func (s *LoadingScreen) Update() (GameState, error) {
+	s.ticker++
+	if s.Loaded && s.ticker > loadingScreenMinTime {
+		alpha, done := s.textFader.Update(1)
+		s.alpha = uint8(math.Ceil(float64(alpha)))
+		if done {
+			return gameLoading, ErrorDoneLoading
+		}
+	}
 	return gameLoading, nil
 }
 
@@ -48,13 +72,15 @@ func (s *LoadingScreen) Draw(screen *ebiten.Image) {
 	if int(*s.Counter) < len(loadingWhat) {
 		whatTxt = loadingWhat[*s.Counter]
 	}
-	s.textRenderer.SetTarget(screen)
-	s.textRenderer.Draw(
+	txt := s.textRenderer
+	txt.SetTarget(screen)
+	txt.SetColor(color.RGBA{0xff, 0xff, 0xff, s.alpha})
+	txt.Draw(
 		"An action adventure story by:\nRowan Lindeque\nTristan Le Roux\nSiôn Le Roux\nPéter Kertész",
 		screen.Bounds().Dx()/2,
 		screen.Bounds().Dy()/2,
 	)
-	s.textRenderer.Draw(
+	txt.Draw(
 		"Loading..."+whatTxt,
 		screen.Bounds().Dx()/2,
 		screen.Bounds().Dy()/8*7,

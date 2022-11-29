@@ -306,14 +306,8 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 
 	*loadingCount++
 	game.StateLock.Lock()
+	game.Loaded = true
 	game.Screens[gameRunning] = g
-	if startingCheckpoint != 0 {
-		g.Checkpoint = startingCheckpoint
-		// trigger reset using the synchronised flow of control
-		game.State = gameOver
-	} else {
-		game.State = gameStart
-	}
 	game.StateLock.Unlock()
 }
 

@@ -105,11 +105,25 @@ func (g *Game) Update() error {
 		}
 	}
 
+	if g.State == gameLoading && g.Loaded {
+		g.Screens[gameLoading].(*LoadingScreen).Loaded = g.Loaded
+	}
+
 	g.StateLock.Lock()
 	prevState := g.State
 	state, err := g.Screens[g.State].Update()
 	g.State = state
 	g.StateLock.Unlock()
+
+	if errors.Is(err, ErrorDoneLoading) {
+		if startingCheckpoint != 0 {
+			g.Checkpoint = startingCheckpoint
+			g.State = gameOver
+		} else {
+			g.State = gameStart
+		}
+		return nil
+	}
 
 	g.StateLock.RLock()
 	if prevState != gameRunning && g.State == gameRunning {
