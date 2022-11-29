@@ -44,6 +44,7 @@ const (
 // Length of the fading animation
 const fadeOutTime = 180
 
+// GameScreen is the screen for the actual main game itself
 type GameScreen struct {
 	Width         int
 	Height        int
@@ -74,7 +75,7 @@ type GameScreen struct {
 	Stat          *Stat
 }
 
-// NewGame fills up the main Game data with assets, entities, pre-generated
+// NewGameScreen fills up the main Game data with assets, entities, pre-generated
 // tiles and other things that take longer to load and would make the game pause
 // before starting if we did it before the first Update loop
 func NewGameScreen(game *Game) {
@@ -298,13 +299,16 @@ func NewGameScreen(game *Game) {
 	g.HUD = NewHUD()
 	g.Zoom = NewZoom()
 
+	game.StateLock.Lock()
 	game.Screens[gameRunning] = g
 	if startingCheckpoint != 0 {
 		g.Checkpoint = startingCheckpoint
-		g.Reset(game)
+		// trigger reset using the synchronised flow of control
+		game.State = gameOver
+	} else {
+		game.State = gameStart
 	}
-
-	game.State = gameStart
+	game.StateLock.Unlock()
 }
 
 func (g *GameScreen) Start() {

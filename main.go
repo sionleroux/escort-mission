@@ -7,6 +7,7 @@ import (
 	"errors"
 	"image"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -32,7 +33,12 @@ func main() {
 
 	ApplyConfigs()
 
-	game := &Game{Width: gameWidth, Height: gameHeight, Stat: &Stat{}}
+	game := &Game{
+		Width:     gameWidth,
+		Height:    gameHeight,
+		Stat:      &Stat{},
+		StateLock: &sync.RWMutex{},
+	}
 	game.Screens = []Screen{
 		&LoadingScreen{},
 		NewStartScreen(game),
@@ -67,6 +73,7 @@ type Game struct {
 	Height     int
 	Screens    []Screen
 	State      GameState
+	StateLock  *sync.RWMutex
 	Loaded     bool
 	DeathTime  int
 	Tick       int
@@ -97,10 +104,13 @@ func (g *Game) Update() error {
 		}
 	}
 
+	g.StateLock.Lock()
 	prevState := g.State
 	state, err := g.Screens[g.State].Update()
 	g.State = state
+	g.StateLock.Unlock()
 
+	g.StateLock.RLock()
 	if prevState != gameRunning && g.State == gameRunning {
 		g.Screens[gameRunning].(*GameScreen).Start()
 	}
@@ -121,13 +131,16 @@ func (g *Game) Update() error {
 			g.Screens[gameRunning].(*GameScreen).Reset(g)
 		}
 	}
+	g.StateLock.RUnlock()
 
 	return err
 }
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
+	g.StateLock.RLock()
 	g.Screens[g.State].Draw(screen)
+	g.StateLock.RUnlock()
 }
 
 // Screen is a full-screen UI Screen for some part of the game like a menu or a
