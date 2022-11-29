@@ -246,6 +246,11 @@ func (s *Sound) Pause() {
 	s.Audio[s.LastPlayed].Pause()
 }
 
+// IsPlaying returns if the sound is playing
+func (s *Sound) IsPlaying() bool {
+	return s.Audio[s.LastPlayed].IsPlaying()
+}
+
 // Sounds is a slice of sounds
 type Sounds []*Sound
 

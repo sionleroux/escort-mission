@@ -65,7 +65,7 @@ func (zs *Zombies) Update(g *GameScreen) {
 			g.Zombies[i] = nil
 			g.Zombies = append((*zs)[:i], (*zs)[i+1:]...)
 			z.Remove()
-			if len(g.Zombies) == 0 && rand.Float64() < 0.3 {
+			if len(g.Zombies) == 0 && rand.Float64() < 0.3 && !g.Voices[voiceCheckpoint].IsPlaying() {
 				g.Voices[voiceKill].Play()
 			}
 		}
