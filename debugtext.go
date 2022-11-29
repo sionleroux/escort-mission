@@ -23,11 +23,13 @@ func DebugText(g *GameScreen, screen *ebiten.Image) {
 			"TPS: %.2f\n"+
 			"X: %.2f\n"+
 			"Y: %.2f\n"+
-			"Zombies: %d\n",
+			"Zombies: %d\n"+
+			"Progress: %.2f%%\n",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
 		g.Player.Object.X/32,
 		g.Player.Object.Y/32,
 		len(g.Zombies),
+		float64(g.Dog.MainPath.NextPoint)/float64(len(g.Dog.MainPath.Points))*100,
 	))
 }
