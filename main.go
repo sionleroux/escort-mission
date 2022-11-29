@@ -39,8 +39,9 @@ func main() {
 		Stat:      &Stat{},
 		StateLock: &sync.RWMutex{},
 	}
+	loadingScreen := NewLoadingScreen()
 	game.Screens = []Screen{
-		&LoadingScreen{},
+		loadingScreen,
 		NewStartScreen(game),
 		NewIntroScreen(game),
 		&GameScreen{},
@@ -48,7 +49,7 @@ func main() {
 		NewWinScreen(game),
 	}
 
-	go NewGameScreen(game)
+	go NewGameScreen(game, loadingScreen.Counter)
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
