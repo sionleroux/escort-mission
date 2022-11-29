@@ -73,6 +73,7 @@ type GameScreen struct {
 	FadeTween     *gween.Tween
 	Alpha         uint8
 	Stat          *Stat
+	NextKillVoice int
 }
 
 // NewGameScreen fills up the main Game data with assets, entities, pre-generated

@@ -29,7 +29,7 @@ var zombieCrawlerSpeed float64 = 0.2
 var zombieSprinterSpeed float64 = 1.2
 
 // zombieRange is how far away the zombie sees something to attack
-var zombieRange float64 = 200
+var zombieRange float64 = 220
 
 // Types of zombies
 type ZombieType uint8
@@ -57,6 +57,7 @@ type Zombies []Zombielike
 
 // Update updates all the zombies
 func (zs *Zombies) Update(g *GameScreen) {
+	zKilled := false
 	for i, z := range *zs {
 		err := z.Update(g)
 		if err != nil {
@@ -65,10 +66,15 @@ func (zs *Zombies) Update(g *GameScreen) {
 			g.Zombies[i] = nil
 			g.Zombies = append((*zs)[:i], (*zs)[i+1:]...)
 			z.Remove()
-			if len(g.Zombies) == 0 && rand.Float64() < 0.3 && !g.Voices[voiceCheckpoint].IsPlaying() {
-				g.Voices[voiceKill].Play()
+			zKilled = true
+			if g.NextKillVoice > 0 {
+				g.NextKillVoice--
 			}
 		}
+	}
+	if zKilled && g.NextKillVoice == 0 && !g.Voices[voiceCheckpoint].IsPlaying() {
+		g.Voices[voiceKill].Play()
+		g.NextKillVoice = rand.Intn(5) + 3
 	}
 }
 
