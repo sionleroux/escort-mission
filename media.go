@@ -127,6 +127,10 @@ func loadImage(name string) *ebiten.Image {
 		log.Fatalf("error decoding file %s as PNG: %v\n", name, err)
 	}
 
+	if raw == nil {
+		log.Fatalf("error empty data for sprite file %s\n", name)
+	}
+
 	return ebiten.NewImageFromImage(raw)
 }
 
