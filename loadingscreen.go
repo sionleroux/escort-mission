@@ -50,6 +50,11 @@ func (s *LoadingScreen) Draw(screen *ebiten.Image) {
 	}
 	s.textRenderer.SetTarget(screen)
 	s.textRenderer.Draw(
+		"An action adventure story by:\nRowan Lindeque\nTristan Le Roux\nSiôn Le Roux\nPéter Kertész",
+		screen.Bounds().Dx()/2,
+		screen.Bounds().Dy()/2,
+	)
+	s.textRenderer.Draw(
 		"Loading..."+whatTxt,
 		screen.Bounds().Dx()/2,
 		screen.Bounds().Dy()/8*7,
@@ -57,7 +62,7 @@ func (s *LoadingScreen) Draw(screen *ebiten.Image) {
 }
 
 func NewTextRenderer() *etxt.Renderer {
-	font := loadFont("assets/fonts/PixelOperator8-Bold.ttf")
+	font := loadFont("assets/fonts/PixelOperator8.ttf")
 	r := etxt.NewStdRenderer()
 	r.SetFont(font)
 	r.SetAlign(etxt.YCenter, etxt.XCenter)
