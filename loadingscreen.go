@@ -4,8 +4,10 @@
 package main
 
 import (
+	"image/color"
+
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/tinne26/etxt"
 )
 
 // LoadingCounter is for tracking how much of the assets have been loaded
@@ -24,11 +26,15 @@ var loadingWhat = []string{
 // LoadingScreen is shown while all the assets are loading.
 // When loading is ready it switches to Intro screen
 type LoadingScreen struct {
-	Counter LoadingCounter // what is being loaded
+	Counter      LoadingCounter // what is being loaded
+	textRenderer *etxt.Renderer
 }
 
 func NewLoadingScreen() *LoadingScreen {
-	return &LoadingScreen{new(uint8)}
+	return &LoadingScreen{
+		Counter:      new(uint8),
+		textRenderer: NewTextRenderer(),
+	}
 }
 
 // Update handles player input to update the start screen
@@ -42,5 +48,20 @@ func (s *LoadingScreen) Draw(screen *ebiten.Image) {
 	if int(*s.Counter) < len(loadingWhat) {
 		whatTxt = loadingWhat[*s.Counter]
 	}
-	ebitenutil.DebugPrint(screen, "Loading..."+whatTxt)
+	s.textRenderer.SetTarget(screen)
+	s.textRenderer.Draw(
+		"Loading..."+whatTxt,
+		screen.Bounds().Dx()/2,
+		screen.Bounds().Dy()/8*7,
+	)
+}
+
+func NewTextRenderer() *etxt.Renderer {
+	font := loadFont("assets/fonts/PixelOperator8-Bold.ttf")
+	r := etxt.NewStdRenderer()
+	r.SetFont(font)
+	r.SetAlign(etxt.YCenter, etxt.XCenter)
+	r.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
+	r.SetSizePx(8)
+	return r
 }
