@@ -44,6 +44,13 @@ const (
 // Length of the fading animation
 const fadeOutTime = 180
 
+type VoiceMeta struct {
+	LastKillVoiceTime       time.Time
+	LastKillVoiceCheckpoint int
+	LastFlavourLine         time.Time
+	LastFlavourLineIndex    int
+}
+
 // GameScreen is the screen for the actual main game itself
 type GameScreen struct {
 	Width         int
@@ -74,7 +81,6 @@ type GameScreen struct {
 	FadeTween     *gween.Tween
 	Alpha         uint8
 	Stat          *Stat
-	NextKillVoice int
 }
 
 // NewGameScreen fills up the main Game data with assets, entities, pre-generated
@@ -206,6 +212,7 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	g.Voices[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)
 	g.Voices[voiceRespawn].AddSound("assets/voice/Respawn", sampleRate, context, 5)
 	g.Voices[voiceKill].AddSound("assets/voice/Kill", sampleRate, context, 6)
+	g.Voices[voiceKill].Shuffle()
 
 	// Load sprites
 	*loadingCount++

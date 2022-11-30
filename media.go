@@ -12,6 +12,7 @@ import (
 	"math/rand"
 	"path"
 	"strconv"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -260,6 +261,11 @@ func (s *Sound) IsPlaying() bool {
 
 // Sounds is a slice of sounds
 type Sounds []*Sound
+
+func (s *Sound) Shuffle() {
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(s.Audio), func(i, j int) { s.Audio[i], s.Audio[j] = s.Audio[j], s.Audio[i] })
+}
 
 // NewMusicPlayer loads a sound into an audio player that can be used to play it
 // as an infinite loop of music without any additional setup required

@@ -67,14 +67,13 @@ func (zs *Zombies) Update(g *GameScreen) {
 			g.Zombies = append((*zs)[:i], (*zs)[i+1:]...)
 			z.Remove()
 			zKilled = true
-			if g.NextKillVoice > 0 {
-				g.NextKillVoice--
-			}
 		}
 	}
-	if zKilled && g.NextKillVoice == 0 && !g.Voices[voiceCheckpoint].IsPlaying() {
-		g.Voices[voiceKill].Play()
-		g.NextKillVoice = rand.Intn(5) + 3
+	if zKilled {
+//		lastPlayerVoice := time.Now().Sub(g.).Seconds()
+		if !g.Voices[voiceCheckpoint].IsPlaying() {
+			g.Voices[voiceKill].Play()
+		}
 	}
 }
 
