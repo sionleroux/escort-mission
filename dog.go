@@ -304,6 +304,19 @@ func (d *Dog) Update(g *GameScreen) {
 		d.followPath(g)
 	}
 
+	// If dog is walking then after some time a flavour voice line is played
+	if d.State == dogNormalWalking || d.State == dogNormalBlocked {
+		if (g.NextVoiceStep == voiceStepFlavour1 || g.NextVoiceStep == voiceStepFlavour2) && g.VoiceGuardTime > voiceGuardTime {
+			i := 0
+			if g.NextVoiceStep == voiceStepFlavour2 {
+				i = 1
+			}
+			g.Voices[voiceFlavour].PlayVariant(g.Checkpoint*2 + i)
+			g.VoiceGuardTime = 0
+			g.NextVoiceStep++
+		}
+	}
+
 	// Animate dog
 	animationFrame := d.Sprite.Meta.FrameTags[dogStateToFrame[d.State]]
 	d.Frame = Animate(d.Frame, g.Tick, animationFrame)

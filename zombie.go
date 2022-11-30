@@ -69,12 +69,12 @@ func (zs *Zombies) Update(g *GameScreen) {
 			zKilled = true
 		}
 	}
+	// If a zombie is killed and a kill voice can be played then it is played
 	if zKilled {
-		if g.VoiceMeta.LastKillVoiceCheckpoint < g.Checkpoint &&
-			time.Now().Sub(g.VoiceMeta.LastVoiceTime).Seconds() > voiceGuardTime {
-			g.VoiceMeta.LastKillVoiceCheckpoint = g.Checkpoint
-			g.VoiceMeta.LastVoiceTime = time.Now()
-			g.Voices[voiceKill].PlayVariant(g.VoiceMeta.LastKillVoiceCheckpoint - 1)
+		if g.Checkpoint > 0 && g.NextVoiceStep == voiceStepKill && g.VoiceGuardTime > voiceGuardTime {
+			g.VoiceGuardTime = 0
+			g.NextVoiceStep++
+			g.Voices[voiceKill].PlayVariant(g.Checkpoint - 1)
 		}
 	}
 }

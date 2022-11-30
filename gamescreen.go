@@ -44,47 +44,48 @@ const (
 // Length of the fading animation
 const fadeOutTime = 180
 
-// VoiceMeta stores metadata aboutn played voices
-type VoiceMeta struct {
-	LastVoiceTime                 time.Time
-	LastKillVoiceCheckpoint       int
-	FlavourLineBetweenCheckpoints int
-}
+// Minimum time between two voice lines
+const voiceGuardTime = 1200
 
-// voiceGuardTime is the minimum time needed between two voice lines
-const voiceGuardTime = 15.0
+// Voices are played in this order between the checkpoints: flavour + kill + flavour
+const (
+	voiceStepFlavour1 uint8 = iota
+	voiceStepKill
+	voiceStepFlavour2
+)
 
 // GameScreen is the screen for the actual main game itself
 type GameScreen struct {
-	Width         int
-	Height        int
-	Tick          int
-	TileRenderer  *TileRenderer
-	LDTKProject   *ldtkgo.Project
-	SoundLoops    Sounds
-	Sounds        Sounds
-	Voices        Sounds
-	Level         int
-	Background    *ebiten.Image
-	Foreground    *ebiten.Image
-	Camera        *camera.Camera
-	Sprites       map[SpriteType]*SpriteSheet
-	ZombieSprites []*SpriteSheet
-	Player        *Player
-	Dog           *Dog
-	SpawnPoints   SpawnPoints
-	Zombies       Zombies
-	BossDefeated  bool
-	Space         *resolv.Space
-	LevelMap      LevelMap
-	Checkpoint    int
-	HUD           *HUD
-	Debuggers     Debuggers
-	Zoom          *Zoom
-	FadeTween     *gween.Tween
-	Alpha         uint8
-	Stat          *Stat
-	VoiceMeta     VoiceMeta
+	Width          int
+	Height         int
+	Tick           int
+	TileRenderer   *TileRenderer
+	LDTKProject    *ldtkgo.Project
+	SoundLoops     Sounds
+	Sounds         Sounds
+	Voices         Sounds
+	Level          int
+	Background     *ebiten.Image
+	Foreground     *ebiten.Image
+	Camera         *camera.Camera
+	Sprites        map[SpriteType]*SpriteSheet
+	ZombieSprites  []*SpriteSheet
+	Player         *Player
+	Dog            *Dog
+	SpawnPoints    SpawnPoints
+	Zombies        Zombies
+	BossDefeated   bool
+	Space          *resolv.Space
+	LevelMap       LevelMap
+	Checkpoint     int
+	HUD            *HUD
+	Debuggers      Debuggers
+	Zoom           *Zoom
+	FadeTween      *gween.Tween
+	Alpha          uint8
+	Stat           *Stat
+	VoiceGuardTime int
+	NextVoiceStep  uint8
 }
 
 // NewGameScreen fills up the main Game data with assets, entities, pre-generated
@@ -92,13 +93,14 @@ type GameScreen struct {
 // before starting if we did it before the first Update loop
 func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	g := &GameScreen{
-		Width:      game.Width,
-		Height:     game.Height,
-		Checkpoint: game.Checkpoint,
-		Debuggers:  debuggers,
-		FadeTween:  gween.New(255, 0, fadeOutTime, ease.OutQuad),
-		Alpha:      255,
-		Stat:       game.Stat,
+		Width:         game.Width,
+		Height:        game.Height,
+		Checkpoint:    game.Checkpoint,
+		Debuggers:     debuggers,
+		FadeTween:     gween.New(255, 0, fadeOutTime, ease.OutQuad),
+		Alpha:         255,
+		Stat:          game.Stat,
+		NextVoiceStep: voiceStepFlavour2,
 	}
 
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
@@ -209,14 +211,16 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	g.Sounds[soundBigZombieDeath2].AddSound("assets/sfx/Big-zombie-death-Phase-2", sampleRate, context)
 
 	// Voices
-	g.Voices = make([]*Sound, 3)
-	for i := 0; i < 3; i++ {
+	g.Voices = make([]*Sound, 4)
+	for i := 0; i < 4; i++ {
 		g.Voices[i] = &Sound{Volume: 1}
 	}
 	g.Voices[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)
 	g.Voices[voiceRespawn].AddSound("assets/voice/Respawn", sampleRate, context, 5)
 	g.Voices[voiceKill].AddSound("assets/voice/Kill", sampleRate, context, 6)
 	g.Voices[voiceKill].Shuffle()
+	g.Voices[voiceFlavour].AddSound("assets/voice/Flavour", sampleRate, context, 12)
+	g.Voices[voiceFlavour].Shuffle()
 
 	// Load sprites
 	*loadingCount++
@@ -373,12 +377,14 @@ func (g *GameScreen) Reset(game *Game) {
 
 	g.SoundLoops[musicBackground].Play()
 	g.Voices[voiceRespawn].Play()
+	g.VoiceGuardTime = 0
 	g.Zoom = NewZoom()
 	game.State = gameRunning
 }
 
 func (g *GameScreen) Update() (GameState, error) {
 	g.Tick++
+	g.VoiceGuardTime++
 
 	// Fade out the black cover
 	if g.Tick < fadeOutTime {
@@ -438,7 +444,8 @@ func (g *GameScreen) Update() (GameState, error) {
 				if g.Dog.State == dogNormalSniffing || g.Dog.State == dogNormalWaitingAtCheckpoint {
 					g.Checkpoint = o.Data.(int)
 					g.Voices[voiceCheckpoint].PlayVariant(g.Checkpoint - 1)
-					g.VoiceMeta.LastVoiceTime = time.Now()
+					g.VoiceGuardTime = 0
+					g.NextVoiceStep = voiceStepFlavour1
 					g.Dog.ContinueFromCheckpoint()
 				}
 			}
