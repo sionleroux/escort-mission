@@ -45,9 +45,8 @@ const (
 const fadeOutTime = 180
 
 type VoiceMeta struct {
-	LastKillVoiceTime       time.Time
+	LastVoiceTime           time.Time
 	LastKillVoiceCheckpoint int
-	LastFlavourLine         time.Time
 	LastFlavourLineIndex    int
 }
 
@@ -81,6 +80,7 @@ type GameScreen struct {
 	FadeTween     *gween.Tween
 	Alpha         uint8
 	Stat          *Stat
+	VoiceMeta     VoiceMeta
 }
 
 // NewGameScreen fills up the main Game data with assets, entities, pre-generated

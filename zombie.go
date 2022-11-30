@@ -70,8 +70,10 @@ func (zs *Zombies) Update(g *GameScreen) {
 		}
 	}
 	if zKilled {
-//		lastPlayerVoice := time.Now().Sub(g.).Seconds()
-		if !g.Voices[voiceCheckpoint].IsPlaying() {
+		if g.VoiceMeta.LastKillVoiceCheckpoint < g.Checkpoint &&
+			rand.Float64() < 0.15 &&
+			!g.Voices[voiceCheckpoint].IsPlaying() {
+			g.VoiceMeta.LastKillVoiceCheckpoint = g.Checkpoint
 			g.Voices[voiceKill].Play()
 		}
 	}
