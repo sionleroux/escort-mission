@@ -40,7 +40,7 @@ func (z *Boss) Update(g *GameScreen) error {
 		}
 	} else {
 		switch z.HitToDie {
-		case 7, 6:
+		case 10, 9, 8:
 			switch z.Zombie.State {
 			case zombieIdle:
 				z.State = bossIdle1
@@ -49,7 +49,7 @@ func (z *Boss) Update(g *GameScreen) error {
 			case zombieHit:
 				z.State = bossHit1
 			}
-		case 5:
+		case 7: // transition to bleeding arm
 			switch z.Zombie.State {
 			case zombieHit:
 				z.State = bossHit1
@@ -58,7 +58,7 @@ func (z *Boss) Update(g *GameScreen) error {
 			case zombieWalking:
 				z.State = bossWalking2
 			}
-		case 4:
+		case 6, 5:
 			switch z.Zombie.State {
 			case zombieHit:
 				z.State = bossHit2
@@ -67,7 +67,7 @@ func (z *Boss) Update(g *GameScreen) error {
 			case zombieWalking:
 				z.State = bossWalking2
 			}
-		case 3:
+		case 4, 3: // transition to 2 bleeding arms
 			switch z.Zombie.State {
 			case zombieHit:
 				z.State = bossHit2
@@ -76,7 +76,7 @@ func (z *Boss) Update(g *GameScreen) error {
 			case zombieWalking:
 				z.State = bossWalking3
 			}
-		case 2:
+		case 2: // transition to red daemon
 			switch z.Zombie.State {
 			case zombieHit:
 				z.State = bossDeath1
