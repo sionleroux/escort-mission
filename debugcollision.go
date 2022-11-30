@@ -20,19 +20,15 @@ func init() {
 // DebugCollision draws boxes around objects in collision space to easily
 // visualise how they move and collide
 func DebugCollision(g *GameScreen, screen *ebiten.Image) {
-	debugPosition(g, screen, g.Player.Object)
-	debugPosition(g, screen, g.Dog.Object)
-	for _, z := range g.Zombies {
-		debugPosition(g, screen, z.Object)
-	}
 	for _, o := range g.Space.Objects() {
-		if o.HasTags(tagWall) {
-			debugPosition(g, screen, o)
-		}
+		debugPosition(g, screen, o)
 	}
 }
 
 func debugPosition(g *GameScreen, screen *ebiten.Image, o *resolv.Object) {
+	if o.Shape == nil {
+		return
+	}
 	verts := o.Shape.(*resolv.ConvexPolygon).Transformed()
 	for i := 0; i < len(verts); i++ {
 		vert := verts[i]
