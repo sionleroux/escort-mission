@@ -117,7 +117,7 @@ func (g *Game) Update() error {
 
 	if errors.Is(err, ErrorDoneLoading) {
 		if startingCheckpoint != 0 {
-			g.Checkpoint = startingCheckpoint
+			g.Screens[gameRunning].(*GameScreen).Checkpoint = startingCheckpoint
 			g.State = gameOver
 		} else {
 			g.State = gameStart
