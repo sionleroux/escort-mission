@@ -44,11 +44,15 @@ const (
 // Length of the fading animation
 const fadeOutTime = 180
 
+// VoiceMeta stores metadata aboutn played voices
 type VoiceMeta struct {
-	LastVoiceTime           time.Time
-	LastKillVoiceCheckpoint int
-	LastFlavourLineIndex    int
+	LastVoiceTime                 time.Time
+	LastKillVoiceCheckpoint       int
+	FlavourLineBetweenCheckpoints int
 }
+
+// voiceGuardTime is the minimum time needed between two voice lines
+const voiceGuardTime = 15.0
 
 // GameScreen is the screen for the actual main game itself
 type GameScreen struct {
@@ -434,6 +438,7 @@ func (g *GameScreen) Update() (GameState, error) {
 				if g.Dog.State == dogNormalSniffing || g.Dog.State == dogNormalWaitingAtCheckpoint {
 					g.Checkpoint = o.Data.(int)
 					g.Voices[voiceCheckpoint].PlayVariant(g.Checkpoint - 1)
+					g.VoiceMeta.LastVoiceTime = time.Now()
 					g.Dog.ContinueFromCheckpoint()
 				}
 			}
