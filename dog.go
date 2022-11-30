@@ -306,14 +306,16 @@ func (d *Dog) Update(g *GameScreen) {
 
 	// If dog is walking then after some time a flavour voice line is played
 	if d.State == dogNormalWalking || d.State == dogNormalBlocked {
-		if (g.NextVoiceStep == voiceStepFlavour1 || g.NextVoiceStep == voiceStepFlavour2) && g.VoiceGuardTime > voiceGuardTime {
-			i := 0
-			if g.NextVoiceStep == voiceStepFlavour2 {
-				i = 1
+		if g.Checkpoint > 0 && g.Checkpoint < 7 {
+			if (g.NextVoiceStep == voiceStepFlavour1 || g.NextVoiceStep == voiceStepFlavour2) && g.VoiceGuardTime > voiceGuardTime {
+				i := 0
+				if g.NextVoiceStep == voiceStepFlavour2 {
+					i = 1
+				}
+				g.Voices[voiceFlavour].PlayVariant((g.Checkpoint-1)*2 + i)
+				g.VoiceGuardTime = 0
+				g.NextVoiceStep++
 			}
-			g.Voices[voiceFlavour].PlayVariant(g.Checkpoint*2 + i)
-			g.VoiceGuardTime = 0
-			g.NextVoiceStep++
 		}
 	}
 
