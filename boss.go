@@ -142,4 +142,5 @@ func (z *Boss) Remove() {
 func (z *Boss) Die(g *GameScreen) {
 	z.Zombie.Die(g)
 	z.Dead = true
+	g.BossDefeated = true
 }

@@ -64,6 +64,7 @@ type GameScreen struct {
 	Dog           *Dog
 	SpawnPoints   SpawnPoints
 	Zombies       Zombies
+	BossDefeated  bool
 	Space         *resolv.Space
 	LevelMap      LevelMap
 	Checkpoint    int
@@ -429,10 +430,12 @@ func (g *GameScreen) Update() (GameState, error) {
 		}
 	}
 
-	// End game when you reach the End entity
-	if collision := g.Player.Object.Check(0, 0, tagEnd); collision != nil {
-		if g.Player.Object.Overlaps(collision.Objects[0]) {
-			return gameWon, nil
+	// End game when you reach the tunnel after defeating the boss zombie
+	if g.BossDefeated {
+		if collision := g.Player.Object.Check(0, 0, tagEnd); collision != nil {
+			if g.Player.Object.Overlaps(collision.Objects[0]) {
+				return gameWon, nil
+			}
 		}
 	}
 
