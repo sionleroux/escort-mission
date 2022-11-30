@@ -111,6 +111,12 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	for _, layer := range g.TileRenderer.RenderedLayers {
 		log.Println("Pre-drawing layer:", layer.Layer.Identifier)
 		if layer.Layer.Identifier == "Treetops" {
+			// Draw black, transparent, scaled copy as fake shadows
+			op := &ebiten.DrawImageOptions{}
+			op.ColorM.Scale(0, 0, 0, 0.1)
+			op.GeoM.Translate(8, 8)
+			fg.DrawImage(layer.Image, op)
+			// Draw real trees
 			fg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
 		} else {
 			bg.DrawImage(layer.Image, &ebiten.DrawImageOptions{})
