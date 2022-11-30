@@ -122,14 +122,17 @@ func (z *Boss) outterAnimationBasedStateChanges(g *GameScreen) {
 		z.State = bossWalking2
 		z.Zombie.State = zombieWalking
 	case bossDeath1:
+		g.Sounds[soundBigZombieDeath1].Play()
 		z.Daemon = true
 		z.Speed = zombieSprinterSpeed * 2
 		z.State = bossPhase2
 		z.Zombie.State = zombieWalking
 	case bossPhase2:
+		g.Sounds[soundBigZombieScream].Play()
 		z.State = bossRunning
 		z.Zombie.State = zombieWalking
 	case bossDeath2:
+		g.Sounds[soundBigZombieDeath2].Play()
 		z.Die(g)
 		z.Zombie.State = zombieDead
 	}

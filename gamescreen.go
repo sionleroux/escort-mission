@@ -179,8 +179,9 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 
 	// Sound
 	*loadingCount++
-	g.Sounds = make([]*Sound, 10)
-	for i := 0; i < 10; i++ {
+	howManySounds := 13
+	g.Sounds = make([]*Sound, howManySounds)
+	for i := 0; i < howManySounds; i++ {
 		g.Sounds[i] = &Sound{Volume: 0.7}
 	}
 	g.Sounds[soundGunShot].AddSound("assets/sfx/Gunshot", sampleRate, context)
@@ -193,6 +194,9 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	g.Sounds[soundZombieGrowl].AddSound("assets/sfx/Zombie-growl", sampleRate, context, 4)
 	g.Sounds[soundZombieDeath].AddSound("assets/sfx/Zombie-Death", sampleRate, context, 2)
 	g.Sounds[soundBigZombieSound].AddSound("assets/sfx/Big-zombie-sound", sampleRate, context, 4)
+	g.Sounds[soundBigZombieDeath1].AddSound("assets/sfx/Big-zombie-death-Phase-1", sampleRate, context)
+	g.Sounds[soundBigZombieScream].AddSound("assets/sfx/Big-zombie-scream-Phase-2", sampleRate, context)
+	g.Sounds[soundBigZombieDeath2].AddSound("assets/sfx/Big-zombie-death-Phase-2", sampleRate, context)
 
 	// Voices
 	g.Voices = make([]*Sound, 3)

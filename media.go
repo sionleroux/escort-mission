@@ -176,6 +176,9 @@ const (
 	soundZombieGrowl
 	soundZombieDeath
 	soundBigZombieSound
+	soundBigZombieDeath1
+	soundBigZombieScream
+	soundBigZombieDeath2
 )
 
 const (
