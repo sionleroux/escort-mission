@@ -15,14 +15,14 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-const gameWidth, gameHeight = 320, 240
-
 var deathCoolDownTime = 4 * 60
 
 const sampleRate int = 44100 // assuming "normal" sample rate
 var context *audio.Context
 
 func main() {
+	const gameWidth, gameHeight = 320, 240
+
 	ebiten.SetWindowSize(gameWidth*2, gameHeight*2)
 	ebiten.SetWindowTitle("eZcort mission")
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)

@@ -8,12 +8,6 @@ import (
 	"math/rand"
 )
 
-// spawnMaxDistance is the distance where the point is activated, if the player is close enough
-const spawnMaxDistance = gameWidth/2 + 150
-
-// spawnMinDistance is the distance where the point is deactivated, if the player is too close
-const spawnMinDistance = gameWidth/2 + 50
-
 // SpawnPoints is an array of SpawnPoint
 type SpawnPoints []*SpawnPoint
 
@@ -112,6 +106,13 @@ func (s *SpawnPoint) SpawnZombie(g *GameScreen) {
 
 // Update updates the state of the spawn point
 func (s *SpawnPoint) Update(g *GameScreen) {
+
+	// spawnMaxDistance is the distance where the point is activated, if the player is close enough
+	var spawnMaxDistance = float64(g.Width)/2 + 150
+
+	// spawnMinDistance is the distance where the point is deactivated, if the player is too close
+	var spawnMinDistance = float64(g.Width)/2 + 50
+
 	if s.InitialSpawned && !s.Continuous {
 		return
 	}
