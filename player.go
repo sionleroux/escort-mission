@@ -184,15 +184,19 @@ func (p *Player) move(dx, dy float64) {
 	}
 
 	if collision := p.Object.Check(dx, 0, tagWall, tagDog); collision != nil {
-		if p.Object.Shape.Intersection(dx, 0, collision.Objects[0].Shape) != nil {
-			dx = 0
+		for _, o := range collision.Objects {
+			if p.Object.Shape.Intersection(dx, 0, o.Shape) != nil {
+				dx = 0
+			}
 		}
 	}
 	p.Object.X += dx
 
 	if collision := p.Object.Check(0, dy, tagWall, tagDog); collision != nil {
-		if p.Object.Shape.Intersection(0, dy, collision.Objects[0].Shape) != nil {
-			dy = 0
+		for _, o := range collision.Objects {
+			if p.Object.Shape.Intersection(dx, 0, o.Shape) != nil {
+				dy = 0
+			}
 		}
 	}
 	p.Object.Y += dy
