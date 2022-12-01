@@ -5,8 +5,8 @@ import (
 	"github.com/tanema/gween/ease"
 )
 
-const zoomOutLevel = 0.875
-const zoomInLevel = 1.125
+const zoomOutLevel = 1.0
+const zoomInLevel = 1.5
 const zoomTime = 15
 
 // Zoom controls the camera zoom effect

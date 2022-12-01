@@ -416,9 +416,6 @@ func (g *GameScreen) Update() (GameState, error) {
 	}
 
 	// Zoom handling
-	if clickedRight() {
-		g.Zoom.On = !g.Zoom.On
-	}
 	g.Zoom.Update()
 	g.Camera.SetZoom(g.Zoom.Amount)
 
