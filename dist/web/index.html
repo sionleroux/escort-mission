@@ -15,7 +15,7 @@
 
   const go = new Go();
   WebAssembly.instantiateStreaming(fetch("escort-mission.wasm"), go.importObject).then(result => {
-    let loadingElem = document.getElementById("loading")
+    let loadingElem = document.getElementById("loadingcover")
     loadingElem.parentNode.removeChild(loadingElem)
     go.run(result.instance);
   });
@@ -44,8 +44,8 @@ body {
 </head>
 
 <body>
-  <div class="container">
-    <div id="loading" class="loading">
+  <div id="loadingcover" class="container">
+    <div class="loading">
       Loading... game data
     </div>
   </div>
