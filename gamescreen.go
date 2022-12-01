@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
@@ -62,7 +61,7 @@ type GameScreen struct {
 	Tick           int
 	TileRenderer   *TileRenderer
 	LDTKProject    *ldtkgo.Project
-	Music          *audio.Player
+	Music          *MusicLoop
 	Sounds         Sounds
 	Voices         Sounds
 	Level          int

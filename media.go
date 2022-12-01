@@ -193,7 +193,7 @@ const (
 
 // Sound stores and plays all the sound variants for one single soundType
 type Sound struct {
-	Audio      [][]byte
+	Audio      []SoundData
 	LastPlayed *audio.Player
 	Volume     float64
 }
@@ -268,9 +268,12 @@ func (s *Sound) Shuffle() {
 	rand.Shuffle(len(s.Audio), func(i, j int) { s.Audio[i], s.Audio[j] = s.Audio[j], s.Audio[i] })
 }
 
+// MusicLoop is an audio player that infinitely loops back to its start
+type MusicLoop struct{ *audio.Player }
+
 // NewMusicPlayer loads a sound into an audio player that can be used to play it
 // as an infinite loop of music without any additional setup required
-func NewMusicPlayer(data []byte) *audio.Player {
+func NewMusicPlayer(data SoundData) *MusicLoop {
 	music, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(data))
 	if err != nil {
 		log.Printf("error decoding sound as Vorbis: %v\n", err)
@@ -281,12 +284,12 @@ func NewMusicPlayer(data []byte) *audio.Player {
 	if err != nil {
 		log.Fatalf("error making music player: %v\n", err)
 	}
-	return musicPlayer
+	return &MusicLoop{musicPlayer}
 }
 
 // NewSoundPlayer loads a sound into an audio player that can be used to play it
 // without any additional setup required
-func NewSoundPlayer(data []byte) *audio.Player {
+func NewSoundPlayer(data SoundData) *audio.Player {
 	sound, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(data))
 	if err != nil {
 		log.Printf("error decoding sound as Vorbis: %v\n", err)
@@ -299,8 +302,11 @@ func NewSoundPlayer(data []byte) *audio.Player {
 	return audioPlayer
 }
 
+// SoundData is bytes returned from a sound file
+type SoundData []byte
+
 // Load an OGG Vorbis sound file with 44100 sample rate and return its stream
-func loadSoundFile(name string, sampleRate int) []byte {
+func loadSoundFile(name string, sampleRate int) SoundData {
 	log.Printf("loading %s\n", name)
 
 	file, err := assets.Open(name)
