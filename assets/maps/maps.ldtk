@@ -10,7 +10,7 @@
 	},
 	"jsonVersion": "1.1.3",
 	"appBuildId": 458364,
-	"nextUid": 99,
+	"nextUid": 100,
 	"identifierStyle": "Capitalize",
 	"worldLayout": "Free",
 	"worldGridWidth": 256,
@@ -2171,6 +2171,34 @@
 			"lineOpacity": 1,
 			"hollow": false,
 			"color": "#3886B0",
+			"renderMode": "Rectangle",
+			"showName": true,
+			"tilesetId": null,
+			"tileId": null,
+			"tileRenderMode": "FitInside",
+			"tileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
+		},
+		{
+			"identifier": "Checkpoint_8",
+			"uid": 99,
+			"tags": [],
+			"width": 96,
+			"height": 96,
+			"resizableX": false,
+			"resizableY": false,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 1,
+			"lineOpacity": 1,
+			"hollow": false,
+			"color": "#94D9B3",
 			"renderMode": "Rectangle",
 			"showName": true,
 			"tilesetId": null,
@@ -4531,23 +4559,6 @@
 						},
 						{
 							"__identifier": "Zombie",
-							"__grid": [76,86],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#D994A3",
-							"iid": "62b0dad0-5110-11ed-8370-01128aa712ba",
-							"width": 16,
-							"height": 16,
-							"defUid": 83,
-							"px": [2432,2752],
-							"fieldInstances": [
-								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
-								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
-							]
-						},
-						{
-							"__identifier": "Zombie",
 							"__grid": [84,86],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -5304,6 +5315,20 @@
 								{ "__identifier": "Initial", "__value": 2, "__type": "Int", "__tile": null, "defUid": 84, "realEditorValues": [] },
 								{ "__identifier": "Continuous", "__value": false, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] }
 							]
+						},
+						{
+							"__identifier": "Checkpoint_8",
+							"__grid": [75,85],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#94D9B3",
+							"iid": "a71d92a0-5110-11ed-a5eb-9343e36cfeb7",
+							"width": 96,
+							"height": 96,
+							"defUid": 99,
+							"px": [2400,2720],
+							"fieldInstances": []
 						}
 					]
 				},
