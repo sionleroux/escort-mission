@@ -596,8 +596,11 @@ func Shoot(g *GameScreen) {
 			for _, o := range c.Objects {
 				if o.HasTags(tagMob) {
 					log.Println("HIT!")
+					g.Cursor.Hit = true
 					o.Data.(*Zombie).Hit(g)
 					return // stop at the first zombie
+				} else {
+					g.Cursor.Hit = false
 				}
 			}
 		}
