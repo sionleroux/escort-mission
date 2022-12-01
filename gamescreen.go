@@ -37,6 +37,7 @@ const (
 	tagWall       = "wall"
 	tagDog        = "dog"
 	tagEnd        = "end"
+	tagOutro      = "outro"
 	tagCheckpoint = "check"
 	tagSandTrap   = "sandtrap"
 )
@@ -242,12 +243,17 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	*loadingCount++
 	entities := level.LayerByIdentifier("Entities")
 
-	// Add endpoint
+	// Add endpoint and nearby outro trigger area
 	endpoint := entities.EntityByIdentifier("End")
 	g.Space.Add(resolv.NewObject(
 		float64(endpoint.Position[0]), float64(endpoint.Position[1]),
 		float64(endpoint.Width), float64(endpoint.Height),
 		tagEnd,
+	))
+	g.Space.Add(resolv.NewObject( // much bigger area around the endpoint
+		float64(endpoint.Position[0]-endpoint.Width*2), float64(endpoint.Position[1]-endpoint.Height*2),
+		float64(endpoint.Width*5), float64(endpoint.Height*5),
+		tagOutro,
 	))
 
 	// Add player to the game
@@ -463,8 +469,15 @@ func (g *GameScreen) Update() (GameState, error) {
 	if g.BossDefeated {
 		if collision := g.Player.Object.Check(0, 0, tagEnd); collision != nil {
 			if g.Player.Object.Overlaps(collision.Objects[0]) {
-				g.Voices[voiceEndgame].Play()
 				return gameWon, nil
+			}
+		}
+		if collision := g.Player.Object.Check(0, 0, tagOutro); collision != nil {
+			if g.Player.Object.Overlaps(collision.Objects[0]) {
+				if g.Voices[voiceEndgame].LastPlayed == nil { // only once
+					g.Music.Pause()
+					g.Voices[voiceEndgame].Play()
+				}
 			}
 		}
 	}

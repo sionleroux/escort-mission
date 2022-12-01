@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"log"
 )
 
 //go:generate ./tools/gen_sprite_tags.sh assets/sprites/Zombie_big.json boss_anim.go boss
@@ -152,7 +153,8 @@ func (z *Boss) Remove() {
 }
 
 func (z *Boss) Die(g *GameScreen) {
-	z.Zombie.Die(g)
+	log.Println("Boss defeated!")
 	z.Dead = true
 	g.BossDefeated = true
+	z.Zombie.Die(g)
 }
