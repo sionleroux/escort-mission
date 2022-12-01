@@ -28,6 +28,9 @@ func main() {
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowIcon([]image.Image{loadImage("assets/icon.png")})
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
+
+	// set Hidden first so that browsers fall back to this instead of Visible when you escape it manually
+	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ebiten.SetCursorMode(ebiten.CursorModeCaptured)
 
 	context = audio.NewContext(sampleRate)
