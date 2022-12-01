@@ -4,7 +4,6 @@
 package main
 
 import (
-	"errors"
 	"image/color"
 	"math"
 
@@ -37,11 +36,6 @@ func NewDeathScreen(game *Game) *DeathScreen {
 }
 
 func (s *DeathScreen) Update() (GameState, error) {
-	// Pressing Q any time quits immediately
-	if ebiten.IsKeyPressed(ebiten.KeyQ) {
-		return gameOver, errors.New("game quit by player")
-	}
-
 	if !s.BellRang {
 		s.bellSound.Play()
 		s.BellRang = true

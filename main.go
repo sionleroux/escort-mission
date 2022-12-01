@@ -91,11 +91,6 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 func (g *Game) Update() error {
 	g.Tick++
 
-	// Pressing Q any time quits immediately
-	if ebiten.IsKeyPressed(ebiten.KeyQ) {
-		return errors.New("game quit by player")
-	}
-
 	// Pressing F toggles full-screen
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		if ebiten.IsFullscreen() {
