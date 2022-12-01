@@ -274,7 +274,7 @@ type MusicLoop struct{ *audio.Player }
 // NewMusicPlayer loads a sound into an audio player that can be used to play it
 // as an infinite loop of music without any additional setup required
 func NewMusicPlayer(data SoundData) *MusicLoop {
-	music, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(data))
+	music, err := vorbis.DecodeWithoutResampling(bytes.NewReader(data))
 	if err != nil {
 		log.Printf("error decoding sound as Vorbis: %v\n", err)
 	}
@@ -290,7 +290,7 @@ func NewMusicPlayer(data SoundData) *MusicLoop {
 // NewSoundPlayer loads a sound into an audio player that can be used to play it
 // without any additional setup required
 func NewSoundPlayer(data SoundData) *audio.Player {
-	sound, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(data))
+	sound, err := vorbis.DecodeWithoutResampling(bytes.NewReader(data))
 	if err != nil {
 		log.Printf("error decoding sound as Vorbis: %v\n", err)
 	}
