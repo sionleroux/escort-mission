@@ -11,7 +11,8 @@ Game controls:
 - Q: quit the game
 - WASD and mouse to move around
 - click to shoot
-- R to reload gun
+- R to reload 
+- Hold shift to sprint
 
 If you find an issue with the game [please open a new ticket here](https://github.com/sinisterstuf/escort-mission/issues).
 
