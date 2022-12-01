@@ -68,6 +68,7 @@ type GameScreen struct {
 	Background     *ebiten.Image
 	Foreground     *ebiten.Image
 	Camera         *camera.Camera
+	Cursor         *Cursor
 	Sprites        map[SpriteType]*SpriteSheet
 	ZombieSprites  []*SpriteSheet
 	Player         *Player
@@ -104,6 +105,7 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	}
 
 	g.Camera = camera.NewCamera(g.Width, g.Height, 0, 0, 0, 1)
+	g.Cursor = NewCursor()
 
 	*loadingCount++
 	var renderer *TileRenderer
@@ -425,6 +427,9 @@ func (g *GameScreen) Update() (GameState, error) {
 	// Update spawn points
 	g.SpawnPoints.Update(g)
 
+	// Update cursor
+	g.Cursor.Update(g)
+
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
@@ -512,6 +517,8 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 	g.Camera.Blit(screen)
 
 	g.HUD.Draw(g.Player.Ammo, screen)
+
+	g.Cursor.Draw(screen)
 
 	// Fading out black cover
 	if g.Tick < fadeOutTime {
