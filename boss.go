@@ -24,12 +24,15 @@ func (z *Boss) Update(g *GameScreen) error {
 	}
 
 	if !z.Dying {
-		z.hitpointBasedStateChanges()
+		z.hitpointBasedStateChanges(g)
 	}
 
 	z.Frame = Animate(z.Frame, g.Tick, z.Sprite.Meta.FrameTags[z.State])
 	if z.Frame == z.Sprite.Meta.FrameTags[z.State].To {
-		z.outterAnimationBasedStateChanges(g)
+		z.animationEndTriggers(g)
+	}
+	if z.Frame == z.Sprite.Meta.FrameTags[z.State].From {
+		z.animationStartTriggers(g)
 	}
 
 	if z.State == bossDeath1 || z.State == bossDeath2 || z.State == bossPhase2 {
@@ -46,8 +49,8 @@ func (z *Boss) Draw(g *GameScreen) {
 	z.Zombie.Draw(g)
 }
 
-// Animation-trigged state changes
-func (z *Boss) outterAnimationBasedStateChanges(g *GameScreen) {
+// State changes triggered by LAST frame of animation
+func (z *Boss) animationEndTriggers(g *GameScreen) {
 	switch z.State {
 	case bossHit1:
 		z.State = bossWalking1
@@ -56,24 +59,32 @@ func (z *Boss) outterAnimationBasedStateChanges(g *GameScreen) {
 		z.State = bossWalking2
 		z.Zombie.State = zombieWalking
 	case bossDeath1:
-		g.Sounds[soundBigZombieDeath1].Play()
 		z.Daemon = true
 		z.Speed = zombieSprinterSpeed * 2
 		z.State = bossPhase2
 		z.Zombie.State = zombieWalking
 	case bossPhase2:
-		g.Sounds[soundBigZombieScream].Play()
 		z.Dying = false
 		z.State = bossRunning
 		z.Zombie.State = zombieWalking
+		g.Sounds[soundBigZombieScream].Play()
 	case bossDeath2:
-		g.Sounds[soundBigZombieDeath2].Play()
 		z.Die(g)
 		z.Zombie.State = zombieDead
 	}
 }
 
-func (z *Boss) hitpointBasedStateChanges() {
+// State changes triggered by FIRST frame of animation
+func (z *Boss) animationStartTriggers(g *GameScreen) {
+	switch z.State {
+	case bossDeath1:
+		g.Sounds[soundBigZombieDeath1].Play()
+	case bossDeath2:
+		g.Sounds[soundBigZombieDeath2].Play()
+	}
+}
+
+func (z *Boss) hitpointBasedStateChanges(g *GameScreen) {
 	if z.Daemon {
 		switch z.HitToDie {
 		case 2:
