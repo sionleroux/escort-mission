@@ -94,8 +94,8 @@ type GameScreen struct {
 // before starting if we did it before the first Update loop
 func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	g := &GameScreen{
-		Width:         game.Width,
-		Height:        game.Height,
+		Width:         game.Width + cameraPadding,
+		Height:        game.Height + cameraPadding,
 		Checkpoint:    game.Checkpoint,
 		Debuggers:     debuggers,
 		FadeTween:     gween.New(255, 0, fadeOutTime, ease.OutQuad),
