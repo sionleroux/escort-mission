@@ -536,7 +536,9 @@ func (g *GameScreen) Draw(screen *ebiten.Image) {
 
 	g.HUD.Draw(g.Player.Ammo, screen)
 
-	g.Cursor.Draw(screen)
+	if g.Player.State != playerReload {
+		g.Cursor.Draw(screen)
+	}
 
 	// Fading out black cover
 	if g.Tick < fadeOutTime {
