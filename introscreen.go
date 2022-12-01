@@ -34,7 +34,7 @@ func NewIntroScreen(game *Game) *IntroScreen {
 		skipTextRenderer: NewSkipTextRenderer(),
 		textFader:        gween.New(0xff, 0, fadeOutTime, ease.OutQuad),
 		skipTextFader:    fadeSeq,
-		IntroVoice:       NewSoundPlayer(loadSoundFile("assets/voice/Intro.ogg", sampleRate), context),
+		IntroVoice:       NewSoundPlayer(loadSoundFile("assets/voice/Intro.ogg", sampleRate)),
 	}
 }
 

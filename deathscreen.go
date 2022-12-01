@@ -28,7 +28,7 @@ type DeathScreen struct {
 func NewDeathScreen(game *Game) *DeathScreen {
 	return &DeathScreen{
 		textRenderer: NewDeathRenderer(),
-		bellSound:    NewSoundPlayer(loadSoundFile("assets/sfx/Bell.ogg", sampleRate), context),
+		bellSound:    NewSoundPlayer(loadSoundFile("assets/sfx/Bell.ogg", sampleRate)),
 		textFader: gween.NewSequence(
 			gween.New(0, 255, float32(deathCoolDownTime)*0.8, ease.OutQuad),
 			gween.New(255, 0, float32(deathCoolDownTime)*0.2, ease.OutQuad),

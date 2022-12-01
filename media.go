@@ -4,6 +4,7 @@
 package main
 
 import (
+	"bytes"
 	"embed"
 	"encoding/json"
 	"image/png"
@@ -192,14 +193,9 @@ const (
 
 // Sound stores and plays all the sound variants for one single soundType
 type Sound struct {
-	Audio      []*audio.Player
-	LastPlayed int
+	Audio      [][]byte
+	LastPlayed *audio.Player
 	Volume     float64
-}
-
-// AddSoundLoop adds one new looped sound to the soundType
-func (s *Sound) AddSoundLoop(f string, sampleRate int, context *audio.Context) {
-	s.Audio = append(s.Audio, NewMusicPlayer(loadSoundFile(f+".ogg", sampleRate), context))
 }
 
 // AddSound adds one new sound to the soundType
@@ -218,7 +214,7 @@ func (s *Sound) AddSound(f string, sampleRate int, context *audio.Context, v ...
 			filename = f + "-" + strconv.Itoa(i+1) + ".ogg"
 		}
 
-		s.Audio = append(s.Audio, NewSoundPlayer(loadSoundFile(filename, sampleRate), context))
+		s.Audio = append(s.Audio, loadSoundFile(filename, sampleRate))
 	}
 }
 
@@ -248,20 +244,20 @@ func (s *Sound) PlayVariant(i int) {
 	if i >= len(s.Audio) || i < 0 {
 		return
 	}
-	s.LastPlayed = i
-	s.Audio[i].SetVolume(s.Volume)
-	s.Audio[i].Rewind()
-	s.Audio[i].Play()
+	sound := NewSoundPlayer(s.Audio[i])
+	s.LastPlayed = sound
+	sound.SetVolume(s.Volume)
+	sound.Play()
 }
 
 // Pause pauses the audio being played
 func (s *Sound) Pause() {
-	s.Audio[s.LastPlayed].Pause()
+	s.LastPlayed.Pause()
 }
 
 // IsPlaying returns if the sound is playing
 func (s *Sound) IsPlaying() bool {
-	return s.Audio[s.LastPlayed].IsPlaying()
+	return s.LastPlayed.IsPlaying()
 }
 
 // Sounds is a slice of sounds
@@ -274,7 +270,12 @@ func (s *Sound) Shuffle() {
 
 // NewMusicPlayer loads a sound into an audio player that can be used to play it
 // as an infinite loop of music without any additional setup required
-func NewMusicPlayer(music *vorbis.Stream, context *audio.Context) *audio.Player {
+func NewMusicPlayer(data []byte) *audio.Player {
+	music, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(data))
+	if err != nil {
+		log.Printf("error decoding sound as Vorbis: %v\n", err)
+	}
+
 	musicLoop := audio.NewInfiniteLoop(music, music.Length())
 	musicPlayer, err := audio.NewPlayer(context, musicLoop)
 	if err != nil {
@@ -285,16 +286,21 @@ func NewMusicPlayer(music *vorbis.Stream, context *audio.Context) *audio.Player 
 
 // NewSoundPlayer loads a sound into an audio player that can be used to play it
 // without any additional setup required
-func NewSoundPlayer(audioFile *vorbis.Stream, context *audio.Context) *audio.Player {
-	audioPlayer, err := audio.NewPlayer(context, audioFile)
+func NewSoundPlayer(data []byte) *audio.Player {
+	sound, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(data))
 	if err != nil {
-		log.Fatalf("error making audio player: %v\n", err)
+		log.Printf("error decoding sound as Vorbis: %v\n", err)
+	}
+
+	audioPlayer, err := audio.NewPlayer(context, sound)
+	if err != nil {
+		log.Printf("error making audio player: %v\n", err)
 	}
 	return audioPlayer
 }
 
 // Load an OGG Vorbis sound file with 44100 sample rate and return its stream
-func loadSoundFile(name string, sampleRate int) *vorbis.Stream {
+func loadSoundFile(name string, sampleRate int) []byte {
 	log.Printf("loading %s\n", name)
 
 	file, err := assets.Open(name)
@@ -303,12 +309,12 @@ func loadSoundFile(name string, sampleRate int) *vorbis.Stream {
 	}
 	defer file.Close()
 
-	music, err := vorbis.DecodeWithSampleRate(sampleRate, file)
+	data, err := ioutil.ReadAll(file)
 	if err != nil {
-		log.Fatalf("error decoding file %s as Vorbis: %v\n", name, err)
+		log.Fatal(err)
 	}
 
-	return music
+	return data
 }
 
 func loadFont(name string) *etxt.Font {

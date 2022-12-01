@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
@@ -61,7 +62,7 @@ type GameScreen struct {
 	Tick           int
 	TileRenderer   *TileRenderer
 	LDTKProject    *ldtkgo.Project
-	SoundLoops     Sounds
+	Music          *audio.Player
 	Sounds         Sounds
 	Voices         Sounds
 	Level          int
@@ -187,9 +188,8 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 
 	// SoundLoops
 	*loadingCount++
-	g.SoundLoops = make([]*Sound, 1)
-	g.SoundLoops[0] = &Sound{Volume: 0.5}
-	g.SoundLoops[musicBackground].AddSoundLoop("assets/music/BackgroundMusic", sampleRate, context)
+	g.Music = NewMusicPlayer(loadSoundFile("assets/music/BackgroundMusic.ogg", sampleRate))
+	g.Music.SetVolume(0.5)
 
 	// Sound
 	*loadingCount++
@@ -343,7 +343,7 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 }
 
 func (g *GameScreen) Start() {
-	g.SoundLoops[musicBackground].Play()
+	g.Music.Play()
 	g.Stat.GameStarted = time.Now()
 }
 
@@ -379,7 +379,7 @@ func (g *GameScreen) Reset(game *Game) {
 	g.Player.Object.X, g.Player.Object.Y = float64(startPos[0]), float64(startPos[1])
 	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
 
-	g.SoundLoops[musicBackground].Play()
+	g.Music.Play()
 	g.Voices[voiceRespawn].Play()
 	g.VoiceGuardTime = 0
 	g.Zoom = NewZoom()
@@ -436,7 +436,7 @@ func (g *GameScreen) Update() (GameState, error) {
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
 			if g.Player.Object.Shape.Intersection(0, 0, collision.Objects[0].Shape) != nil {
-				g.SoundLoops[musicBackground].Pause()
+				g.Music.Pause()
 				g.Sounds[soundPlayerDies].Play()
 				g.Stat.CounterPlayerDied++
 				return gameOver, nil // return early, no point in continuing, you are dead
@@ -480,7 +480,7 @@ func (g *GameScreen) Update() (GameState, error) {
 	// Game over if the dog dies
 	if g.Dog.Mode == dogDead {
 		g.Stat.CounterDogDied++
-		g.SoundLoops[musicBackground].Pause()
+		g.Music.Pause()
 		return gameOver, nil
 	}
 
