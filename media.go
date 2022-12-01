@@ -244,6 +244,9 @@ func (s *Sound) Play() {
 
 // PlayVariant plays the selected audio
 func (s *Sound) PlayVariant(i int) {
+	if i >= len(s.Audio) || i < 0 {
+		return		
+	}
 	s.LastPlayed = i
 	s.Audio[i].SetVolume(s.Volume)
 	s.Audio[i].Rewind()
