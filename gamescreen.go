@@ -384,7 +384,7 @@ func (g *GameScreen) Reset(game *Game) {
 	g.Player.Object.X, g.Player.Object.Y = float64(startPos[0]), float64(startPos[1])
 	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
 
-	g.Music.Play()
+	g.Music.FadeIn()
 	g.Voices[voiceRespawn].Play()
 	g.VoiceGuardTime = 0
 	g.Zoom = NewZoom()
@@ -437,6 +437,9 @@ func (g *GameScreen) Update() (GameState, error) {
 	// Update cursor
 	g.Cursor.Update(g)
 
+	// Update music
+	g.Music.Update()
+
 	// Collision detection and response between zombie and player
 	if collision := g.Player.Object.Check(0, 0, tagMob); collision != nil {
 		if g.Player.Object.Overlaps(collision.Objects[0]) {
@@ -475,7 +478,7 @@ func (g *GameScreen) Update() (GameState, error) {
 		if collision := g.Player.Object.Check(0, 0, tagOutro); collision != nil {
 			if g.Player.Object.Overlaps(collision.Objects[0]) {
 				if g.Voices[voiceEndgame].LastPlayed == nil { // only once
-					g.Music.Pause()
+					g.Music.FadeOut()
 					g.Voices[voiceEndgame].Play()
 				}
 			}

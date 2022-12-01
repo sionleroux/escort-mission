@@ -19,6 +19,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/solarlune/ldtkgo"
+	"github.com/tanema/gween"
+	"github.com/tanema/gween/ease"
 	"github.com/tinne26/etxt"
 )
 
@@ -269,7 +271,35 @@ func (s *Sound) Shuffle() {
 }
 
 // MusicLoop is an audio player that infinitely loops back to its start
-type MusicLoop struct{ *audio.Player }
+type MusicLoop struct {
+	*audio.Player
+	tween *gween.Tween
+}
+
+// FadeOut fades out the music smoothly to 0% volume
+func (m *MusicLoop) FadeOut() {
+	m.tween = gween.New(0.5, 0, 1*60, ease.InExpo)
+}
+
+// FadeIn fades in the music smoothly to 50% volume
+func (m *MusicLoop) FadeIn() {
+	m.tween = gween.New(0, 0.5, 2*60, ease.InExpo)
+	m.Play()
+}
+
+// Update the music volume for fade effects
+func (m *MusicLoop) Update() {
+	if m.tween != nil {
+		volume, done := m.tween.Update(1)
+		m.SetVolume(float64(volume))
+		if done {
+			m.tween = nil
+			if volume == 0 {
+				m.Pause()
+			}
+		}
+	}
+}
 
 // NewMusicPlayer loads a sound into an audio player that can be used to play it
 // as an infinite loop of music without any additional setup required
@@ -284,7 +314,7 @@ func NewMusicPlayer(data SoundData) *MusicLoop {
 	if err != nil {
 		log.Fatalf("error making music player: %v\n", err)
 	}
-	return &MusicLoop{musicPlayer}
+	return &MusicLoop{musicPlayer, nil}
 }
 
 // NewSoundPlayer loads a sound into an audio player that can be used to play it
