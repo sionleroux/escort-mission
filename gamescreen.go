@@ -213,8 +213,9 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	g.Sounds[soundBigZombieDeath2].AddSound("assets/sfx/Big-zombie-death-Phase-2", sampleRate, context)
 
 	// Voices
-	g.Voices = make([]*Sound, 4)
-	for i := 0; i < 4; i++ {
+	howManyVoices := 5
+	g.Voices = make([]*Sound, howManyVoices)
+	for i := 0; i < howManyVoices; i++ {
 		g.Voices[i] = &Sound{Volume: 1}
 	}
 	g.Voices[voiceCheckpoint].AddSound("assets/voice/Checkpoint", sampleRate, context, 7)
@@ -223,6 +224,7 @@ func NewGameScreen(game *Game, loadingCount LoadingCounter) {
 	g.Voices[voiceKill].Shuffle()
 	g.Voices[voiceFlavour].AddSound("assets/voice/Flavour", sampleRate, context, 12)
 	g.Voices[voiceFlavour].Shuffle()
+	g.Voices[voiceEndgame].AddSound("assets/voice/Endgame", sampleRate, context)
 
 	// Load sprites
 	*loadingCount++
@@ -462,6 +464,7 @@ func (g *GameScreen) Update() (GameState, error) {
 	if g.BossDefeated {
 		if collision := g.Player.Object.Check(0, 0, tagEnd); collision != nil {
 			if g.Player.Object.Overlaps(collision.Objects[0]) {
+				g.Voices[voiceEndgame].Play()
 				return gameWon, nil
 			}
 		}

@@ -187,6 +187,7 @@ const (
 	voiceRespawn
 	voiceKill
 	voiceFlavour
+	voiceEndgame
 )
 
 // Sound stores and plays all the sound variants for one single soundType
@@ -245,7 +246,7 @@ func (s *Sound) Play() {
 // PlayVariant plays the selected audio
 func (s *Sound) PlayVariant(i int) {
 	if i >= len(s.Audio) || i < 0 {
-		return		
+		return
 	}
 	s.LastPlayed = i
 	s.Audio[i].SetVolume(s.Volume)
