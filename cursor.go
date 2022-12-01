@@ -21,12 +21,12 @@ func NewCursor() *Cursor {
 }
 
 func (c *Cursor) Update(g *GameScreen) {
+	cx, cy := ebiten.CursorPosition()
+	c.position.X, c.position.Y = float64(cx), float64(cy)
 	return
 }
 
 func (c *Cursor) Draw(screen *ebiten.Image) {
-	cx, cy := ebiten.CursorPosition()
-	c.position.X, c.position.Y = float64(cx), float64(cy)
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(c.position.X, c.position.Y)
 	op.GeoM.Translate( // position image centre around coords
