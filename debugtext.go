@@ -14,6 +14,10 @@ import (
 
 func init() {
 	debuggers.Add(DebugFunc(DebugText))
+
+	// Uncap FPS so you can see if a code change has had an impact on
+	// the game's performance
+	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 }
 
 // DebugText prints out general debug information as text

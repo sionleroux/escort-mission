@@ -27,7 +27,6 @@ func main() {
 	ebiten.SetWindowTitle("eZcort mission")
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowIcon([]image.Image{loadImage("assets/icon.png")})
-	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
 	ebiten.SetCursorMode(CursorMode) // set at build-time in cursor_{web,desktop}.go
 
 	context = audio.NewContext(sampleRate)
