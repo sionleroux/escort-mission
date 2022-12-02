@@ -500,7 +500,18 @@ func (g *GameScreen) Update() (GameState, error) {
 	level := g.LDTKProject.Levels[g.Level]
 	g.Camera.SetPosition(
 		math.Min(math.Max(g.Player.Object.X, float64(g.Width)/2), float64(level.Width)-float64(g.Width)/2),
-		math.Min(math.Max(g.Player.Object.Y, float64(g.Height)/2), float64(level.Height)-float64(g.Height)/2))
+		math.Min(math.Max(g.Player.Object.Y, float64(g.Height)/2), float64(level.Height)-float64(g.Height)/2),
+	)
+
+	// Retroactively unstick object that collide from small rotations
+	if collision := g.Player.Object.Check(0, 0); collision != nil {
+		for _, o := range collision.Objects {
+			if cs := g.Player.Object.Shape.Intersection(0, 0, o.Shape); cs != nil {
+				g.Player.Object.X += cs.MTV.X()
+				g.Player.Object.Y += cs.MTV.Y()
+			}
+		}
+	}
 
 	return gameRunning, nil
 }
