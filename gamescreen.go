@@ -395,6 +395,16 @@ func (g *GameScreen) Update() (GameState, error) {
 	g.Tick++
 	g.VoiceGuardTime++
 
+	// Pressing X any time quits immediately
+	if ebiten.IsKeyPressed(ebiten.KeyX) {
+		// literally copied this whole code from the player-zombie collision section below
+		log.Println("game reset manually by player!")
+		g.Music.Pause()
+		g.Sounds[soundPlayerDies].Play()
+		g.Stat.CounterPlayerDied++
+		return gameOver, nil
+	}
+
 	// Fade out the black cover
 	if g.Tick < fadeOutTime {
 		alpha, _ := g.FadeTween.Update(1)
