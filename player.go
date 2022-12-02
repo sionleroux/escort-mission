@@ -194,7 +194,7 @@ func (p *Player) move(dx, dy float64) {
 
 	if collision := p.Object.Check(0, dy, tagWall, tagDog); collision != nil {
 		for _, o := range collision.Objects {
-			if p.Object.Shape.Intersection(dx, 0, o.Shape) != nil {
+			if p.Object.Shape.Intersection(0, dy, o.Shape) != nil {
 				dy = 0
 			}
 		}
