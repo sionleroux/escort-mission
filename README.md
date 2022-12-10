@@ -2,6 +2,9 @@
 
 Follow a dog through a post-apocalytpic wasteland full of zombies; this is our entry for [Game Off 2022](https://itch.io/jam/game-off-2022)
 
+- Play the latest (free download or play in browser) on itch: [sinisterstuf.itch.io/escort-mission](https://sinisterstuf.itch.io/escort-mission)
+- Check the source code on GitHub: [github.com/sinisterstuf/escort-mission](https://github.com/sinisterstuf/escort-mission/)
+
 ## For game testers
 
 For alpha testing use [⬇️ this link](https://nightly.link/sinisterstuf/escort-mission/workflows/build/main/escort-mission-bundle.zip) to download the latest development build.
@@ -22,6 +25,6 @@ Make sure you have [Go 1.19 or later](https://go.dev/) to contribute to the game
 
 To build the game yourself, run: `go build .` it will produce an escort-mission file and on Windows escort-mission.exe.
 
-To run the tests, run: `go test ./...` but there are no tests yet.
+To run the tests, run: `go test ./...`
 
 The project has a very simple, flat structure, the first place to start looking is the main.go file.
