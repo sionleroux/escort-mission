@@ -105,8 +105,8 @@ func (p *Player) Update(g *GameScreen) {
 
 	// Player gun rotation
 	cx, cy := g.Camera.GetCursorCoords()
-	adjacent := float64(cx) - p.Object.X
-	opposite := float64(cy) - p.Object.Y
+	adjacent := float64(cx) - p.Object.Position.X
+	opposite := float64(cy) - p.Object.Position.Y
 	p.Angle = math.Atan2(opposite, adjacent)
 
 	p.Frame = Animate(p.Frame, g.Tick, p.Sprite.Meta.FrameTags[p.State])
@@ -190,7 +190,7 @@ func (p *Player) move(dx, dy float64) {
 			}
 		}
 	}
-	p.Object.X += dx
+	p.Object.Position.X += dx
 
 	if collision := p.Object.Check(0, dy, tagWall, tagDog); collision != nil {
 		for _, o := range collision.Objects {
@@ -199,7 +199,7 @@ func (p *Player) move(dx, dy float64) {
 			}
 		}
 	}
-	p.Object.Y += dy
+	p.Object.Position.Y += dy
 }
 
 // Draw draws the Player to the screen
@@ -227,8 +227,8 @@ func (p *Player) Draw(g *GameScreen) {
 		)).(*ebiten.Image),
 		g.Camera.GetTranslation(
 			op,
-			float64(p.Object.X),
-			float64(p.Object.Y),
+			float64(p.Object.Position.X),
+			float64(p.Object.Position.Y),
 		),
 	)
 }
@@ -254,7 +254,7 @@ func (p *Player) handleControls() {
 // Position returns the Player's current coordinates
 func (p *Player) Position() *Coord {
 	return &Coord{
-		X: p.Object.X,
-		Y: p.Object.Y,
+		X: p.Object.Position.X,
+		Y: p.Object.Position.Y,
 	}
 }

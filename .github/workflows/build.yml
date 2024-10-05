@@ -10,7 +10,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.19
+        go-version: 1.23
     - name: Install dependencies
       shell: bash
       run: sudo apt-get update && sudo apt-get -y install libgl1-mesa-dev xorg-dev libasound2-dev
@@ -27,7 +27,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.19
+        go-version: 1.23
     - name: Install dependencies
       shell: bash
       run: go install github.com/akavel/rsrc@latest
@@ -54,7 +54,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.19
+        go-version: 1.23
     - name: Build Mac exe
       shell: bash
       run: go build -tags release
@@ -76,7 +76,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.19
+        go-version: 1.23
     - name: Install dependencies
       shell: bash
       run: sudo apt-get update && sudo apt-get -y install libgl1-mesa-dev xorg-dev libasound2-dev
@@ -101,7 +101,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.19
+        go-version: 1.23
     - name: Build Web binary
       shell: bash
       run: GOOS=js GOARCH=wasm go build -v -ldflags "-w -s" -o dist/web/escort-mission.wasm -tags release

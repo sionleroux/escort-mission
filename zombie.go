@@ -155,7 +155,7 @@ type Zombie struct {
 	Sprite     *SpriteSheet   // Used for zombie animations
 	Speed      float64        // The speed this zombie walks at
 	TempSpeed  float64        // Temporary speed multiplier
-	Target     *resolv.Object // Target object (player or dog)
+	Target     *resolv.Vector // Target vector (player or dog)
 	HitToDie   int            // Number of hits needed to die
 	ZombieType ZombieType     // Type of the zombie
 	SpawnPoint *SpawnPoint    // Reference for the SpawnPoint where the zombie was spawned
@@ -173,8 +173,8 @@ func (z *Zombie) Remove() {
 // Position returns the current coordinates of the zombie
 func (z *Zombie) Position() *Coord {
 	return &Coord{
-		X: z.Object.X,
-		Y: z.Object.Y,
+		X: z.Object.Position.X,
+		Y: z.Object.Position.Y,
 	}
 }
 
@@ -196,10 +196,10 @@ func (z *Zombie) Update(g *GameScreen) error {
 		zShouldWalk := false
 
 		if playerDistance < zombieRange {
-			z.Target = g.Player.Object
+			z.Target = &g.Player.Object.Position
 			zShouldWalk = true
 		} else if dogDistance < zombieRange*1.2 {
-			z.Target = g.Dog.Object
+			z.Target = &g.Dog.Object.Position
 			zShouldWalk = true
 		}
 
@@ -232,22 +232,22 @@ func (z *Zombie) Update(g *GameScreen) error {
 
 func (z *Zombie) walk() {
 	// Zombies rotate towards their target
-	adjacent := z.Target.X - z.Object.X
-	opposite := z.Target.Y - z.Object.Y
+	adjacent := z.Target.X - z.Object.Position.X
+	opposite := z.Target.Y - z.Object.Position.Y
 	z.Angle = math.Atan2(opposite, adjacent)
 
 	// Zombie movement logic
 	// TODO: this could be simplified using maths
-	if z.Object.X < z.Target.X {
+	if z.Object.Position.X < z.Target.X {
 		z.MoveRight()
 	}
-	if z.Object.X > z.Target.X {
+	if z.Object.Position.X > z.Target.X {
 		z.MoveLeft()
 	}
-	if z.Object.Y < z.Target.Y {
+	if z.Object.Position.Y < z.Target.Y {
 		z.MoveDown()
 	}
-	if z.Object.Y > z.Target.Y {
+	if z.Object.Position.Y > z.Target.Y {
 		z.MoveUp()
 	}
 }
@@ -286,8 +286,8 @@ func (z *Zombie) MoveRight() {
 func (z *Zombie) move(dx, dy float64) {
 	z.State = zombieWalking
 	if collision := z.Object.Check(dx, dy, tagMob, tagWall); collision == nil {
-		z.Object.X += dx
-		z.Object.Y += dy
+		z.Object.Position.X += dx
+		z.Object.Position.Y += dy
 	}
 	// Collision detection and response between sand trap and zombie
 	z.TempSpeed = 1
@@ -325,8 +325,8 @@ func (z *Zombie) Draw(g *GameScreen) {
 		)).(*ebiten.Image),
 		g.Camera.GetTranslation(
 			op,
-			float64(z.Object.X),
-			float64(z.Object.Y),
+			float64(z.Object.Position.X),
+			float64(z.Object.Position.Y),
 		),
 	)
 

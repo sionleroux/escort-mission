@@ -381,7 +381,7 @@ func (g *GameScreen) Reset(game *Game) {
 			"Checkpoint_" + strconv.Itoa(g.Checkpoint),
 		).Position
 	}
-	g.Player.Object.X, g.Player.Object.Y = float64(startPos[0]), float64(startPos[1])
+	g.Player.Object.Position.X, g.Player.Object.Position.Y = float64(startPos[0]), float64(startPos[1])
 	g.Dog.Reset(g.Checkpoint, float64(startPos[0]+dogOffset), float64(startPos[1]))
 
 	g.Music.FadeIn()
@@ -509,16 +509,16 @@ func (g *GameScreen) Update() (GameState, error) {
 	// Position camera and clamp in to the Map dimensions
 	level := g.LDTKProject.Levels[g.Level]
 	g.Camera.SetPosition(
-		math.Min(math.Max(g.Player.Object.X, float64(g.Width)/2), float64(level.Width)-float64(g.Width)/2),
-		math.Min(math.Max(g.Player.Object.Y, float64(g.Height)/2), float64(level.Height)-float64(g.Height)/2),
+		math.Min(math.Max(g.Player.Object.Position.X, float64(g.Width)/2), float64(level.Width)-float64(g.Width)/2),
+		math.Min(math.Max(g.Player.Object.Position.Y, float64(g.Height)/2), float64(level.Height)-float64(g.Height)/2),
 	)
 
 	// Retroactively unstick object that collide from small rotations
 	if collision := g.Player.Object.Check(0, 0); collision != nil {
 		for _, o := range collision.Objects {
 			if cs := g.Player.Object.Shape.Intersection(0, 0, o.Shape); cs != nil {
-				g.Player.Object.X += cs.MTV.X()
-				g.Player.Object.Y += cs.MTV.Y()
+				g.Player.Object.Position.X += cs.MTV.X
+				g.Player.Object.Position.Y += cs.MTV.Y
 			}
 		}
 	}
@@ -604,12 +604,12 @@ func Shoot(g *GameScreen) {
 		g.Player.State = playerShooting
 		rangeOfFire := g.Player.Range
 		sX, sY := g.Space.WorldToSpace(
-			g.Player.Object.X-math.Cos(g.Player.Angle-math.Pi)*rangeOfFire,
-			g.Player.Object.Y-math.Sin(g.Player.Angle-math.Pi)*rangeOfFire,
+			g.Player.Object.Position.X-math.Cos(g.Player.Angle-math.Pi)*rangeOfFire,
+			g.Player.Object.Position.Y-math.Sin(g.Player.Angle-math.Pi)*rangeOfFire,
 		)
 		pX, pY := g.Space.WorldToSpace(
-			g.Player.Object.X+g.Player.Object.W/2,
-			g.Player.Object.Y+g.Player.Object.H/2,
+			g.Player.Object.Position.X+g.Player.Object.Size.X/2,
+			g.Player.Object.Position.Y+g.Player.Object.Size.Y/2,
 		)
 		cells := g.Space.CellsInLine(pX, pY, sX, sY)
 		for _, c := range cells {

@@ -90,7 +90,7 @@ func (s *SpawnPoint) SpawnZombie(g *GameScreen) {
 
 	z := NewZombie(s, nc, s.ZombieType, sprites)
 
-	z.Target = g.Player.Object
+	z.Target = &g.Player.Object.Position
 	g.Space.Add(z.Object)
 
 	if s.ZombieType == zombieBig {
@@ -117,7 +117,7 @@ func (s *SpawnPoint) Update(g *GameScreen) {
 		return
 	}
 
-	playerDistance := CalcDistance(s.Position.X, s.Position.Y, g.Player.Object.X, g.Player.Object.Y)
+	playerDistance := CalcDistance(s.Position.X, s.Position.Y, g.Player.Object.Position.X, g.Player.Object.Position.Y)
 
 	// Spawn point is activated if the player is close enougn, but not too close
 	if playerDistance < spawnMaxDistance && playerDistance > spawnMinDistance {

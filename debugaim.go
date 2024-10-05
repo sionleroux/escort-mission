@@ -21,12 +21,12 @@ func init() {
 func DebugAim(g *GameScreen, screen *ebiten.Image) {
 	rangeOfFire := g.Player.Range
 	sX, sY := g.Camera.GetScreenCoords(
-		g.Player.Object.X-math.Cos(g.Player.Angle-math.Pi)*rangeOfFire,
-		g.Player.Object.Y-math.Sin(g.Player.Angle-math.Pi)*rangeOfFire,
+		g.Player.Object.Position.X-math.Cos(g.Player.Angle-math.Pi)*rangeOfFire,
+		g.Player.Object.Position.Y-math.Sin(g.Player.Angle-math.Pi)*rangeOfFire,
 	)
 	pX, pY := g.Camera.GetScreenCoords(
-		g.Player.Object.X,
-		g.Player.Object.Y,
+		g.Player.Object.Position.X,
+		g.Player.Object.Position.Y,
 	)
 	ebitenutil.DrawLine(screen, pX, pY, sX, sY, color.Black)
 }

@@ -107,7 +107,7 @@ func (d *Dog) Reset(cp int, x, y float64) {
 	d.CurrentPath = d.MainPath
 	d.CurrentPath.NextPoint = d.findClosestPathPoint(x, y)
 	d.OnMainPath = true
-	d.Object.X, d.Object.Y = x, y
+	d.Object.Position.X, d.Object.Position.Y = x, y
 	d.turnTowardsPathPoint()
 }
 
@@ -152,7 +152,7 @@ func (d *Dog) planFleeingRoute(vector Coord, g *GameScreen) *Path {
 	fleeingPath := &Path{}
 	nv := NormalizeVector(vector)
 	fleeingPath.Points = []Coord{
-		{X: d.Object.X + nv.X*fleeingPathLength, Y: d.Object.Y + nv.Y*fleeingPathLength},
+		{X: d.Object.Position.X + nv.X*fleeingPathLength, Y: d.Object.Position.Y + nv.Y*fleeingPathLength},
 	}
 	return fleeingPath
 }
@@ -161,7 +161,7 @@ func (d *Dog) planFleeingRoute(vector Coord, g *GameScreen) *Path {
 func (d *Dog) planRouteBackToMainPath(g *GameScreen) *Path {
 	returnPath := &Path{}
 	returnPath.Points = g.LevelMap.FindPath(
-		Coord{X: d.Object.X, Y: d.Object.Y},
+		Coord{X: d.Object.Position.X, Y: d.Object.Position.Y},
 		d.LastPathCoord,
 	)
 	returnPath.Points[len(returnPath.Points)-1] = d.LastPathCoord
@@ -257,7 +257,7 @@ func (d *Dog) Update(g *GameScreen) {
 	d.updateState(g)
 
 	// If the dog is out of the screen for too long then it dies
-	sx, sy := g.Camera.GetScreenCoords(d.Object.X, d.Object.Y)
+	sx, sy := g.Camera.GetScreenCoords(d.Object.Position.X, d.Object.Position.Y)
 	if sx < 0 || sy < 0 || sx > float64(g.Width) || sy > float64(g.Height) {
 		d.OutOfSightCounter++
 		if d.OutOfSightCounter > outOfSightLimit {
@@ -342,8 +342,8 @@ func (d *Dog) walk(g *GameScreen) {
 
 // TurnTowardsCoordinate turns the dog to the direction of the point
 func (d *Dog) turnTowardsCoordinate(coord Coord) {
-	adjacent := coord.X - d.Object.X
-	opposite := coord.Y - d.Object.Y
+	adjacent := coord.X - d.Object.Position.X
+	opposite := coord.Y - d.Object.Position.Y
 	d.Angle = math.Atan2(opposite, adjacent)
 }
 
@@ -353,7 +353,7 @@ func (d *Dog) turnTowardsPathPoint() {
 }
 
 func (d *Dog) followPlayer(g *GameScreen) {
-	d.turnTowardsCoordinate(Coord{X: g.Player.Object.X, Y: g.Player.Object.Y})
+	d.turnTowardsCoordinate(Coord{X: g.Player.Object.Position.X, Y: g.Player.Object.Position.Y})
 
 	d.move(
 		math.Cos(d.Angle)*dogWalkingSpeed*d.TempSpeed,
@@ -368,7 +368,7 @@ func (d *Dog) followPath(g *GameScreen) {
 	}
 
 	nextPoint := d.CurrentPath.Points[d.CurrentPath.NextPoint]
-	nextPathCoordDistance := CalcDistance(nextPoint.X, nextPoint.Y, d.Object.X, d.Object.Y)
+	nextPathCoordDistance := CalcDistance(nextPoint.X, nextPoint.Y, d.Object.Position.X, d.Object.Position.Y)
 	if nextPathCoordDistance < 2 {
 		d.CurrentPath.NextPoint++
 		if d.CurrentPath.NextPoint == len(d.CurrentPath.Points) {
@@ -454,8 +454,8 @@ func (d *Dog) move(dx, dy float64) {
 		}
 	}
 
-	d.Object.X += dx
-	d.Object.Y += dy
+	d.Object.Position.X += dx
+	d.Object.Position.Y += dy
 }
 
 // Draw draws the Dog to the screen
@@ -483,8 +483,8 @@ func (d *Dog) Draw(g *GameScreen) {
 		)).(*ebiten.Image),
 		g.Camera.GetTranslation(
 			op,
-			float64(d.Object.X),
-			float64(d.Object.Y),
+			float64(d.Object.Position.X),
+			float64(d.Object.Position.Y),
 		),
 	)
 }
@@ -492,7 +492,7 @@ func (d *Dog) Draw(g *GameScreen) {
 // Position returns the Dog's current coordinates
 func (d *Dog) Position() *Coord {
 	return &Coord{
-		X: d.Object.X,
-		Y: d.Object.Y,
+		X: d.Object.Position.X,
+		Y: d.Object.Position.Y,
 	}
 }
